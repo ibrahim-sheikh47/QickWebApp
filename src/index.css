@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@font-face {
+    font-family: "PJSregular" ;
+    src: url(../src/assets/fonts/Regular.ttf);
+}
+@font-face {
+    font-family: "PJSbold" ;
+    src: url(../src/assets/fonts/Bold.ttf);
+}
+@font-face {
+    font-family: "PJSextra" ;
+    src: url(../src/assets/fonts/ExtraBold.ttf);
+}
+@font-face {
+    font-family: "PJSmedium" ;
+    src: url(../src/assets/fonts/Medium.ttf);
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+@keyframes zoomIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+.animate-zoom-in {
+    animation: zoomIn 0.3s ease-in-out;
+}
+.selectIcon{
+    background-image: url('assets/svgs/Down.svg');
+    background-size: 20px;
+    background-position: right 20px center;
+    background-repeat: no-repeat;
+}
+.placeholder-black::placeholder {
+    color: black;
+}
+  .bg-image::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("./assets/bg-image.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    filter: blur(10px);
+    z-index: -1;
+  }
+
