@@ -1,15 +1,11 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 
-//images
-import image from "../../assets/SignIn.png";
-import logo from "../../assets/logo.png";
-import eye from "../../assets/svgs/EyeSlash.svg";
-import eyeOpen from "../../assets/view.png";
 //forms
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import assets from "../../assets/assets"
 
 //react
 import { useState } from "react";
@@ -43,7 +39,7 @@ const SignIn = () => {
     <div className="flex justify-center items-center min-w-full min-h-screen bg-image relative">
       <div className="flex flex-col bg-white min-w-[508px] h-[560px] rounded-l-[20px] overflow-hidden">
         <div className="h-[50px] w-[508px] bg-primary flex justify-start items-center">
-          <img src={logo} className="px-5 w-auto h-[36px]" />
+          <img src={assets.logo} className="px-5 w-auto h-[36px]" />
         </div>
         <div className="flex items-start justify-center h-full px-5 flex-col w-full">
           <div className="font-PJSextra text-[26px] ">Sign In</div>
@@ -74,13 +70,13 @@ const SignIn = () => {
                 Password
               </label>
               <div className="mr-3 cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
-                <img src={showPassword ? eyeOpen : eye} className="w-6 h-6" />
+                <img src={showPassword ? assets.eyeOpen : assets.eye} className="w-6 h-6" />
               </div>
             </div>
             {/* {errors.password && <span className="error text-sm font-PJSmedium  text-redbutton">{errors.password.message}</span>} */}
             <button
               type="submit"
-              onClick={() => navigate("/Dashboard")}
+              onClick={() => navigate("/Dashboard/Reports")}
               className="bg-lime w-full h-[50px] rounded-[100px] mt-4 text-[14px] font-PJSmedium transition duration-300 ease-in-out transform hover:scale-105"
             >
               Sign In
@@ -101,7 +97,7 @@ const SignIn = () => {
         </div>
       </div>
       <div className="min-w-[508px] h-[560px] ">
-        <img src={image} className="w-[508px] h-full object-cover rounded-r-[20px]" />
+        <img src={assets.bgImage} className="w-[508px] h-full object-cover rounded-r-[20px]" />
       </div>
     </div>
   );

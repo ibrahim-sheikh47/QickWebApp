@@ -3,14 +3,10 @@
 /* eslint-disable react/prop-types */
 import { Link } from "react-router-dom";
 import { AppModal } from "../../../components";
-import PlusIcon from "../../../assets/svgs/Plus-notify.svg";
-import Calendar from "../../../assets/svgs/Calendarblue.svg";
-import Info from "../../../assets/svgs/Info2.svg";
-import Check from "../../../assets/svgs/CheckCircle.svg";
-import Cross from "../../../assets/svgs/XCircle.svg";
-import Discount from "../../../assets/svgs/SealPercent.svg";
+
 import { useState } from "react";
 import BookingDetails from "./BookingDetails";
+import assets from "../../../assets/assets";
 
 ////////////MODALS FOR GENERAL NOTIFICATION/////////////
 const NewBookingModal = ({ isOpen, onClose }) => {
@@ -37,7 +33,7 @@ const NewBookingModal = ({ isOpen, onClose }) => {
             <AppModal modalopen={isOpen} onClose={onClose} height="auto" width="auto">
                 <div className="text-center mt-12 flex flex-col">
                     <div className="mx-auto p-3 rounded-full w-[max-content] bg-[#ebf9fb]">
-                        <img className="w-8" src={PlusIcon} alt="" />
+                        <img className="w-8" src={assets.PlusIcon} alt="" />
                     </div>
                     <h2 className="font-PJSbold text-lg mt-5">New Booking</h2>
                     <p className="mt-2 w-80 mx-auto text-secondary font-PJSregular text-[14px]">
@@ -76,7 +72,7 @@ const NewBookingModal = ({ isOpen, onClose }) => {
             <AppModal modalopen={isCancelConfirmationModalOpen} onClose={() => setIsCancelConfirmationModalOpen(false)} height="auto" width="auto">
                 <div className="text-center mt-12 flex flex-col">
                     <div className="mx-auto p-3 rounded-full w-[max-content] bg-[#ebf9fb]">
-                        <img className="w-8" src={Info} alt="" />
+                        <img className="w-8" src={assets.Info} alt="" />
                     </div>
                     <h2 className="font-PJSbold text-lg mt-5">Cancel Booking</h2>
                     <p className="mt-2 w-80 mx-auto text-secondary font-PJSregular text-[14px]">
@@ -133,7 +129,7 @@ const NewBookingRequestModal = ({ isOpen, onClose }) => {
             <AppModal modalopen={isOpen} onClose={onClose} height="auto" width="auto">
                 <div className="text-center mt-12 flex flex-col">
                     <div className="mx-auto p-3 rounded-full w-[max-content] bg-[#ebf9fb]">
-                        <img className="w-8" src={Calendar} alt="" />
+                        <img className="w-8" src={assets.Calendar} alt="" />
                     </div>
                     <h2 className="font-PJSbold text-lg mt-5">New Booking Request</h2>
                     <p className="mt-2 w-80 mx-auto text-secondary font-PJSregular text-[14px]">
@@ -172,7 +168,7 @@ const NewBookingRequestModal = ({ isOpen, onClose }) => {
             <AppModal modalopen={isBookingRequestModalOpen} onClose={() => setIsBookingRequestModalOpen(false)} height="auto" width="auto">
                 <div className="text-center mt-12 flex flex-col">
                     <div className="mx-auto p-3 rounded-full w-[max-content] bg-[#ebf9fb]">
-                        <img className="w-8" src={Check} alt="" />
+                        <img className="w-8" src={assets.Check} alt="" />
                     </div>
                     <h2 className="font-PJSbold text-lg mt-5">Booking Request Accepted</h2>
                     <p className="mt-2 w-80 mx-auto text-secondary font-PJSregular text-[14px]">
@@ -217,7 +213,7 @@ const BookingRequestAcceptedModal = ({ isOpen, onClose }) => {
             <AppModal modalopen={isOpen} onClose={onClose} height="auto" width="auto">
                 <div className="text-center mt-12 flex flex-col">
                     <div className="mx-auto p-3 rounded-full w-[max-content] bg-[#e8faf3]">
-                        <img className="w-8" src={Check} alt="" />
+                        <img className="w-8" src={assets.Check} alt="" />
                     </div>
                     <h2 className="font-PJSbold text-lg mt-5">Booking Request Accepted</h2>
                     <p className="mt-2 w-80 mx-auto text-secondary font-PJSregular text-[14px]">
@@ -301,7 +297,7 @@ const BookingCanceledAdminModal = ({ isOpen, onClose }) => {
             <AppModal modalopen={isOpen} onClose={onClose} height="auto" width="auto">
                 <div className="text-center mt-12 flex flex-col">
                     <div className="mx-auto p-3 rounded-full w-[max-content] bg-[#fdeeee]">
-                        <img className="w-8" src={Cross} alt="" />
+                        <img className="w-8" src={assets.Cross} alt="" />
                     </div>
                     <h2 className="font-PJSbold text-lg mt-5">Booking Canceled: Admin</h2>
                     <p className="mt-2 w-80 mx-auto text-secondary font-PJSregular text-[14px]">
@@ -350,7 +346,7 @@ const BookingCanceledAdminModal = ({ isOpen, onClose }) => {
             <AppModal modalopen={isOpenMatchModalOpen} onClose={() => setIsOpenMatchModalOpen(false)} height="auto" width={500}>
                 <div className="text-center mt-12 flex flex-col">
                     <div className="mx-auto p-3 rounded-full w-[max-content] bg-[#ebf9fb]">
-                        <img className="w-8" src={Discount} alt="" />
+                        <img className="w-8" src={assets.Discount} alt="" />
                     </div>
                     <h2 className="font-PJSbold text-lg mt-5">Discount</h2>
                     <p className="mt-2 w-80 mx-auto text-secondary font-PJSregular text-[14px]">
@@ -390,7 +386,7 @@ const BookingCanceledAdminModal = ({ isOpen, onClose }) => {
             <AppModal modalopen={isOpenGameModalOpen} onClose={() => setIsOpenGameModalOpen(false)} height="auto" width="auto">
                 <div className="text-center mt-12 flex flex-col">
                     <div className="mx-auto p-3 rounded-full w-[max-content] bg-[#e8faf3]">
-                        <img className="w-8" src={Check} alt="" />
+                        <img className="w-8" src={assets.Check} alt="" />
                     </div>
                     <h2 className="font-PJSbold text-lg mt-5">Success</h2>
                     <p className="mt-2 w-80 mx-auto text-secondary font-PJSregular text-[14px]">
@@ -443,7 +439,7 @@ const PaymentReceivedModal = ({ isOpen, onClose }) => {
             <AppModal modalopen={isOpen} onClose={onClose} height="auto" width="auto">
                 <div className="text-center mt-12 flex flex-col">
                     <div className="mx-auto p-3 rounded-full w-[max-content] bg-[#ebf9fb]">
-                        <img className="w-8" src={Check} alt="" />
+                        <img className="w-8" src={assets.Check} alt="" />
                     </div>
                     <h2 className="font-PJSbold text-lg mt-5">Payment Received</h2>
                     <p className="mt-2 w-84 mx-auto text-secondary font-PJSregular text-[14px]">
@@ -485,7 +481,7 @@ const PaymentReceivedModal = ({ isOpen, onClose }) => {
             <AppModal modalopen={isPaymentReceivedModalOpen} onClose={() => setIsPaymentReceivedModalOpen(false)} height="auto" width="auto">
                 <div className="text-center mt-12 flex flex-col">
                     <div className="mx-auto p-3 rounded-full w-[max-content] bg-[#ebf9fb]">
-                        <img className="w-8" src={Info} alt="" />
+                        <img className="w-8" src={assets.Info} alt="" />
                     </div>
                     <h2 className="font-PJSbold text-lg mt-5">Allocate Credits</h2>
                     <p className="mt-2 w-80 mx-auto text-secondary font-PJSregular text-[14px]">
@@ -524,7 +520,7 @@ const PaymentReceivedModal = ({ isOpen, onClose }) => {
             <AppModal modalopen={isCreditAllocateModalOpen} onClose={() => setIsCreditAllocateModalOpen(false)} height="auto" width="auto">
                 <div className="text-center mt-12 flex flex-col">
                     <div className="mx-auto p-3 rounded-full w-[max-content] bg-[#ebf9fb]">
-                        <img className="w-8" src={Check} alt="" />
+                        <img className="w-8" src={assets.Check} alt="" />
                     </div>
                     <h2 className="font-PJSbold text-lg mt-5"> Credits Allocated</h2>
                     <p className="mt-2 w-96 mx-auto text-secondary font-PJSregular text-[14px]">
@@ -570,7 +566,7 @@ const UserCancelationModal = ({ isOpen, onClose }) => {
             <AppModal modalopen={isOpen} onClose={onClose} height="auto" width="auto">
                 <div className="text-center mt-12 flex flex-col">
                     <div className="mx-auto p-3 rounded-full w-[max-content] bg-[#e8faf3]">
-                        <img className="w-8" src={Check} alt="" />
+                        <img className="w-8" src={assets.Check} alt="" />
                     </div>
                     <h2 className="font-PJSbold text-lg mt-5">Payment Received: User Cancelation</h2>
                     <p className="mt-2 w-96 mx-auto text-secondary font-PJSregular text-[14px]">
@@ -617,7 +613,7 @@ const AdminCancelationModal = ({ isOpen, onClose }) => {
             <AppModal modalopen={isOpen} onClose={onClose} height="auto" width="auto">
                 <div className="text-center mt-12 flex flex-col">
                     <div className="mx-auto p-3 rounded-full w-[max-content] bg-[#e8faf3]">
-                        <img className="w-8" src={Check} alt="" />
+                        <img className="w-8" src={assets.Check} alt="" />
                     </div>
                     <h2 className="font-PJSbold text-lg mt-5">Payment Received: Admin Cancelation</h2>
                     <p className="mt-2 w-96 mx-auto text-secondary font-PJSregular text-[14px]">

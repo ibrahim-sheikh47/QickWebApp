@@ -1,7 +1,7 @@
 import { useState } from "react";
-import info from "../../../assets/svgs/Info.svg";
 import GeneralNotifications from "./GeneralNotifications";
 import PaymentNotifications from "./PaymentNotifications";
+import assets from "../../../assets/assets";
 
 const Notifications = () => {
     const [activeTab, setActiveTab] = useState("General");
@@ -17,7 +17,7 @@ const Notifications = () => {
                     <div className="flex items-center gap-1">
                         <div className="font-PJSbold text-2xl">Notifications</div>
                         <button onClick={() => handleTabClick("info")}>
-                            <img src={info} className="w-[20px] h-[20px]" alt="Info" />
+                            <img src={assets.info} className="w-[20px] h-[20px]" alt="Info" />
                         </button>
                     </div>
                     <div className="font-PJSregular text-[14px] text-secondary">
@@ -43,10 +43,10 @@ const Notifications = () => {
 
             </div>
             {activeTab === "General" && (
-                <div><GeneralNotifications/></div>
+                <div><GeneralNotifications /></div>
             )}
             {activeTab === "Payments" && (
-                <div><PaymentNotifications/></div>
+                <div><PaymentNotifications /></div>
             )}
         </>
     );

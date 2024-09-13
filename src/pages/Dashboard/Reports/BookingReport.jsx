@@ -1,9 +1,6 @@
-import Back from "../../../assets/svgs/back.svg";
-import search from "../../../assets/svgs/Search.svg";
-import down from "../../../assets/svgs/Down.svg";
-import download from "../../../assets/svgs/Export.svg";
+
+
 import { useState } from "react";
-import CheckCircle from "../../../assets/svgs/CheckCircleBlue.svg";
 import {
     NewBookingModal,
     RecurringBookingModal,
@@ -13,6 +10,7 @@ import {
 } from "./ReportsDetails";
 import { bookings } from "../../../constants/reportsIndex";
 import { AppModal } from "../../../components";
+import assets from "../../../assets/assets";
 
 const BookingReport = () => {
 
@@ -72,7 +70,7 @@ const BookingReport = () => {
             <div className="bg-white rounded-lg mt-5 p-4">
                 <div className="flex items-center justify-between p-5">
                     <div className="flex items-center gap-4"  >
-                        <img src={Back} alt="Back" onClick={backNav} className="cursor-pointer" />
+                        <img src={assets.Back} alt="Back" onClick={backNav} className="cursor-pointer" />
                         <p className="text-2xl font-PJSbold text-primary">Bookings
                             <span className="text-secondary font-PJSregular text-sm ml-1">(271 Results)</span>
                         </p>
@@ -86,22 +84,22 @@ const BookingReport = () => {
                                 />
                                 <img
                                     className="absolute inset-y-0 my-auto h-8 w-12 border-r border-transparent stroke-gray-500 px-3.5 peer-focus:border-lime-300 peer-focus:stroke-lime-500"
-                                    src={search}
+                                    src={assets.search}
                                     alt="Search"
                                 />
                             </form>
                         </button>
                         <div className="border-2 border-secondaryThirty bg-transparent w-[170px] text-center justify-center flex h-[42px] rounded-full">
                             <p className="my-auto flex items-center text-sm gap-2 text-primary font-PJSmedium">1 Jan - 31 Jan 2021
-                                <img src={down} alt="Down" /></p>
+                                <img src={assets.down} alt="Down" /></p>
                         </div>
                         <div className="border-2 border-secondaryThirty bg-transparent w-[115px] text-center justify-center flex h-[42px] rounded-full relative cursor-pointer" onClick={openFieldModal}>
                             <p className="my-auto flex items-center text-sm gap-2 text-primary font-PJSmedium">All Fields
-                                <img src={down} alt="Down" /></p>
+                                <img src={assets.down} alt="Down" /></p>
                         </div>
                         <div className="border-2 border-secondaryThirty bg-transparent w-[130px] text-center justify-center flex h-[42px] rounded-full cursor-pointer" onClick={openDownloadModal}>
                             <p className="my-auto flex items-center text-sm gap-2 text-primary font-PJSmedium">
-                                <img src={download} className="w-5 h-5" alt="Download" />
+                                <img src={assets.download} className="w-5 h-5" alt="Download" />
                                 Download
                             </p>
                         </div>
@@ -171,7 +169,7 @@ const BookingReport = () => {
                 }}>
                 <div className="mt-0">
                     <div className="flex items-center gap-2">
-                        <img src={download} className="w-5 h-5" alt="" />
+                        <img src={assets.download} className="w-5 h-5" alt="" />
                         <p className="font-PJSmedium text-sm">Download</p>
                     </div>
                     <div className="h-[1px] w-full my-3 bg-secondaryThirty"></div>
@@ -179,15 +177,15 @@ const BookingReport = () => {
                     <div className="font-PJSmedium text-sm flex flex-col gap-2">
                         <div className="flex items-center justify-between cursor-pointer" onClick={() => handleOptionSelect('As PDF')}>
                             <p>As PDF</p>
-                            {selectedOption === 'As PDF' && <img src={CheckCircle} className="w-5" alt="Check" />}
+                            {selectedOption === 'As PDF' && <img src={assets.CheckCircle} className="w-5" alt="Check" />}
                         </div>
                         <div className="flex items-center justify-between cursor-pointer" onClick={() => handleOptionSelect('As CSV')}>
                             <p>As CSV</p>
-                            {selectedOption === 'As CSV' && <img src={CheckCircle} className="w-5" alt="Check" />}
+                            {selectedOption === 'As CSV' && <img src={assets.CheckCircle} className="w-5" alt="Check" />}
                         </div>
                         <div className="flex items-center justify-between cursor-pointer" onClick={() => handleOptionSelect('As Excel')}>
                             <p>As Excel</p>
-                            {selectedOption === 'As Excel' && <img src={CheckCircle} className="w-5" alt="Check" />}
+                            {selectedOption === 'As Excel' && <img src={assets.CheckCircle} className="w-5" alt="Check" />}
                         </div>
                     </div>
                     <button
@@ -225,23 +223,23 @@ const BookingReport = () => {
                     <div className="font-PJSmedium text-sm flex flex-col gap-2">
                         <div className="flex items-center justify-between cursor-pointer" onClick={() => handleOptionSelect('All Fields')}>
                             <p className="underline">All Fields</p>
-                            {selectedOption === 'All Fields' && <img src={CheckCircle} className="w-5" alt="Check" />}
+                            {selectedOption === 'All Fields' && <img src={assets.CheckCircle} className="w-5" alt="Check" />}
                         </div>
                         <div className="flex items-center justify-between cursor-pointer" onClick={() => handleOptionSelect('East Field')}>
                             <p>East Field</p>
-                            {selectedOption === 'East Field' && <img src={CheckCircle} className="w-5" alt="Check" />}
+                            {selectedOption === 'East Field' && <img src={assets.CheckCircle} className="w-5" alt="Check" />}
                         </div>
                         <div className="flex items-center justify-between cursor-pointer" onClick={() => handleOptionSelect('Jr Field')}>
                             <p>Jr Field</p>
-                            {selectedOption === 'Jr Field' && <img src={CheckCircle} className="w-5" alt="Check" />}
+                            {selectedOption === 'Jr Field' && <img src={assets.CheckCircle} className="w-5" alt="Check" />}
                         </div>
                         <div className="flex items-center justify-between cursor-pointer" onClick={() => handleOptionSelect('North Field')}>
                             <p>North Field</p>
-                            {selectedOption === 'North Field' && <img src={CheckCircle} className="w-5" alt="Check" />}
+                            {selectedOption === 'North Field' && <img src={assets.CheckCircle} className="w-5" alt="Check" />}
                         </div>
                         <div className="flex items-center justify-between cursor-pointer" onClick={() => handleOptionSelect('South Field')}>
                             <p>South Field</p>
-                            {selectedOption === 'South Field' && <img src={CheckCircle} className="w-5" alt="Check" />}
+                            {selectedOption === 'South Field' && <img src={assets.CheckCircle} className="w-5" alt="Check" />}
                         </div>
                     </div>
                     <button

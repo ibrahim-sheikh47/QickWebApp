@@ -2,21 +2,21 @@ import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 // Pages
 import {
+  BookingReport,
   Calendar,
   Chats,
+  CreditHolderReport,
   Dashboard,
   Notifications,
   Profile,
   Reports,
+  SalesReport,
   SignIn,
   SignUp,
+  SplashScreen,
   Users,
+  UsersReport,
 } from "../pages";
-import SplashScreen from "../pages/SplashScreen";
-import BookingReport from "../pages/Dashboard/Reports/BookingReport";
-import SalesReport from "../pages/Dashboard/Reports/SalesReport";
-import UsersReport from "../pages/Dashboard/Reports/UsersReport";
-import CreditHolderReport from "../pages/Dashboard/Reports/CreditHolderReport";
 
 export const AppNavigation = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1000);
@@ -31,7 +31,11 @@ export const AppNavigation = () => {
   }, []);
 
   if (isMobile) {
-    return <div className="text-center items-center justify-center min-h-screen flex  text-2xl font-PJSbold">OPEN MOBILE APP</div>;
+    return <div className=
+      "text-center items-center justify-center min-h-screen flex bg-secondary">
+      <p className="bg-black text-lime p-10 rounded-2xl text-2xl font-PJSbold">
+        SWITCH TO MOBILE APP</p>
+    </div>;
   }
 
   return (

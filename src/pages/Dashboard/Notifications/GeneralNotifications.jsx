@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import circle from "../../../assets/circle.png";
 import { notificationsData } from "../../../constants/notification-index";
 import { BookingCanceledAdminModal, BookingCanceledUsersModal, BookingConfirmedModal, BookingRequestAcceptedModal, NewBookingModal, NewBookingRequestModal } from "./Modals";
+import assets from "../../../assets/assets";
 
 const GeneralNotifications = () => {
     const [isNewBooking, setIsNewBooking] = useState(false);
@@ -62,9 +62,9 @@ const GeneralNotifications = () => {
                                 <p className="font-PJSbold text-[18px]">{notification.title}</p>
                                 <p className="flex items-center gap-3 text-[14px] text-secondary">
                                     <span>{notification.name}</span>
-                                    <img className="w-2" src={circle} alt="" />
+                                    <img className="w-2" src={assets.circle} alt="" />
                                     <span>{notification.date}</span>
-                                    <img className="w-2" src={circle} alt="" />
+                                    <img className="w-2" src={assets.circle} alt="" />
                                     <span>{notification.time}</span>
                                 </p>
                             </div>

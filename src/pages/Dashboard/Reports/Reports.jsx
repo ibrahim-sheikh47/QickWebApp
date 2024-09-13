@@ -1,13 +1,11 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
-import down from "../../../assets/svgs/Down.svg";
-import club from "../../../assets/club.png";
 import AppModal from "../../../components/AppModal/AppModal";
 import { DateRange } from 'react-date-range';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
-import CheckCircle from "../../../assets/svgs/CheckCircleBlue.svg";
 import { BookingBar, CreditHolderChart, SalesBar, UsersChart } from "./Charts";
+import assets from "../../../assets/assets";
 
 const Section = ({ title, children, date, onDateClick }) => (
   <div className="md:w-1/2 w-full h-[400px] rounded-xl bg-white shadow-sm drop-shadow-sm p-4">
@@ -15,7 +13,7 @@ const Section = ({ title, children, date, onDateClick }) => (
       <p className="text-2xl text-primary font-PJSextra">{title}</p>
       <p onClick={onDateClick} className="text-sm text-primary font-PJSbold flex items-center gap-2 cursor-pointer">
         {date}
-        <img className="w-5" src={down} alt="Expand date options" />
+        <img className="w-5" src={assets.down} alt="Expand date options" />
       </p>
     </div>
     {children}
@@ -110,7 +108,7 @@ const Reports = () => {
         <div className="relative cursor-pointer">
           <p onClick={() => openModal('facility')} className="font-PJSextra text-3xl text-primary flex items-center gap-3">
             Futeca
-            <img src={down} className="w-6" alt="Expand facility options" />
+            <img src={assets.down} className="w-6" alt="Expand facility options" />
           </p>
           <AppModal
             modalopen={isModalOpen.facility}
@@ -126,17 +124,17 @@ const Reports = () => {
               <p className="text-lg font-PJSbold mt-3">Select a facility</p>
               <div className="flex items-center justify-between mt-6 cursor-pointer" onClick={() => handleFacilitySelect('Miami One Soccer')}>
                 <div className="flex items-center gap-3">
-                  <img src={club} alt="Club" className="w-8 h-8 rounded-full" />
+                  <img src={assets.club} alt="Club" className="w-8 h-8 rounded-full" />
                   <p className="text-sm font-PJSregular">Miami One Soccer</p>
                 </div>
-                {selectedFacility === 'Miami One Soccer' && <img src={CheckCircle} className="w-6" alt="Selected" />}
+                {selectedFacility === 'Miami One Soccer' && <img src={assets.CheckCircle} className="w-6" alt="Selected" />}
               </div>
               <div className="flex items-center justify-between mt-6 cursor-pointer" onClick={() => handleFacilitySelect('Orlando One Soccer')}>
                 <div className="flex items-center gap-3">
-                  <img src={club} alt="Club" className="w-8 h-8 rounded-full" />
+                  <img src={assets.club} alt="Club" className="w-8 h-8 rounded-full" />
                   <p className="text-sm font-PJSregular">Orlando One Soccer</p>
                 </div>
-                {selectedFacility === 'Orlando One Soccer' && <img src={CheckCircle} className="w-6" alt="Selected" />}
+                {selectedFacility === 'Orlando One Soccer' && <img src={assets.CheckCircle} className="w-6" alt="Selected" />}
               </div>
               <button
                 className="w-full mt-12 transition duration-300 ease-in-out transform hover:scale-105 h-[40px] text-[14px] rounded-full bg-lime font-PJSmedium justify-center items-center"

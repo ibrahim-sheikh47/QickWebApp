@@ -1,11 +1,6 @@
 import { useState } from "react";
 
-//images
-import image from "../../assets/SignIn.png";
-import logo from "../../assets/logo.png";
-import eye from "../../assets/svgs/EyeSlash.svg";
-import eyeOpen from "../../assets/view.png";
-
+import assets from "../../assets/assets"
 //forms
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -49,7 +44,7 @@ const SignUp = () => {
     <div className="flex justify-center items-center min-w-full min-h-screen bg-image relative">
       <div className="flex flex-col bg-white min-w-[508px] h-[900px] rounded-l-[20px] overflow-hidden my-5 mb-5">
         <div className="h-[50px] w-[508px] bg-primary flex justify-start items-center">
-          <img src={logo} className="px-5 w-auto h-[35px]" />
+          <img src={assets.logo} className="px-5 w-auto h-[35px]" />
         </div>
         <div className="flex items-start justify-center h-full px-5 flex-col w-full">
           <div className="font-PJSextra text-[26px] ">Sign Up</div>
@@ -126,7 +121,7 @@ const SignUp = () => {
                 className=" font-PJSmedium text-primary text-[14px] outline-none appearance-none w-[80%]  h-full"
               />
               <div className="mr-3 cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
-                <img src={showPassword ? eyeOpen : eye} className="w-6 h-6" />
+                <img src={showPassword ? assets.eyeOpen : assets.eye} className="w-6 h-6" />
               </div>
             </div>
             {/* {errors.password && <span className="error text-sm font-PJSmedium  text-redbutton">{errors.password.message}</span>} */}
@@ -156,7 +151,7 @@ const SignUp = () => {
         </div>
       </div>
       <div className="min-w-[508px] h-[900px] rounded-r-[20px]">
-        <img src={image} className="w-[508px] h-full" />
+        <img src={assets.bgImage} className="w-[508px] h-full" />
       </div>
     </div>
   );

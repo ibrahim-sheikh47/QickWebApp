@@ -1,21 +1,11 @@
 import { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Outlet, Link, useNavigate } from "react-router-dom";
-
-// Assets
-import logo from "../../assets/logo.png";
 import { HiBars3BottomLeft } from "react-icons/hi2";
-import calendarsvg from "../../assets/svgs/Calendar.svg";
-import profileicon from "../../assets/svgs/User-black.svg";
-import piesvg from "../../assets/svgs/PieChart.svg";
-import chatsvg from "../../assets/svgs/Chat.svg";
-import search from "../../assets/svgs/Search.svg";
-import bell from "../../assets/svgs/Bell.svg";
-import logout from "../../assets/svgs/SignOut.svg";
-import club from "../../assets/club.png";
 
 // Components
 import { AppModal } from "../../components";
+import assets from "../../assets/assets";
 
 // Utility Function
 function classNames(...classes) {
@@ -24,7 +14,9 @@ function classNames(...classes) {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [selectedTab, setSelectedTab] = useState();
+
+  // Set "Reports" as the default tab
+  const [selectedTab, setSelectedTab] = useState("Reports");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notificationCount] = useState(3); // notification count set as 3 initially
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,9 +27,9 @@ const Dashboard = () => {
   };
 
   const adminNavigation = [
-    { name: "Calendar", link: "/Dashboard/Calendar", icon: calendarsvg },
-    { name: "Reports", link: "/Dashboard/Reports", icon: piesvg },
-    { name: "Chats", link: "/Dashboard/Chats", icon: chatsvg },
+    { name: "Calendar", link: "/Dashboard/Calendar", icon: assets.calendarsvg },
+    { name: "Reports", link: "/Dashboard/Reports", icon: assets.piesvg },
+    { name: "Chats", link: "/Dashboard/Chats", icon: assets.chatsvg },
   ];
 
   return (
@@ -78,7 +70,7 @@ const Dashboard = () => {
                   </button>
                 </div>
                 <div className="flex flex-shrink-0 items-center px-4">
-                  <img className="h-5 w-auto" src={logo} alt="Your Company" />
+                  <img className="h-5 w-auto" src={assets.logo} alt="Your Company" />
                 </div>
                 <nav className="mt-5 h-0 flex-1 overflow-y-auto space-y-1 px-2">
                   {adminNavigation.map((item) => (
@@ -107,7 +99,7 @@ const Dashboard = () => {
       {/* Static sidebar for desktop */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col bg-primary">
         <div className="flex h-16 items-center bg-primary px-6">
-          <img className="h-8 w-auto" src={logo} alt="Your Company" />
+          <img className="h-8 w-auto" src={assets.logo} alt="Your Company" />
         </div>
         <nav className="flex-1 overflow-y-auto space-y-1 px-2 py-4">
           {adminNavigation.map((item) => (
@@ -144,14 +136,14 @@ const Dashboard = () => {
           <div className="w-full flex justify-end items-center ">
             <div className="flex w-1/2 justify-center items-center ">
               <div className="w-[60%] flex items-center border border-secondaryThirty rounded-[100px] h-[40px] px-4 gap-4">
-                <img src={search} className="w-6 h-6" alt="Search" />
+                <img src={assets.search} className="w-6 h-6" alt="Search" />
                 <input
                   placeholder="Search keyword"
                   className="font-PJSmedium text-primary text-[14px] outline-none appearance-none w-[80%] h-full"
                 />
               </div>
-              <button className="flex justify-center items-center rounded-[100px] border border-secondaryThirty w-[40px] h-[40px] mx-5 relative bg-secondaryThirty hover:scale-110 transition duration-300 ease-in-out">
-                <img src={bell} className="w-5 h-5" alt="Notifications" />
+              <button className="flex justify-center items-center rounded-[100px] border border-secondaryThirty w-[40px] h-[40px] mx-5 relative bg-secondaryThirty hover:scale-110 transition duration-300 ease-in-out" onClick={() => navigate("/Dashboard/Notifications")}>
+                <img src={assets.bell} className="w-5 h-5" alt="Notifications" />
                 {notificationCount > 0 && (
                   <span className="absolute font-PJSbold top-2 right-[10px] -mt-1 -mr-1 bg-lime text-black font-semibold px-1 rounded-full text-[10px]">
                     {notificationCount}
@@ -160,7 +152,7 @@ const Dashboard = () => {
               </button>
 
               <div className="flex items-center gap-2 cursor-pointer" onClick={() => setIsModalOpen(true)}>
-                <img src={club} alt="Club" />
+                <img src={assets.club} alt="Club" />
                 <div className="font-PJSmedium">Futeca</div>
               </div>
             </div>
@@ -193,11 +185,11 @@ const Dashboard = () => {
       >
         <div className="flex flex-col space-y-2 font-PJSmedium">
           <button className="flex items-center gap-2" onClick={handleNav}>
-            <img src={profileicon} className="w-5 h-5" alt="Profile" />
+            <img src={assets.profileicon} className="w-5 h-5" alt="Profile" />
             Profile
           </button>
           <button className="text-redbutton flex items-center gap-2">
-            <img src={logout} className="w-5 h-5" alt="Logout" />
+            <img src={assets.logout} className="w-5 h-5" alt="Logout" />
             Logout
           </button>
         </div>

@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import circle from "../../../assets/circle.png";
 import { paymentNotifications } from "../../../constants/notification-index";
 import { AdminCancelationModal, AllocatedCreditsModal, PaymentReceivedModal, UserCancelationModal } from "./Modals";
-import dollar from "../../../assets/svgs/CurrencyDollar.svg"
+import assets from "../../../assets/assets";
 
 const GeneralNotifications = () => {
     const [isPaymentReceived, setIsPaymentReceived] = useState(false);
@@ -52,15 +51,15 @@ const GeneralNotifications = () => {
                 <React.Fragment key={notification.id}>
                     <div className="flex items-center cursor-pointer p-4 rounded-xl hover:bg-blueSecondary gap-5 h-[100px]" onClick={() => handleModel(notification.type)}>
                         <div className="p-3 rounded-full bg-[#e8faf3]">
-                            <img className="w-7" src={dollar} alt="" />
+                            <img className="w-7" src={assets.dollar} alt="" />
                         </div>
                         <div className="flex flex-col">
                             <p className="font-PJSbold text-[18px]">{notification.title}</p>
                             <p className="flex items-center gap-3 text-[14px] text-secondary">
                                 <span>{notification.name}</span>
-                                <img className="w-2" src={circle} alt="" />
+                                <img className="w-2" src={assets.circle} alt="" />
                                 <span>{notification.date}</span>
-                                <img className="w-2" src={circle} alt="" />
+                                <img className="w-2" src={assets.circle} alt="" />
                                 <span>{notification.time}</span>
                             </p>
                         </div>
