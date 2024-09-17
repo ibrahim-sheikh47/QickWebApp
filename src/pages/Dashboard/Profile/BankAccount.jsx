@@ -197,7 +197,7 @@ const BankAccount = () => {
                             className={`flex items-center justify-between mt-5 border-2 rounded-lg py-3 px-5 ${preferredAccount !== account.name ? 'opacity-50' : ''}`}
                         >
                             <div className="flex items-center gap-3">
-                                <img className="w-6" src={assets.account.icon} alt={account.name} />
+                                <img className="w-6" src={account.icon} alt={account.name} />
                                 <p>{account.name}</p>
                             </div>
                             <div className="flex items-center gap-8">

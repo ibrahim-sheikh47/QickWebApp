@@ -65,7 +65,7 @@ const BarChart = ({ data, selectedBar, setSelectedBar }) => {
 };
 
 const BookingBar = () => {
-    const [selectedBar, setSelectedBar] = useState(null);
+    const [selectedBar, setSelectedBar] = useState('Jr Field');
 
     const navigate = useNavigate();
     const handleNavigation = () => {
@@ -90,7 +90,7 @@ const BookingBar = () => {
                 className="flex justify-center items-center py-2 absolute bottom-0 my-1"
                 onClick={handleNavigation}
             >
-                <span className="text-[16px] font-PJSbold text-primary">
+                <span className="text-[16px] hover:text-primary font-PJSbold text-secondary">
                     See details
                 </span>
             </button>
@@ -199,7 +199,7 @@ const SalesBar = () => {
                 className="flex justify-center items-center py-2 absolute bottom-0 my-1"
                 onClick={handleNavigation}
             >
-                <span className="text-[16px] font-PJSbold text-primary">
+                <span className="text-[16px] hover:text-primary font-PJSbold text-secondary">
                     See details
                 </span>
             </button>
@@ -313,7 +313,7 @@ const UsersChart = () => {
             <button onClick={handleNavigation}
                 className="flex justify-center items-center py-2 absolute bottom-0 my-1"
             >
-                <span className="text-[16px] font-PJSbold text-primary">
+                <span className="text-[16px] hover:text-primary font-PJSbold text-secondary">
                     See details
                 </span>
             </button>
@@ -436,7 +436,7 @@ const CreditHolderChart = () => {
             <button onClick={handleNavigation}
                 className="flex justify-center items-center py-2 absolute bottom-0 my-1"
             >
-                <span className="text-[16px] font-PJSbold text-primary">
+                <span className="text-[16px] hover:text-primary font-PJSbold text-secondary">
                     See details
                 </span>
             </button>

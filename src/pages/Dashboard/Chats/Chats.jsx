@@ -1,41 +1,15 @@
-import React, { useState } from "react";
-
-//svgs
-import info from "../../../assets/svgs/Info.svg";
-import search from "../../../assets/svgs/Search.svg";
-import plus from "../../../assets/svgs/Plus.svg";
-import calendarblue from "../../../assets/svgs/Calendarblue.svg";
-import block from "../../../assets/svgs/Block.svg";
-import megaphone from "../../../assets/svgs/Megaphone.svg";
-import funnel from "../../../assets/svgs/FunnelSimple.svg";
-import down from "../../../assets/svgs/Down.svg";
-import cross from "../../../assets/svgs/Cross.svg";
-import checkwhite from "../../../assets/svgs/CheckWhite.svg";
-import usericon from "../../../assets/svgs/User.svg";
-import smiley from "../../../assets/svgs/Smiley.svg";
-import attachfile from "../../../assets/svgs/Paperclip.svg";
-import camera from "../../../assets/svgs/Camera.svg";
-import infolarge from "../../../assets/svgs/InfoLarge.svg";
-import checkblack from "../../../assets/svgs/CheckBlack.svg";
-import message from "../../../assets/svgs/EnvelopeSimple.svg";
-import phone from "../../../assets/svgs/Phone.svg";
-import hash from "../../../assets/svgs/Hash.svg";
-import calendar from "../../../assets/svgs/CalendarBlack.svg";
-
-//images
-import user from "../../../assets/user.png";
-
-//icons
-import { LuPlus } from "react-icons/lu";
-
+/* eslint-disable react/no-unknown-property */
+import { useState } from "react";
 //modal
 import { AppModal } from "../../../components";
-
 //forms
-import { useForm, useController } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { PushUsers, UserData } from "../../../constants";
+
+import assets from "../../../assets/assets";
+
 let selected = [];
 const Chats = () => {
   const [screenstate, setscreenstate] = useState(1);
@@ -113,7 +87,7 @@ const Chats = () => {
                 <div className="flex items-center gap-1">
                   <div>Chats</div>
                   <button onClick={openinfomodal}>
-                    <img src={info} className="w-[20px] h-[20px]" />
+                    <img src={assets.info} className="w-[20px] h-[20px]" />
                   </button>
                 </div>
                 <div className="font-PJSregular text-[14px] text-secondary">
@@ -123,14 +97,14 @@ const Chats = () => {
               {/* icons search and new chat */}
               <div className="flex flex-row justify-end items-center gap-3 w-[70%] ">
                 <button className="flex justify-center items-center rounded-[100px]  ">
-                  <form action="" class="relative mx-auto w-max">
+                  <form action="" className="relative mx-auto w-max">
                     <input
                       type="search"
-                      class="peer font-PJSregular text-[14px] cursor-pointer relative z-10 h-12 w-12 rounded-full border border-secondaryThirty bg-transparent pl-12 outline-none focus:w-[220px] focus:cursor-text focus:border-lime-300 focus:pl-10 focus:pr-4"
+                      className="peer font-PJSregular text-[14px] cursor-pointer relative z-10 h-12 w-12 rounded-full border border-secondaryThirty bg-transparent pl-12 outline-none focus:w-[220px] focus:cursor-text focus:border-lime-300 focus:pl-10 focus:pr-4"
                     />
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      class="absolute inset-y-0 my-auto h-8 w-12 border-r border-transparent stroke-gray-500 px-3.5 peer-focus:border-lime-300 peer-focus:stroke-lime-500"
+                      className="absolute inset-y-0 my-auto h-8 w-12 border-r border-transparent stroke-gray-500 px-3.5 peer-focus:border-lime-300 peer-focus:stroke-lime-500"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -145,7 +119,7 @@ const Chats = () => {
                   </form>
                 </button>
                 <button className="flex justify-center items-center rounded-[100px] bg-lime h-12 w-12">
-                  <img src={plus} className="w-5 h-5" />
+                  <img src={assets.plus} className="w-5 h-5" />
                 </button>
               </div>
 
@@ -163,17 +137,17 @@ const Chats = () => {
                     setscreenstate(2), console.log(screenstate);
                   }}
                 >
-                  <img src={megaphone} />
+                  <img src={assets.megaphone} />
                 </button>
                 <button className="h-10 w-10 rounded-full border border-secondaryThirty flex justify-center items-center">
-                  <img src={funnel} />
+                  <img src={assets.funnel} />
                 </button>
                 <button
                   onClick={opensortmodal}
                   className=" gap-2 font-PJSregular text-[14px] h-10 w-[100px] rounded-full border border-secondaryThirty flex justify-center items-center"
                 >
                   Sort:All
-                  <img src={down} />
+                  <img src={assets.down} />
                 </button>
               </div>
             </div>
@@ -229,7 +203,7 @@ const Chats = () => {
               <div className="flex flex-col justify-center  ">
                 <div className="flex items-center gap-2">
                   <div>
-                    <img src={user} className="w-[55px] h-[55px]" />
+                    <img src={assets.user} className="w-[55px] h-[55px]" />
                   </div>
                   <button className="text-[18px]">Angelina Marcus</button>
                 </div>
@@ -240,14 +214,14 @@ const Chats = () => {
                   onClick={opendetailsmodal}
                   className="flex gap-2 font-PJSmedium text-[12px] justify-center items-center rounded-[100px] bg-white w-[140px] h-[40px] "
                 >
-                  <img src={calendarblue} className="w-5 h-5" />
+                  <img src={assets.calendarblue} className="w-5 h-5" />
                   Booking Details
                 </button>
                 <button
                   onClick={openmodal}
                   className="flex gap-2 font-PJSmedium text-[12px] justify-center items-center rounded-[100px] bg-white w-[140px] h-[40px] "
                 >
-                  <img src={block} className="w-5 h-5" />
+                  <img src={assets.block} className="w-5 h-5" />
                   Block User
                 </button>
               </div>
@@ -257,7 +231,7 @@ const Chats = () => {
             {/* input */}
             <div className="flex bg-white h-[60px] w-[610px] absolute bottom-4 rounded-full items-center justify-between px-5">
               <button>
-                <img src={smiley} />
+                <img src={assets.smiley} />
               </button>
               <input
                 {...register("title")}
@@ -266,10 +240,10 @@ const Chats = () => {
               />
               <div className="flex gap-4">
                 <button>
-                  <img src={attachfile} />
+                  <img src={assets.attachfile} />
                 </button>
                 <button>
-                  <img src={camera} />
+                  <img src={assets.camera} />
                 </button>
               </div>
             </div>
@@ -279,7 +253,7 @@ const Chats = () => {
         </>
       ) : (
         <>
-          <div className="flex flex-col  w-[440px] h-[750px] bg-white rounded-l-[16px] border-r-[1px] border-secondaryTen">
+          <div className="flex flex-col  w-[500px] h-[750px] bg-white rounded-l-[16px] border-r-[1px] border-secondaryTen">
             <div className="flex justify-between px-4 mt-6 font-PJSbold text-[24px] h-[100px] w-full border-b-[1px] border-secondaryTwenty ">
               <div className="flex flex-col justify-center w-[400px]  ">
                 <div className="flex items-center gap-1">
@@ -289,14 +263,14 @@ const Chats = () => {
               {/* icons search and new chat */}
               <div className="flex flex-row justify-end items-center gap-3 w-[70%] ">
                 <button className="flex justify-center items-center rounded-[100px]  ">
-                  <form action="" class="relative mx-auto w-max">
+                  <form action="" className="relative mx-auto w-max">
                     <input
                       type="search"
-                      class="peer font-PJSregular text-[14px] cursor-pointer relative z-10 h-12 w-12 rounded-full border border-secondaryThirty bg-transparent pl-12 outline-none focus:w-[220px] focus:cursor-text focus:border-lime-300 focus:pl-10 focus:pr-4"
+                      className="peer font-PJSregular text-[14px] cursor-pointer relative z-10 h-12 w-12 rounded-full border border-secondaryThirty bg-transparent pl-12 outline-none focus:w-[220px] focus:cursor-text focus:border-lime-300 focus:pl-10 focus:pr-4"
                     />
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      class="absolute inset-y-0 my-auto h-8 w-12 border-r border-transparent stroke-gray-500 px-3.5 peer-focus:border-lime-300 peer-focus:stroke-lime-500"
+                      className="absolute inset-y-0 my-auto h-8 w-12 border-r border-transparent stroke-gray-500 px-3.5 peer-focus:border-lime-300 peer-focus:stroke-lime-500"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -314,7 +288,7 @@ const Chats = () => {
                   className="flex justify-center items-center rounded-[100px] border border-secondaryThirty h-12 w-12"
                   onClick={() => setscreenstate(1)}
                 >
-                  <img src={cross} className="w-5 h-5" />
+                  <img src={assets.cross} className="w-5 h-5" />
                 </button>
               </div>
 
@@ -339,7 +313,7 @@ const Chats = () => {
                     {/* image div */}
                     <div>
                       {/* Adjust the path to be relative to the current file */}
-                      <img src={item.image} alt="" className="w-12 h-12" />
+                      <img src={assets.item.image} alt="" className="w-12 h-12" />
                     </div>
                     {/* image div */}
                     {/* name and message */}
@@ -363,7 +337,7 @@ const Chats = () => {
                       onClick={() => handleFriends(item.name)}
                     >
                       {selected.includes(item.name) ? (
-                        <img src={checkwhite} />
+                        <img src={assets.checkwhite} />
                       ) : null}
                     </button>
                   </div>
@@ -373,12 +347,12 @@ const Chats = () => {
             </div>
           </div>
 
-          <div className="flex flex-col w-[660px] h-[750px] bg-white rounded-r-[16px]">
+          <div className="flex flex-col w-[700px] h-[750px] bg-white rounded-r-[16px]">
             <div className="flex justify-between px-6 mt-6 font-PJSbold text-[24px] h-[100px] w-full border-b-[1px] border-secondaryTwenty ">
               <div className="flex flex-col justify-center  ">
                 <div className="flex items-center gap-2">
                   <div className="w-[56px] h-[56px] rounded-full bg-secondaryTen flex justify-center items-center">
-                    <img src={usericon} className="w-6 h-6" />
+                    <img src={assets.usericon} className="w-6 h-6" />
                   </div>
                   <button className="text-[18px]">Selected Users</button>
                 </div>
@@ -421,7 +395,7 @@ const Chats = () => {
       >
         <div className="flex flex-col justify-center items-center">
           <div className="flex w-[80px] h-[80px] bg-secondaryTen rounded-full justify-center items-center">
-            <img src={infolarge} className="h-[48px] w-[48px]" />
+            <img src={assets.infolarge} className="h-[48px] w-[48px]" />
           </div>
           <div className="font-PJSbold text-[20px] mt-2">Block User</div>
           <div className="font-PJSregular text-[14px] mt-2 text-secondary">
@@ -453,7 +427,7 @@ const Chats = () => {
 
           <div className="flex gap-2 mt-6">
             <div className="flex justify-center font-PJSregular items-center h-[24px] w-[24px] rounded-full bg-lime">
-              <img src={checkblack} />
+              <img src={assets.checkblack} />
             </div>{" "}
             Booking confirmed by users or teams
           </div>
@@ -489,19 +463,19 @@ const Chats = () => {
             <div className="flex justify-between font-PJSmedium text-[14px]">
               Chats with active bookings
               <div className="flex justify-center items-center bg-blue w-[18px] h-[18px] rounded-[4px]">
-                <img src={checkwhite} className="w-[12px] h-[12px]" />
+                <img src={assets.checkwhite} className="w-[12px] h-[12px]" />
               </div>
             </div>
             <div className="flex justify-between font-PJSmedium text-[14px]">
               Chats with inactive bookings
               <div className="flex justify-center items-center bg-blue w-[18px] h-[18px] rounded-[4px]">
-                <img src={checkwhite} className="w-[12px] h-[12px]" />
+                <img src={assets.checkwhite} className="w-[12px] h-[12px]" />
               </div>
             </div>
             <div className="flex justify-between font-PJSmedium text-[14px]">
               Archived chats
               <div className="flex justify-center items-center bg-blue w-[18px] h-[18px] rounded-[4px]">
-                <img src={checkwhite} className="w-[12px] h-[12px]" />
+                <img src={assets.checkwhite} className="w-[12px] h-[12px]" />
               </div>
             </div>
           </div>
@@ -538,7 +512,7 @@ const Chats = () => {
             </div>
             <div className="flex justify-between items-center font-PJSmedium text-[14px]">
               <div className="flex items-center gap-2">
-                <img src={user} className="w-[56px] h-[56px]" />
+                <img src={assets.user} className="w-[56px] h-[56px]" />
                 <div className="flex flex-col">
                   <div className="font-PJSregular text-secondary">Name</div>
                   <div className="font-PJSregular underline">
@@ -557,7 +531,7 @@ const Chats = () => {
               <div className="flex justify-between items-center w-full">
                 <div className="flex items-center gap-2">
                   <div className="flex w-[48px] h-[48px] rounded-full bg-secondaryTen justify-center items-center">
-                    <img src={message} />
+                    <img src={assets.message} />
                   </div>
                   <div className="flex flex-col">
                     <div className="font-PJSregular text-secondary text-[12px]">
@@ -580,7 +554,7 @@ const Chats = () => {
               <div className="flex justify-between items-center w-full">
                 <div className="flex items-center gap-2">
                   <div className="flex w-[48px] h-[48px] rounded-full bg-secondaryTen justify-center items-center">
-                    <img src={phone} />
+                    <img src={assets.phone} />
                   </div>
                   <div className="flex flex-col">
                     <div className="font-PJSregular text-secondary text-[12px]">
@@ -603,7 +577,7 @@ const Chats = () => {
               <div className="flex justify-between items-center w-full">
                 <div className="flex items-center gap-2">
                   <div className="flex w-[48px] h-[48px] rounded-full bg-secondaryTen justify-center items-center">
-                    <img src={hash} />
+                    <img src={assets.hash} />
                   </div>
                   <div className="flex flex-col">
                     <div className="font-PJSregular text-secondary text-[12px]">
@@ -624,7 +598,7 @@ const Chats = () => {
               <div className="flex justify-between items-center w-full">
                 <div className="flex items-center gap-2">
                   <div className="flex w-[48px] h-[48px] rounded-full bg-secondaryTen justify-center items-center">
-                    <img src={calendar} />
+                    <img src={assets.calendar} />
                   </div>
                   <div className="flex flex-col gap-1">
                     <div className="font-PJSregular text-secondary text-[12px]">

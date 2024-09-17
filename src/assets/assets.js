@@ -29,7 +29,6 @@ import FacilityRules from "../assets/svgs/BookOpen.svg";
 import FacilityManagers from "../assets/svgs/User-black.svg";
 import Discounts from "../assets/svgs/Percent.svg";
 import dollar from "../assets/svgs/CurrencyDollar.svg";
-
 import close from "../assets/svgs/close.svg";
 import cameraIcon from "../assets/svgs/Camera-white.svg";
 import Plus from "../assets/svgs/Plus.svg";
@@ -52,10 +51,28 @@ import yellowcircle from "../assets/svgs/yellowcircle.svg";
 import percent from "../assets/svgs/Percent.svg";
 import linkicon from "../assets/svgs/Paperclip.svg";
 import copy from "../assets/copy.png";
-import bgImage from "../assets/SignIn.png"
+import bgImage from "../assets/SignIn.png";
+import plus from "../assets/svgs/Plus.svg";
+import calendarblue from "../assets/svgs/Calendarblue.svg";
+import block from "../assets/svgs/Block.svg";
+import megaphone from "../assets/svgs/Megaphone.svg";
+import funnel from "../assets/svgs/FunnelSimple.svg";
+import cross from "../assets/svgs/Cross.svg";
+import checkwhite from "../assets/svgs/CheckWhite.svg";
+import usericon from "../assets/svgs/User.svg";
+import smiley from "../assets/svgs/Smiley.svg";
+import attachfile from "../assets/svgs/Paperclip.svg";
+import camera from "../assets/svgs/Camera.svg";
+import infolarge from "../assets/svgs/InfoLarge.svg";
+import checkblack from "../assets/svgs/CheckBlack.svg";
+import message from "../assets/svgs/EnvelopeSimple.svg";
+import phone from "../assets/svgs/Phone.svg";
+import hash from "../assets/svgs/Hash.svg";
+import calendar from "../assets/svgs/CalendarBlack.svg";
+import user from "../assets/user.png";
+import splash from "../assets/bg-image.jpg";
 
-import splash from "../assets/bg-image.jpg"
-
+// Export all assets
 export default {
     splash,
     bgImage,
@@ -111,4 +128,22 @@ export default {
     percent,
     linkicon,
     copy,
+    plus,
+    calendarblue,
+    block,
+    megaphone,
+    funnel,
+    cross,
+    checkwhite,
+    usericon,
+    smiley,
+    attachfile,
+    camera,
+    infolarge,
+    checkblack,
+    message,
+    phone,
+    hash,
+    calendar,
+    user,
 };

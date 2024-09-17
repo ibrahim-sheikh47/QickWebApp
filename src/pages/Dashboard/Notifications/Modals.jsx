@@ -5,8 +5,8 @@ import { Link } from "react-router-dom";
 import { AppModal } from "../../../components";
 
 import { useState } from "react";
-import BookingDetails from "./BookingDetails";
 import assets from "../../../assets/assets";
+import BookingDetails from "../../../components/BookingDetails/BookingDetails";
 
 ////////////MODALS FOR GENERAL NOTIFICATION/////////////
 const NewBookingModal = ({ isOpen, onClose }) => {

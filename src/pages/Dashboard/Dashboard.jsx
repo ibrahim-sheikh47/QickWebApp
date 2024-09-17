@@ -25,6 +25,10 @@ const Dashboard = () => {
     navigate("/Dashboard/Profile");
     setIsModalOpen(false);
   };
+  const handleLogout = () => {
+    navigate("/SignIn");
+    setIsModalOpen(false);
+  };
 
   const adminNavigation = [
     { name: "Calendar", link: "/Dashboard/Calendar", icon: assets.calendarsvg },
@@ -188,7 +192,7 @@ const Dashboard = () => {
             <img src={assets.profileicon} className="w-5 h-5" alt="Profile" />
             Profile
           </button>
-          <button className="text-redbutton flex items-center gap-2">
+          <button className="text-redbutton flex items-center gap-2" onClick={handleLogout}>
             <img src={assets.logout} className="w-5 h-5" alt="Logout" />
             Logout
           </button>
