@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 // Pages
 import {
   BookingReport,
-  Calendar,
+  CalendarComponent,
   Chats,
   CreditHolderReport,
   Dashboard,
@@ -31,11 +31,13 @@ export const AppNavigation = () => {
   }, []);
 
   if (isMobile) {
-    return <div className=
-      "text-center items-center justify-center min-h-screen flex bg-secondary">
-      <p className="bg-black text-lime p-10 rounded-2xl text-2xl font-PJSbold">
-        SWITCH TO MOBILE APP</p>
-    </div>;
+    return (
+      <div className="text-center items-center justify-center min-h-screen flex bg-secondary">
+        <p className="bg-black text-lime p-10 rounded-2xl text-2xl font-PJSbold">
+          SWITCH TO MOBILE APP
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -44,7 +46,7 @@ export const AppNavigation = () => {
       <Route Component={SignIn} path="/SignIn" />
       <Route Component={SignUp} path="/SignUp" />
       <Route Component={Dashboard} path="/Dashboard">
-        <Route Component={Calendar} path="Calendar" />
+        <Route Component={CalendarComponent} path="Calendar" />
         <Route Component={Reports} path="Reports" />
         <Route Component={Chats} path="Chats" />
         <Route Component={Users} path="Users" />
@@ -53,9 +55,11 @@ export const AppNavigation = () => {
         <Route Component={BookingReport} path="Reports/BookingReport" />
         <Route Component={SalesReport} path="Reports/SalesReport" />
         <Route Component={UsersReport} path="Reports/UsersReport" />
-        <Route Component={CreditHolderReport} path="Reports/CreditHolderReport" />
+        <Route
+          Component={CreditHolderReport}
+          path="Reports/CreditHolderReport"
+        />
       </Route>
     </Routes>
   );
 };
-

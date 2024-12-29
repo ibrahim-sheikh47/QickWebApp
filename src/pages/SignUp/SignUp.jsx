@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-import assets from "../../assets/assets"
+import assets from "../../assets/assets";
 //forms
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -12,11 +12,31 @@ import { useNavigate } from "react-router-dom";
 //phoneinput
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import useFetch from "../../api/hooks/useFetch";
+import { login, signup } from "../../api/services/authService";
+import Loader from "../../components/Loader/Loader";
+import Toast from "../../components/Toast/Toast";
+import { createFacility } from "../../api/services/facilityService";
+import { useStateContext } from "../../context";
+
 const SignUp = () => {
+  const { setUser, setCurrentFacility } = useStateContext();
   const [value, setValue] = useState();
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [type, setType] = useState("success");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    if (isLoggedIn) {
+      navigate("/Dashboard/Reports");
+    }
+  }, []);
+
   const formSchema = yup.object().shape({
-    fullname: yup.string().required("Full Name is required."),
+    name: yup.string().required("Name is required."),
     facilityname: yup.string().required("Facility Name is required."),
     zipcode: yup.string().required("Zip Code is required."),
     password: yup.string().required("Password is required."),
@@ -24,20 +44,77 @@ const SignUp = () => {
     email: yup
       .string()
       .email("Please enter a valid Email")
-
-      .required("Facility Name is required."),
+      .required("Email is required."),
   });
-  const { register, handleSubmit, formState, } = useForm({
+
+  const { register, handleSubmit, formState } = useForm({
     resolver: yupResolver(formSchema),
     mode: "onChange",
   });
 
-  const { errors } = formState;
-  const onSubmit = (data) => {
-    console.log(data);
-    navigate("/Dashboard")
+  const getMyLocation = () => {
+    const location = window.navigator && window.navigator.geolocation;
+
+    if (location) {
+      location.getCurrentPosition(
+        (position) => {
+          return {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          };
+        },
+        (error) => {
+          return { latitude: null, longitude: null };
+        }
+      );
+    } else {
+      return { latitude: null, longitude: null };
+    }
   };
 
+  const { errors } = formState;
+  const onSubmit = async (data) => {
+    setLoading(true);
+    try {
+      const response = await signup(data);
+      if (response.existingUser) {
+        const loginResponse = await login({
+          email: data.email,
+          password: data.password,
+        });
+        if (loginResponse.existingUser) {
+          localStorage.setItem("authToken", loginResponse.token);
+          localStorage.setItem("isLoggedIn", true);
+          setUser(loginResponse.existingUser);
+
+          const body = {
+            zip: data.zipcode,
+            name: data.facilityname,
+            location: getMyLocation(),
+          };
+          const facility = await createFacility(
+            body,
+            response.existingUser._id
+          );
+          setCurrentFacility(facility);
+          showToast(response.message);
+          navigate("/Dashboard/Reports");
+        }
+      }
+    } catch (err) {
+      if (err.response && err.response.data) {
+        showToast(err.response.data.message, "error");
+      } else console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const showToast = (message, type = "success") => {
+    setMessage(message);
+    setType(type);
+    setOpen(true);
+  };
 
   const [showPassword, setShowPassword] = useState(false);
   return (
@@ -52,19 +129,30 @@ const SignUp = () => {
             Signing-up is a breeze!
           </div>
           {/* Input fields */}
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col w-full">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col w-full"
+          >
             <input
-              {...register("fullname")}
+              {...register("name")}
               placeholder="Full Name"
               className="border outline-none border-secondaryThirty w-full mt-4 rounded-[10px] h-[50px] px-4 font-PJSmedium text-primary text-[14px]"
             />
-            {errors.fullname && <span className="error text-sm font-PJSmedium  text-redbutton">{errors.fullname.message}</span>}
+            {errors.name && (
+              <span className="error text-sm font-PJSmedium  text-redbutton">
+                {errors.name.message}
+              </span>
+            )}
             <input
               {...register("facilityname")}
               placeholder="Facility Name"
               className="border outline-none border-secondaryThirty w-full mt-4 rounded-[10px] h-[50px] px-4 font-PJSmedium text-primary text-[14px]"
             />
-            {errors.facilityname && <span className="error text-sm font-PJSmedium  text-redbutton">{errors.facilityname.message}</span>}
+            {errors.facilityname && (
+              <span className="error text-sm font-PJSmedium  text-redbutton">
+                {errors.facilityname.message}
+              </span>
+            )}
             <input
               {...register("email")}
               placeholder="Email Address"
@@ -75,7 +163,7 @@ const SignUp = () => {
 
             <div className="mt-4">
               <PhoneInput
-                country={'hn'}
+                country={"hn"}
                 placeholder="Phone Number"
                 value={value}
                 onChange={(value) => setValue(value)}
@@ -120,8 +208,14 @@ const SignUp = () => {
                 type={showPassword ? "text" : "password"}
                 className=" font-PJSmedium text-primary text-[14px] outline-none appearance-none w-[80%]  h-full"
               />
-              <div className="mr-3 cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
-                <img src={showPassword ? assets.eyeOpen : assets.eye} className="w-6 h-6" />
+              <div
+                className="mr-3 cursor-pointer"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <img
+                  src={showPassword ? assets.eyeOpen : assets.eye}
+                  className="w-6 h-6"
+                />
               </div>
             </div>
             {/* {errors.password && <span className="error text-sm font-PJSmedium  text-redbutton">{errors.password.message}</span>} */}
@@ -132,7 +226,8 @@ const SignUp = () => {
               rows={4}
             />
 
-            <button type="submit"
+            <button
+              type="submit"
               className="bg-lime w-full h-[50px] rounded-[100px] mt-4 text-[14px] font-PJSmedium transition duration-300 ease-in-out transform hover:scale-105"
             >
               Sign Up
@@ -153,6 +248,10 @@ const SignUp = () => {
       <div className="min-w-[508px] h-[900px] rounded-r-[20px]">
         <img src={assets.bgImage} className="w-[508px] h-full" />
       </div>
+
+      <Toast open={open} setOpen={setOpen} message={message} type={type} />
+
+      {loading && <Loader />}
     </div>
   );
 };

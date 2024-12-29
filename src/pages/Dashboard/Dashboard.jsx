@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import { HiBars3BottomLeft } from "react-icons/hi2";
@@ -6,6 +6,10 @@ import { HiBars3BottomLeft } from "react-icons/hi2";
 // Components
 import { AppModal } from "../../components";
 import assets from "../../assets/assets";
+import { useStateContext } from "../../context";
+import { getFacilities } from "../../api/services/facilityService";
+import Loader from "../../components/Loader/Loader";
+import Toast from "../../components/Toast/Toast";
 
 // Utility Function
 function classNames(...classes) {
@@ -13,6 +17,8 @@ function classNames(...classes) {
 }
 
 const Dashboard = () => {
+  const { user, currentFacility, setCurrentFacility, setMyFacilities } =
+    useStateContext();
   const navigate = useNavigate();
 
   // Set "Reports" as the default tab
@@ -20,27 +26,63 @@ const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notificationCount] = useState(3); // notification count set as 3 initially
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [type, setType] = useState("success");
+
+  useEffect(() => {
+    fetchMyFacilities();
+  }, []);
 
   const handleNav = () => {
     navigate("/Dashboard/Profile");
     setIsModalOpen(false);
   };
+
   const handleLogout = () => {
+    localStorage.clear();
+
     navigate("/SignIn");
     setIsModalOpen(false);
   };
 
   const adminNavigation = [
-    { name: "Calendar", link: "/Dashboard/Calendar", icon: assets.calendarsvg },
     { name: "Reports", link: "/Dashboard/Reports", icon: assets.piesvg },
+    { name: "Calendar", link: "/Dashboard/Calendar", icon: assets.calendarsvg },
     { name: "Chats", link: "/Dashboard/Chats", icon: assets.chatsvg },
   ];
+
+  const fetchMyFacilities = async () => {
+    setLoading(true);
+    try {
+      const response = await getFacilities(user._id);
+      if (response.length > 0) setCurrentFacility(response[0]);
+      setMyFacilities(response);
+    } catch (err) {
+      if (err.response && err.response.data) {
+        showToast(err.response.data.message, "error");
+      } else console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const showToast = (message, type = "success") => {
+    setMessage(message);
+    setType(type);
+    setOpen(true);
+  };
 
   return (
     <div>
       {/* Sidebar for mobile */}
       <Transition.Root show={sidebarOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-40 lg:hidden" onClose={setSidebarOpen}>
+        <Dialog
+          as="div"
+          className="relative z-40 lg:hidden"
+          onClose={setSidebarOpen}
+        >
           <Transition.Child
             as={Fragment}
             enter="transition-opacity ease-linear duration-300"
@@ -74,7 +116,11 @@ const Dashboard = () => {
                   </button>
                 </div>
                 <div className="flex flex-shrink-0 items-center px-4">
-                  <img className="h-5 w-auto" src={assets.logo} alt="Your Company" />
+                  <img
+                    className="h-5 w-auto"
+                    src={assets.logo}
+                    alt="Your Company"
+                  />
                 </div>
                 <nav className="mt-5 h-0 flex-1 overflow-y-auto space-y-1 px-2">
                   {adminNavigation.map((item) => (
@@ -82,7 +128,9 @@ const Dashboard = () => {
                       key={item.name}
                       to={item.link}
                       className={classNames(
-                        item.name === selectedTab ? "bg-gray-900 text-white" : "text-gray-300",
+                        item.name === selectedTab
+                          ? "bg-gray-900 text-white"
+                          : "text-gray-300",
                         "group flex items-center rounded-md px-2 py-2 text-base font-medium"
                       )}
                       onClick={() => {
@@ -146,8 +194,15 @@ const Dashboard = () => {
                   className="font-PJSmedium text-primary text-[14px] outline-none appearance-none w-[80%] h-full"
                 />
               </div>
-              <button className="flex justify-center items-center rounded-[100px] border border-secondaryThirty w-[40px] h-[40px] mx-5 relative bg-secondaryThirty hover:scale-110 transition duration-300 ease-in-out" onClick={() => navigate("/Dashboard/Notifications")}>
-                <img src={assets.bell} className="w-5 h-5" alt="Notifications" />
+              <button
+                className="flex justify-center items-center rounded-[100px] border border-secondaryThirty w-[40px] h-[40px] mx-5 relative bg-secondaryThirty hover:scale-110 transition duration-300 ease-in-out"
+                onClick={() => navigate("/Dashboard/Notifications")}
+              >
+                <img
+                  src={assets.bell}
+                  className="w-5 h-5"
+                  alt="Notifications"
+                />
                 {notificationCount > 0 && (
                   <span className="absolute font-PJSbold top-2 right-[10px] -mt-1 -mr-1 bg-lime text-black font-semibold px-1 rounded-full text-[10px]">
                     {notificationCount}
@@ -155,9 +210,30 @@ const Dashboard = () => {
                 )}
               </button>
 
-              <div className="flex items-center gap-2 cursor-pointer" onClick={() => setIsModalOpen(true)}>
-                <img src={assets.club} alt="Club" />
-                <div className="font-PJSmedium">Futeca</div>
+              <div
+                className="flex items-center gap-2 cursor-pointer"
+                onClick={() => setIsModalOpen(true)}
+              >
+                <img
+                  style={{
+                    height: "50px",
+                    width: "50px",
+                    borderRadius: "25px",
+                    border: "1px solid #ddd",
+                  }}
+                  src={
+                    currentFacility &&
+                    currentFacility.icon &&
+                    currentFacility.icon !== null &&
+                    currentFacility.icon.trim() !== ""
+                      ? currentFacility.icon
+                      : assets.placeholder
+                  }
+                  alt="Facility"
+                />
+                <div className="font-PJSmedium">
+                  {currentFacility ? currentFacility.name : ""}
+                </div>
               </div>
             </div>
           </div>
@@ -183,8 +259,17 @@ const Dashboard = () => {
         height="auto"
         width="150px"
         customStyles={{
-          overlay: { justifyContent: 'flex-start', alignItems: 'flex-end', padding: '2rem' },
-          modal: { position: 'absolute', top: '5%', right: '0', margin: '1rem' },
+          overlay: {
+            justifyContent: "flex-start",
+            alignItems: "flex-end",
+            padding: "2rem",
+          },
+          modal: {
+            position: "absolute",
+            top: "5%",
+            right: "0",
+            margin: "1rem",
+          },
         }}
       >
         <div className="flex flex-col space-y-2 font-PJSmedium">
@@ -192,12 +277,19 @@ const Dashboard = () => {
             <img src={assets.profileicon} className="w-5 h-5" alt="Profile" />
             Profile
           </button>
-          <button className="text-redbutton flex items-center gap-2" onClick={handleLogout}>
+          <button
+            className="text-redbutton flex items-center gap-2"
+            onClick={handleLogout}
+          >
             <img src={assets.logout} className="w-5 h-5" alt="Logout" />
             Logout
           </button>
         </div>
       </AppModal>
+
+      <Toast open={open} setOpen={setOpen} message={message} type={type} />
+
+      {loading && <Loader />}
     </div>
   );
 };

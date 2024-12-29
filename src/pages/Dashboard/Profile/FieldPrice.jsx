@@ -1,434 +1,1746 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import assets from "../../../assets/assets";
-
-
+import {
+  createFacilityField,
+  deleteFacilityFields,
+  getFacilityFields,
+} from "../../../api/services/facilityService";
+import { useForm, FormProvider } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import Loader from "../../../components/Loader/Loader";
+import { useStateContext } from "../../../context";
+import { useNavigate } from "react-router-dom";
+import { MdDeleteOutline, MdDragHandle } from "react-icons/md";
+import AppModal from "../../../components/AppModal/AppModal";
+import { uploadFile } from "../../../api/services/uploadService";
 
 const FieldPrice = () => {
-    const [step, setStep] = useState(0);
+  const navigate = useNavigate();
+  const { currentFacility } = useStateContext();
+  const [fields, setFields] = useState([]);
+  const [step, setStep] = useState(0);
+  const [showFieldsSection, setShowFieldsSection] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const dataX = useRef();
 
-    const [showFieldsSection, setShowFieldsSection] = useState(true);
+  const [photos, setPhotos] = useState([]);
+  const [modalOpen, setModalOpen] = useState(null);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [fieldNames, setFieldNames] = useState([]);
+  const [photoFiles, setPhotoFiles] = useState([]);
 
-    const handleSubmitStep1 = () => {
-        setStep(1);
-        setShowFieldsSection(false);
-    };
+  const handleSubmitStep1 = () => {
+    setStep(1);
+    setShowFieldsSection(false);
+  };
 
-    const handleSubmitStep2 = () => {
-        setStep(2);
-    };
-    const handleBack = () => {
-        setStep(1);
-    };
-    const [selectedSize, setSelectedSize] = useState(null);
-    const [selectedTimes, setSelectedTimes] = useState([]);
-
-    const fieldSizes = ['5v5', '6v6', '7v7', '8v8', '9v9', '11v11'];
-    const timeDuration = ['30mins', '60mins', '90mins', '120mins'];
-
-    const handleSizeSelect = (time) => {
-        setSelectedSize(time);
-    };
-    const handleTimeSelect = (time) => {
-        setSelectedTimes((prevSelectedTimes) =>
-            prevSelectedTimes.includes(time)
-                ? prevSelectedTimes.filter((t) => t !== time)
-                : [...prevSelectedTimes, time]
-        );
-    };
-    const handleFormClose = () => {
-        setShowFieldsSection(true);
-        setStep(0);
+  const handleSubmitStep2 = () => {
+    setStep(2);
+  };
+  const handleBack = () => {
+    if (step > 1) setStep(1);
+    else {
+      setStep(0);
+      setShowFieldsSection(true);
     }
-    const daysOfWeek = [
-        "General",
-        "Mon",
-        "Tue",
-        "Wed",
-        "Thu",
-        "Fri",
-        "Sat",
-        "Sun",
-    ];
+  };
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedTimes, setSelectedTimes] = useState([]);
 
-    const [selectedDays, setSelectedDays] = useState([]);
+  const fieldSizes = ["5v5", "6v6", "7v7", "8v8", "9v9", "11v11"];
+  const timeDuration = ["30mins", "60mins", "90mins", "120mins"];
 
-    const toggleDay = (day) => {
-        if (selectedDays.includes(day)) {
-            setSelectedDays(selectedDays.filter(item => item !== day));
-        } else {
-            setSelectedDays([...selectedDays, day]);
+  const timingObject = {
+    from: "",
+    to: "",
+    name: "",
+    prices: [],
+  };
+  const [bookingDurations, setBookingDurations] = useState([
+    { name: "30mins", isSelected: false },
+    { name: "60mins", isSelected: false },
+    { name: "90mins", isSelected: false },
+    { name: "120mins", isSelected: false },
+  ]);
+  const [customisedPrices, setCustomisedPrices] = useState([
+    { day: "General", name: "General", isSelected: false, isEnabled: true },
+    { day: "Mon", name: "Monday", isSelected: false, isEnabled: true },
+    { day: "Tue", name: "Tuesday", isSelected: false, isEnabled: true },
+    { day: "Wed", name: "Wednesday", isSelected: false, isEnabled: true },
+    { day: "Thur", name: "Thursday", isSelected: false, isEnabled: true },
+    { day: "Fri", name: "Friday", isSelected: false, isEnabled: true },
+    { day: "Sat", name: "Saturday", isSelected: false, isEnabled: true },
+    { day: "Sun", name: "Sunday", isSelected: false, isEnabled: true },
+  ]);
+  const [timings, setTimings] = useState([timingObject]);
+  const [savedPrices, setSavedPrices] = useState([]);
+  const [outerIndex, setOuterIndex] = useState(null);
+  const [innerIndex, setInnerIndex] = useState(null);
+  const [isFinished, setIsFinished] = useState(false);
+
+  const colors = {
+    primary: "#141F2B",
+    secondary: "#849AB8",
+    lime: "#9CFC38",
+    limeTenPercent: "rgba(156, 252, 56, 0.1)",
+    limeFortyPercent: "rgba(156, 252, 56, 0.4)",
+    limeNinetyPercent: "rgba(156, 252, 56, 0.8)",
+    button: "#1F2933",
+    buttonTenPercent: "rgba(31, 41, 51, 0.1)",
+    footer: "#33C0DB",
+    disabledButton: "#2F4B2E",
+    disabledText: "#21352C",
+    tabbar: "#181818",
+    map: "#F14336",
+    mapTenPercent: "rgba(241, 67, 54, 0.1)",
+    mapFortyPercent: "rgba(241, 67, 54, 0.4)",
+    banner: "#661FFE",
+    all: "#FCAE38",
+    card: "#0C1621",
+    star: "#FFCB12",
+    starTenPercent: "rgba(255, 203, 18, 0.1)",
+    orange: "#FF9212",
+    darkGreen: "#047C37",
+    clock: "#33C0DB",
+    clockTenPercent: "rgba(51, 192, 219, 0.1)",
+    clockThirtyPercent: "rgba(51, 192, 219, 0.3)",
+    switchTrack: "#1A2D23",
+    profileButton: "#333333",
+    golden: "#FFCB12",
+    light: "#F8F8F8",
+    white: "#FFFFFF",
+    lightSelected: "#F4F4F5",
+    chartblue: "#33C0DB",
+    chartyellow: "#FFCB12",
+    cancel: "rgba(132, 154, 184, 0.1)",
+    lightIconBg: "#D9D9D9",
+    lightEventsBg: "#F3F5F8",
+    secondaryEightPercent: "rgba(132, 154, 184, 0.08)",
+    secondaryTenPercent: "rgba(132, 154, 184, 0.1)",
+    secondaryTwentyPercent: "rgba(132, 154, 184, 0.2)",
+    secondaryThirtyPercent: "rgba(132, 154, 184, 0.3)",
+    secondaryFiftyPercent: "rgba(132, 154, 184, 0.5)",
+    green: "rgba(53, 231, 128, 1)",
+    black: "black",
+    locationtext: "rgba(121, 121, 121, 1)",
+    whiteTenPercent: "rgba(255, 255, 255, 0.1)",
+    whiteFiftyPercent: "rgba(255, 255, 255, 0.5)",
+  };
+
+  const timeSlots = [
+    { key: "6am", value: "06:00 am" },
+    { key: "7am", value: "07:00 am" },
+    { key: "8am", value: "08:00 am" },
+    { key: "9am", value: "09:00 am" },
+    { key: "10am", value: "10:00 am" },
+    { key: "11am", value: "11:00 am" },
+    { key: "12pm", value: "12:00 pm" },
+    { key: "1pm", value: "01:00 pm" },
+    { key: "2pm", value: "02:00 pm" },
+    { key: "3pm", value: "03:00 pm" },
+    { key: "4pm", value: "04:00 pm" },
+    { key: "5pm", value: "05:00 pm" },
+    { key: "6pm", value: "06:00 pm" },
+    { key: "7pm", value: "07:00 pm" },
+    { key: "8pm", value: "08:00 pm" },
+    { key: "9pm", value: "09:00 pm" },
+    { key: "until_close", value: "Until Close" },
+  ];
+
+  useEffect(() => {
+    if (outerIndex === null || innerIndex === null) {
+      timings[timings.length - 1].prices = [];
+
+      var length = bookingDurations.filter((bD) => bD.isSelected).length;
+      if (length > 0) {
+        for (let i = 0; i < length; i++) {
+          if (
+            customisedPrices.filter(
+              (cP) => cP.name === "General" && cP.isEnabled && cP.isSelected
+            ).length > 0
+          ) {
+            timings[timings.length - 1].name = "General";
+          } else {
+            timings[timings.length - 1].name = "";
+          }
+
+          timings[timings.length - 1].prices.push({
+            price: "",
+            bookingDuration: "",
+          });
         }
-    };
-    const selectedDaysInOrder = daysOfWeek.filter(day => selectedDays.includes(day)).join(', ');
+      }
+      if (timings[timings.length - 1].prices.length === length)
+        setTimings([...timings]);
+    } else {
+      console.log(timings);
+    }
+  }, [bookingDurations, timings.length, customisedPrices]);
 
-    return (
-        <div>
+  useEffect(() => {
+    console.log("timings: ", JSON.stringify(timings));
+  }, [timings]);
 
-            {showFieldsSection && (
-                <>
-                    <div className="min-h-[600px] relative">
-                        <p className="font-PJSbold text-xl">Fields</p>
-                        <div className="absolute bottom-0 left-0 right-0 flex justify-center mb-5">
-                            <button onClick={handleSubmitStep1}
-                                className="w-[600px] transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full bg-lime font-PJSmedium"
-                            >
-                                Add New Field
-                            </button>
+  useEffect(() => {
+    fetchFields();
+  }, []);
+
+  const fetchFields = async () => {
+    setLoading(true);
+    try {
+      const facilityFields = await getFacilityFields(currentFacility._id);
+      setFields(facilityFields);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSizeSelect = (time) => {
+    setSelectedSize(time);
+  };
+
+  const handleFormClose = () => {
+    setShowFieldsSection(true);
+    setStep(0);
+  };
+
+  const step1Schema = yup.object().shape({
+    name: yup.string().required("Field name is required."),
+    fieldType: yup.string().required("Field type is required."),
+    surfaceType: yup.string().required("Surface type is required."),
+  });
+
+  const step2Schema = yup.object().shape({});
+
+  const methods = useForm({
+    resolver: yupResolver(step === 1 ? step1Schema : step2Schema),
+    defaultValues: {
+      name: "",
+      fieldType: "",
+      surfaceType: "",
+    },
+  });
+
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = methods;
+
+  const onSubmit = async (data) => {
+    if (showFieldsSection && step == 0) {
+      setStep(1);
+      setShowFieldsSection(false);
+    } else if (step == 1) {
+      if (!selectedSize) {
+        alert("You must select at least one option for Combo fields");
+        return;
+      }
+
+      dataX.current = { ...data };
+      setStep(2);
+      console.log(dataX);
+    } else {
+      if (photoFiles.length > 0) {
+        uploadFiles();
+      } else {
+        saveField();
+      }
+    }
+  };
+
+  const uploadFiles = async () => {
+    let urls = [];
+    photoFiles.forEach(async (file) => {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        urls.push(await uploadFile(formData));
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
+    saveField(urls);
+  };
+
+  const validateForm = () => {
+    if (!timings[timings.length - 1].from.trim().length) {
+      alert("Missing required field: Kindly select FROM TIME");
+      return false;
+    } else if (!timings[timings.length - 1].to.trim().length) {
+      alert("Missing required field: Kindly select TO TIME");
+      return false;
+    } else if (!timings[timings.length - 1].name.trim().length) {
+      alert("Missing required field: Kindly enter NAME");
+      return false;
+    } else if (
+      !timings[timings.length - 1].prices.filter((p) => p.price !== "").length
+    ) {
+      alert(
+        "Missing required field: Kindly add prices for selected booking durations"
+      );
+      return false;
+    }
+
+    return true;
+  };
+
+  const saveField = async (files = []) => {
+    setLoading(true);
+    var specificPrices = [];
+    let generalPrice = {};
+    try {
+      savedPrices.forEach((savedPrice) => {
+        if (
+          savedPrice.days.length === 1 &&
+          savedPrice.days[0].name === "General"
+        ) {
+          savedPrice.timings.forEach((timing) => {
+            generalPrice = {
+              bookingDurations: timing.prices.map((p) => {
+                return p.bookingDuration;
+              }),
+              from: timing.from,
+              to: timing.to,
+              timeSlotName: timing.name,
+              pricing: timing.prices.map((p) => {
+                return `${p.price}$ for ${p.bookingDuration}`;
+              }),
+            };
+          });
+        } else {
+          savedPrice.days.forEach((day) => {
+            savedPrice.timings.forEach((timing) => {
+              specificPrices.push({
+                day: day.name,
+                bookingDurations: timing.prices.map((p) => {
+                  return p.bookingDuration;
+                }),
+                from: timing.from,
+                to: timing.to,
+                timeSlotName: timing.name,
+                pricing: timing.prices.map((p) => {
+                  return `${p.price}$ for ${p.bookingDuration}`;
+                }),
+              });
+            });
+          });
+        }
+      });
+    } catch (err) {
+      console.log(err);
+    }
+
+    try {
+      let body = { ...dataX.current };
+      body.fieldImages = files;
+      body.location = {
+        latitude: 31.561609,
+        longitude: 74.412559,
+      };
+      body.generalPrice = generalPrice;
+      body.specificPrice = specificPrices;
+
+      const response = await createFacilityField(body, currentFacility._id);
+      window.location.reload();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteField = async (fieldId) => {
+    setLoading(true);
+    try {
+      await deleteFacilityFields(fieldId);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+      fetchFields();
+    }
+  };
+
+  const handleDeletePhoto = (index) => {
+    const newPhotos = [...photos];
+    const newFieldNames = [...fieldNames];
+    newPhotos.splice(index, 1);
+    newFieldNames.splice(index, 1);
+    setPhotos(newPhotos);
+    setFieldNames(newFieldNames);
+    closeModal();
+  };
+
+  const handleFileUpload2 = (e) => {
+    const files = Array.from(e.target.files);
+    setPhotoFiles(files);
+    const newPhotos = files.map((file) => URL.createObjectURL(file));
+    setPhotos((prevPhotos) => [...prevPhotos, ...newPhotos]);
+    setFieldNames((prevFieldNames) => [
+      ...prevFieldNames,
+      ...Array(newPhotos.length).fill(""),
+    ]);
+  };
+
+  const openModal = (index) => {
+    setModalOpen(index);
+  };
+
+  const closeModal = () => {
+    setModalOpen(null);
+  };
+
+  const handleFieldNameChange = (index, value) => {
+    const newFieldNames = [...fieldNames];
+    newFieldNames[index] = value;
+    setFieldNames(newFieldNames);
+  };
+
+  const handleSaveChanges = () => {
+    closeModal();
+  };
+
+  const handleEdit = (indexOut, indexInn) => {
+    if (outerIndex === indexOut && innerIndex === indexInn) {
+      setOuterIndex(null);
+      setInnerIndex(null);
+    } else {
+      // Populate fields with the saved price details
+      const priceToEdit = JSON.parse(JSON.stringify(savedPrices[indexOut]));
+      const timingToEdit = JSON.parse(
+        JSON.stringify(priceToEdit.timings[indexInn])
+      );
+
+      // Repopulate timings
+      setTimings([timingToEdit]);
+
+      // Set the editable index
+      setOuterIndex(indexOut);
+      setInnerIndex(indexInn);
+
+      // Mark as editing
+      setIsFinished(false);
+    }
+  };
+
+  const saveEditedPrice = () => {
+    if (validateForm()) {
+      // Update the savedPrices array with edited values
+      const updatedPrices = [...savedPrices];
+      updatedPrices[outerIndex].timings[innerIndex] = JSON.parse(
+        JSON.stringify(timings[timings.length - 1])
+      );
+      setSavedPrices(updatedPrices);
+
+      // Reset states
+      customisedPrices.forEach((cP) => {
+        if (cP.isSelected) {
+          cP.isEnabled = false;
+        } else {
+          cP.isEnabled = true;
+          cP.isSelected = false;
+        }
+      });
+
+      setCustomisedPrices([...customisedPrices]);
+      setBookingDurations((prev) =>
+        prev.map((bD) => ({ ...bD, isSelected: false }))
+      );
+      setTimings[timingObject];
+
+      // Reset editable state
+      setOuterIndex(null);
+      setInnerIndex(null);
+    }
+  };
+
+  return (
+    <div>
+      {showFieldsSection && (
+        <>
+          <div className="min-h-[600px] relative">
+            <p className="font-PJSbold text-xl">Fields</p>
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "1rem",
+                marginTop: "10px",
+              }}
+            >
+              {fields.length > 0 &&
+                fields.map((field) => {
+                  let price = field.generalPrice;
+                  if (!price.bookingDurations.length || !price.pricing.length) {
+                    price = "No general price mentioned.";
+                  } else {
+                    price = field.generalPrice.pricing.join(", ");
+                  }
+
+                  return (
+                    <div
+                      key={field._id}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
+                        cursor: "pointer",
+                        padding: "1.2rem",
+                        borderColor: colors.secondary,
+                        height: "70px",
+                        width: "100%",
+                        borderRadius: "16px",
+                        backgroundColor: "white",
+                        border: "1px solid grey",
+                      }}
+                    >
+                      <MdDragHandle color={colors.lime} size={"2rem"} />
+                      <div style={{ flex: 1 }}>
+                        <div className="font-PJSbold text-large">
+                          {field.name}
                         </div>
+                        <div className="font-PJSlight text-md">{price}</div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => deleteField(field._id)}
+                      >
+                        <img
+                          className="w-6"
+                          src={assets.Del}
+                          alt="Delete Icon"
+                        />
+                      </button>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+          <button
+            onClick={handleSubmitStep1}
+            style={{
+              backgroundColor: colors.lime,
+              color: "#000",
+            }}
+            className="w-full  h-[54px] text-[14px] rounded-full bg-secondaryTen font-PJSmedium justify-center items-center text-secondaryThirty"
+          >
+            Add New Field
+          </button>
+        </>
+      )}
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {step === 1 && (
+            <div>
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <p className="font-PJSbold text-xl">
+                    Add New Field{" "}
+                    <span className="text-secondary text-sm">(Step 1/2)</span>
+                  </p>
+                </div>
+                <div>
+                  <img
+                    onClick={handleFormClose}
+                    className="w-6 h-6"
+                    src={assets.close}
+                    alt=""
+                  />
+                </div>
+              </div>
+
+              <div className="relative mt-5">
+                <input
+                  className={`block px-4 pt-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm  bg-white border-secondaryThirty w-full h-[54px]`}
+                  type="text"
+                  {...register("name")}
+                />
+
+                {errors.name && (
+                  <span
+                    style={{
+                      fontSize: 10,
+                      color: "red",
+                      marginLeft: 45,
+                      marginTop: 5,
+                    }}
+                  >
+                    {errors.name.message}
+                  </span>
+                )}
+
+                <label
+                  htmlFor="FieldName"
+                  className="absolute top-2 left-4 text-secondary font-PJSmedium text-xs"
+                >
+                  Field Name
+                </label>
+              </div>
+              <div className="relative mt-5">
+                <select
+                  className={`block px-4 pt-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm appearance-none bg-white border-secondaryThirty selectIcon w-full h-[54px]`}
+                  {...register("fieldType")}
+                >
+                  <option value="">Choose an option</option>
+                  <option value="Indoor">Indoor</option>
+                </select>
+
+                {errors.fieldType && (
+                  <span
+                    style={{
+                      fontSize: 10,
+                      color: "red",
+                      marginLeft: 45,
+                      marginTop: 5,
+                    }}
+                  >
+                    {errors.fieldType.message}
+                  </span>
+                )}
+
+                <label
+                  htmlFor="fieldType"
+                  className="absolute top-2 left-4 text-secondary font-PJSmedium text-xs"
+                >
+                  Field Type
+                </label>
+              </div>
+              <div className="relative mt-5">
+                <select
+                  className={`block px-4 pt-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm appearance-none bg-white border-secondaryThirty selectIcon w-full h-[54px]`}
+                  {...register("surfaceType")}
+                >
+                  <option value="">Choose an option</option>
+                  <option value="Turf">Turf</option>
+                </select>
+
+                {errors.surfaceType && (
+                  <span
+                    style={{
+                      fontSize: 10,
+                      color: "red",
+                      marginLeft: 45,
+                      marginTop: 5,
+                    }}
+                  >
+                    {errors.surfaceType.message}
+                  </span>
+                )}
+
+                <label
+                  htmlFor="fieldType"
+                  className="absolute top-2 left-4 text-secondary font-PJSmedium text-xs"
+                >
+                  Surface Type
+                </label>
+              </div>
+              <div className="mt-10">
+                <p className="font-PJSbold text-[16px] mb-3">Field Size</p>
+                <div className="flex gap-4">
+                  {fieldSizes.map((size, index) => (
+                    <div key={`${index}`}>
+                      <button
+                        type="button"
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          flexDirection: "row",
+                          width: 100,
+                          height: 45,
+                          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.25)", // Box shadow here
+                          borderRadius: 16,
+                          backgroundColor:
+                            selectedSize === size ? colors.clock : colors.white,
+                          marginTop: 10,
+                          gap: 10,
+                        }}
+                        onClick={() => handleSizeSelect(size)} // Update the selected value
+                      >
+                        <span
+                          style={{
+                            color:
+                              selectedSize === size ? colors.white : "black",
+                            fontSize: 12,
+                          }}
+                        >
+                          {size}
+                        </span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="w-full mt-5">
+                <div className="flex items-center gap-3">
+                  <p className="font-PJSbold text-[16px]">Combo Fields</p>
+                  <img className="w-[18px] h-[18px]" src={assets.info} alt="" />
+                </div>
+
+                <select
+                  className="w-full border-2 p-3 mt-3 rounded-xl text-secondary selectIcon appearance-none focus:outline-none"
+                  {...register("combinationFields")}
+                >
+                  <option className="text-secondary" value="">
+                    Select Option
+                  </option>
+                  <option className="text-secondary" value="USD">
+                    South Field, North Field
+                  </option>
+                </select>
+
+                {errors.combinationFields && (
+                  <span
+                    style={{
+                      fontSize: 10,
+                      color: "red",
+                      marginLeft: 45,
+                      marginTop: 5,
+                    }}
+                  >
+                    {errors.combinationFields.message}
+                  </span>
+                )}
+              </div>
+
+              <div className="mt-10">
+                <p className="font-PJSbold text-xl mb-3">Upload Field Images</p>
+                <div className="overflow-x-auto no-scrollbar w-[100%]">
+                  <div className="flex gap-7 min-w-[max-content]">
+                    <div className="w-44 h-44 rounded-xl border-secondaryThirty border-2 flex justify-center items-center">
+                      <div className="text-center min-w-44">
+                        <label htmlFor="uploadInput" className="cursor-pointer">
+                          <img
+                            src={assets.PhotoIcon}
+                            alt="Upload Icon"
+                            className="mx-auto mb-2"
+                          />
+                          <p className="font-PJSmedium">Upload Photos</p>
+                        </label>
+                        <input
+                          type="file"
+                          id="uploadInput"
+                          className="hidden"
+                          accept="image/*"
+                          onChange={handleFileUpload2}
+                          multiple
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-4 flex-wrap">
+                      {photos.map((photo, index) => (
+                        <div
+                          key={index}
+                          className="relative w-44 h-44 flex justify-center items-center cursor-pointer"
+                          onMouseEnter={() => setHoveredIndex(index)}
+                          onMouseLeave={() => setHoveredIndex(null)}
+                        >
+                          <img
+                            src={photo}
+                            alt={`Uploaded photo ${index}`}
+                            className="w-full h-full object-cover rounded-xl"
+                          />
+                          {hoveredIndex === index && (
+                            <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-50 rounded-xl">
+                              <img
+                                src={assets.edit}
+                                className="object-cover"
+                                onClick={() => openModal(index)}
+                              />
+                            </div>
+                          )}
+                          <div className="absolute bottom-3 left-4">
+                            <p className="text-white font-PJSbold text-sm">
+                              {fieldNames[index]}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {step === 2 && (
+            <>
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <p className="font-PJSbold text-xl">
+                    East Field{" "}
+                    <span className="text-secondary text-sm"> (Step 2/2)</span>
+                  </p>
+                </div>
+                <div>
+                  <img
+                    onClick={handleFormClose}
+                    className="w-6 h-6"
+                    src={assets.close}
+                    alt=""
+                  />
+                </div>
+              </div>
+
+              <div>
+                {/* Customize Prices */}
+                <div style={{ marginTop: 20 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 5,
+                    }}
+                  >
+                    <h2 style={{ fontSize: "16px", color: "black" }}>
+                      Customize its Prices
+                    </h2>
+                    <p style={{ fontSize: "10px", color: "gray" }}>
+                      (You can select many at once)
+                    </p>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      overflowX: "auto",
+                      gap: 10,
+                      height: 60,
+                    }}
+                  >
+                    {customisedPrices.map((customisedPrice, index) => (
+                      <button
+                        type="button"
+                        key={index}
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          flexDirection: "row",
+                          width: 100,
+                          height: 45,
+                          borderRadius: 16,
+                          boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.25)", // Box shadow here
+                          backgroundColor: customisedPrice.isEnabled
+                            ? customisedPrice.isSelected
+                              ? colors.clock
+                              : colors.white
+                            : "gray",
+                          color: customisedPrice.isEnabled
+                            ? customisedPrice.isSelected
+                              ? "white"
+                              : "black"
+                            : "white",
+                          marginTop: 10,
+                        }}
+                        disabled={!customisedPrice.isEnabled}
+                        onClick={() => {
+                          const index =
+                            customisedPrices.indexOf(customisedPrice);
+                          if (customisedPrice.day === "General") {
+                            customisedPrices
+                              .filter((c) => c.day !== "General")
+                              .forEach((cP) => {
+                                cP.isSelected = false;
+                              });
+                          } else {
+                            customisedPrices
+                              .filter((c) => c.day === "General")
+                              .forEach((cP) => {
+                                cP.isSelected = false;
+                              });
+                          }
+                          customisedPrices[index].isSelected =
+                            !customisedPrice.isSelected;
+                          setCustomisedPrices([...customisedPrices]);
+                        }}
+                      >
+                        {customisedPrice.day}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Booking Durations */}
+                <div style={{ marginTop: 20 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 5,
+                    }}
+                  >
+                    <h2 style={{ fontSize: "16px", color: "black" }}>
+                      Booking Durations
+                    </h2>
+                    <p style={{ fontSize: "10px", color: "gray" }}>
+                      (Select all that apply)
+                    </p>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      overflowX: "auto",
+                      gap: 10,
+                      height: 60,
+                    }}
+                  >
+                    {bookingDurations.map((bookingDuration, index) => (
+                      <button
+                        type="button"
+                        key={index}
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          flexDirection: "row",
+                          width: 100,
+                          height: 45,
+                          boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.25)", // Box shadow here
+                          borderRadius: 16,
+                          backgroundColor: bookingDuration.isSelected
+                            ? colors.clock
+                            : colors.white,
+                          color: bookingDuration.isSelected ? "white" : "black",
+                          marginTop: 10,
+                        }}
+                        disabled={innerIndex !== null}
+                        onClick={() => {
+                          const index =
+                            bookingDurations.indexOf(bookingDuration);
+                          bookingDurations[index].isSelected =
+                            !bookingDuration.isSelected;
+                          setBookingDurations([...bookingDurations]);
+                        }}
+                      >
+                        {bookingDuration.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Saved Prices Layout */}
+                {savedPrices.length > 0 &&
+                  savedPrices.map((sP, i) => (
+                    <div key={i}>
+                      <div>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            width: "100%",
+                            alignSelf: "center",
+                            alignItems: "center",
+                            marginTop: 10,
+                          }}
+                        >
+                          <h2 style={{ fontSize: "16px", color: "black" }}>
+                            {sP.days.map(
+                              (c, i) =>
+                                `${c.name}${
+                                  i !== sP.days.length - 1 ? ", " : ""
+                                }`
+                            )}
+                          </h2>
+                          <div style={{ flex: 1 }} />
+                          <button
+                            type="button"
+                            style={{
+                              width: 40,
+                              height: 40,
+                              borderRadius: 20,
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              border: "1px solid gray",
+                            }}
+                            onClick={() => {
+                              sP.days.forEach((d) => {
+                                customisedPrices.forEach((cP) => {
+                                  if (
+                                    cP.name === d.name &&
+                                    cP.isSelected &&
+                                    !cP.isEnabled
+                                  ) {
+                                    cP.isSelected = false;
+                                    cP.isEnabled = true;
+                                  }
+                                });
+                              });
+                              setCustomisedPrices([...customisedPrices]);
+                              setSavedPrices(
+                                savedPrices.filter((sp, index) => index !== i)
+                              );
+                              setInnerIndex(null);
+                            }}
+                          >
+                            <img
+                              className="w-6"
+                              src={assets.Del}
+                              alt="Delete Icon"
+                            />
+                          </button>
+                        </div>
+                      </div>
+
+                      {sP.timings.length > 0 &&
+                        sP.timings.map((timing, index) => {
+                          return (
+                            <div
+                              style={{
+                                width: "100%",
+                                height: "60px",
+                                borderColor: colors.secondary,
+                                borderRadius: "16px",
+                                display: "flex",
+                                flexDirection: "row",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                backgroundColor: colors.white,
+                                border: "1px solid grey",
+                                gap: "20px",
+                                padding: "20px",
+                                marginTop: "20px",
+                              }}
+                              key={index}
+                            >
+                              <div style={{ flex: "1" }}>
+                                <span
+                                  style={{
+                                    color: colors.black,
+                                    fontSize: "10px",
+                                  }}
+                                >
+                                  {`${timing.name} (${timing.from} to ${timing.to})`}
+                                </span>
+                                <span
+                                  style={{
+                                    color: colors.black,
+                                    fontSize: "14px",
+                                  }}
+                                >
+                                  {timing.prices &&
+                                    timing.prices
+                                      .map((t, ti) => {
+                                        return `$${t.price} for ${
+                                          t.bookingDuration
+                                        }${
+                                          ti <= timing.prices.length - 2
+                                            ? " - "
+                                            : ""
+                                        }`;
+                                      })
+                                      .join("")}
+                                </span>
+                              </div>
+
+                              <button
+                                type="button"
+                                style={{
+                                  width: 40,
+                                  height: 40,
+                                  borderRadius: 20,
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  border: "1px solid gray",
+                                }}
+                                onClick={() => handleEdit(i, index)}
+                              >
+                                <img
+                                  className="w-6"
+                                  src={assets.editBlack}
+                                  alt="Edit Icon"
+                                />
+                              </button>
+                              <button
+                                type="button"
+                                style={{
+                                  width: 40,
+                                  height: 40,
+                                  borderRadius: 20,
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  border: "1px solid gray",
+                                }}
+                                onClick={() => {
+                                  savedPrices[index].timings =
+                                    sP.timings.filter(
+                                      (t) => t.name !== timing.name
+                                    );
+
+                                  setSavedPrices([...savedPrices]);
+                                }}
+                              >
+                                <img
+                                  className="w-6"
+                                  src={assets.Del}
+                                  alt="Delete Icon"
+                                />
+                              </button>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  ))}
+              </div>
+
+              {customisedPrices.filter((cP) => cP.isEnabled && cP.isSelected)
+                .length > 0 &&
+                (outerIndex === null || innerIndex === null) && (
+                  <div style={{ marginTop: "10px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        width: "100%",
+                        margin: "0 auto",
+                        alignItems: "center",
+                      }}
+                    >
+                      <span
+                        style={{
+                          color: colors.black,
+                          fontSize: "16px",
+                        }}
+                      >
+                        {customisedPrices
+                          .filter((cP) => cP.isSelected && cP.isEnabled)
+                          .map((c, i) => {
+                            return `${c.name}${
+                              i !==
+                              customisedPrices.filter(
+                                (cP) => cP.isSelected && cP.isEnabled
+                              ).length -
+                                1
+                                ? ", "
+                                : ""
+                            }`;
+                          })}
+                      </span>
+
+                      <button
+                        type="button"
+                        style={{
+                          width: "40px",
+                          height: "40px",
+                          borderRadius: "50%",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          borderColor: colors.secondary,
+                          borderWidth: "1px",
+                          backgroundColor: "transparent",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => {
+                          customisedPrices.forEach((cP) => {
+                            if (cP.isEnabled && cP.isSelected) {
+                              cP.isSelected = false;
+                            }
+                          });
+                          bookingDurations.forEach((bD) => {
+                            if (bD.isSelected) {
+                              bD.isSelected = false;
+                            }
+                          });
+
+                          // resetting timings array
+                          setTimings([timingObject]);
+                          // Disabling already selected days
+                          setCustomisedPrices([...customisedPrices]);
+                          // clearing booking durations
+                          setBookingDurations([...bookingDurations]);
+                        }}
+                      >
+                        <img
+                          className="w-6"
+                          src={assets.Del}
+                          alt="Delete Icon"
+                        />
+                      </button>
                     </div>
 
-
-                </>
-            )}
-            {step === 1 && (
-                <>
-                    <form>
-                        <div className="flex items-center justify-between mb-5">
-                            <div>
-                                <p className="font-PJSbold text-xl">Add New Field <span className="text-secondary text-sm">(Step 1/2)</span></p>
-                            </div>
-                            <div>
-                                <img onClick={handleFormClose} className="w-6 h-6" src={assets.close} alt="" />
-                            </div>
-                        </div>
-
-                        <div className="relative mt-5">
-                            <input
-                                className={`block px-4 pt-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm  bg-white border-secondaryThirty w-full h-[54px]`} type="text" />
-                            <label htmlFor="FieldName" className="absolute top-2 left-4 text-secondary font-PJSmedium text-xs">Field Name</label>
-                        </div>
-                        <div className="relative mt-5">
-                            <select className={`block px-4 pt-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm appearance-none bg-white border-secondaryThirty selectIcon w-full h-[54px]`}>
-                                <option value="">Choose an option</option>
-                                <option value="Indoor">Indoor</option>
-                            </select>
-                            <label htmlFor="fieldType" className="absolute top-2 left-4 text-secondary font-PJSmedium text-xs">Field Type</label>
-                        </div>
-                        <div className="relative mt-5">
-                            <select className={`block px-4 pt-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm appearance-none bg-white border-secondaryThirty selectIcon w-full h-[54px]`}>
-                                <option value="">Choose an option</option>
-                                <option value="Turf">Turf</option>
-                            </select>
-                            <label htmlFor="fieldType" className="absolute top-2 left-4 text-secondary font-PJSmedium text-xs">Surface Type</label>
-                        </div>
-                        <div className="mt-10">
-                            <p className="font-PJSbold text-[16px] mb-3">Field Size</p>
-                            <div className="flex gap-4">
-                                {fieldSizes.map((size) => (
-                                    <div key={size} className="flex items-center">
-                                        <p
-                                            className={`font-PJSregular flex justify-center items-center w-[90px] h-[42px] text-sm border rounded-xl cursor-pointer ${selectedSize === size ? 'bg-blue text-white' : ''
-                                                }`}
-                                            onClick={() => handleSizeSelect(size)}
-                                        >
-                                            {size}
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="w-full mt-5">
-                            <div className="flex items-center gap-3">
-                                <p className="font-PJSbold text-[16px]">Combo Fields</p>
-                                <img className="w-[18px] h-[18px]" src={assets.info} alt="" />
-                            </div>
-
-                            <select className="w-full border-2 p-3 mt-3 rounded-xl text-secondary selectIcon appearance-none focus:outline-none" name="" id="">
-                                <option className="text-secondary" value="" >Select Option</option>
-                                <option className="text-secondary" value="USD">South Field, North Field</option>
-                            </select>
-                        </div>
-                        <div className="w-full mt-12">
-                            <button onClick={handleSubmitStep2}
-                                className="w-full transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full bg-lime font-PJSmedium justify-center items-center"
+                    {timings.length > 1 &&
+                      timings
+                        .slice(0, timings.length - 1)
+                        .map((timing, index) => {
+                          return (
+                            <div
+                              style={{
+                                width: "100%",
+                                height: "60px",
+                                borderColor: colors.secondary,
+                                borderRadius: "16px",
+                                display: "flex",
+                                flexDirection: "row",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                backgroundColor: colors.white,
+                                border: "1px solid grey",
+                                gap: "20px",
+                                padding: "20px",
+                                marginTop: "20px",
+                              }}
+                              key={index}
                             >
-                                Next
-                            </button>
-                        </div>
-                    </form>
-
-                </>
-            )}
-            {step === 2 && (
-                <>
-                    <form>
-                        <div className="flex items-center justify-between mb-5">
-                            <div>
-                                <p className="font-PJSbold text-xl">East Field <span className="text-secondary text-sm"> (Step 2/2)</span></p>
-                            </div>
-                            <div>
-                                <img onClick={handleFormClose} className="w-6 h-6" src={assets.close} alt="" />
-                            </div>
-                        </div>
-                        <div className="mt-10">
-                            <p className="font-PJSbold text-[16px]">Customize Prices by Day    <span className="text-xs text-secondary"> (You can select many days at once)</span></p>
-                            <div className="flex gap-4 mt-5 overflow-x-auto max-w-[700px]">
-                                {daysOfWeek.map((day, index) => (
-                                    <div key={index} className="flex items-center">
-                                        <p
-                                            className={`font-PJSregular  flex justify-center items-center  text-sm whitespace-nowrap border px-5 py-2 rounded-xl cursor-pointer ${selectedDays.includes(day) ? 'bg-blue text-white' : 'text-black'}`}
-                                            onClick={() => toggleDay(day)}
-                                        >
-                                            {day}
-                                        </p>
-
-                                    </div>
-                                ))}
-                            </div>
-
-                        </div>
-                        <div className="mt-10">
-                            <p className="font-PJSbold text-[16px]">Booking Durations <span className="text-xs text-secondary">(Select all that apply)</span></p>
-                            <div className="flex gap-4 mt-3">
-                                {timeDuration.map((time) => (
-                                    <div key={time} className="flex items-center">
-                                        <p
-                                            className={`font-PJSmedium flex justify-center items-center w-[92px] h-[42px] text-sm border rounded-xl cursor-pointer ${selectedTimes.includes(time) ? 'bg-blue text-white' : ''}`}
-                                            onClick={() => handleTimeSelect(time)}
-                                        >
-                                            {time}
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="mt-10">
-                            <div>
-
-                                <p className="text-[16px] font-PJSbold flex gap-5 items-center">{selectedDaysInOrder}</p>
-                                <div className="relative mt-5">
-                                    <input
-                                        className={`block px-4 pt-4 border rounded-lg shadow-sm focus:outline-none font-PJSbold text-sm placeholder-black bg-white border-secondaryThirty w-full h-[54px]`} type="text"
-                                        placeholder="$__ to $__"
-                                    />
-                                    <label htmlFor="FieldName" className="absolute top-2 left-4 text-secondary font-PJSmedium text-xs">Morning price (From <span>__</span> to <span>__</span></label>
-                                </div>
-
-                            </div>
-
-                            <div className="flex items-center w-full gap-2">
-                                <div className="relative mt-5 w-full">
-                                    <select
-                                        className={`block px-4 pt-4 border rounded-lg shadow-sm focus:outline-none font-PJSbold text-sm appearance-none bg-white border-secondaryThirty selectIcon w-full h-[67px]`}
-                                    >
-                                        <option value="">Choose an option</option>
-                                        <option value="General Discount">From Opening</option>
-                                    </select>
-                                    <label htmlFor="DiscountType" className="absolute top-3 left-4 text-secondary font-PJSmedium text-xs">From</label>
-                                </div>
-                                <div className="relative mt-5 w-full">
-                                    <select
-                                        className={`block px-4 pt-4 border rounded-lg shadow-sm focus:outline-none font-PJSbold text-sm appearance-none bg-white border-secondaryThirty selectIcon w-full h-[67px]`}
-                                    >
-                                        <option value="">Choose an option</option>
-                                        <option value="General Discount">12:00pm</option>
-                                    </select>
-                                    <label htmlFor="DiscountType" className="absolute top-3 left-4 text-secondary font-PJSmedium text-xs">To</label>
-                                </div>
-                            </div>
-                            <div className="relative mt-5">
-                                <input
-                                    className={`block px-4 pt-4 border rounded-lg shadow-sm focus:outline-none font-PJSbold text-sm placeholder-black bg-white border-secondaryThirty w-full h-[54px]`} type="text"
-                                    placeholder="Morning Price"
-                                />
-                                <label htmlFor="FieldName" className="absolute top-2 left-4 text-secondary font-PJSmedium text-xs">Time Slot Name</label>
-                            </div>
-                            <div className="relative mt-5 flex justify-between items-center  border rounded-lg border-secondaryThirty px-3">
-                                <input
-                                    className={`block pt-4 shadow-sm focus:outline-none font-PJSmedium text-sm  bg-white  w-full h-[54px]`} type="text" />
-                                <label htmlFor="FieldName" className="absolute top-2 left-4 text-secondary font-PJSmedium text-xs">Price for 60 min</label>
-                                <div className="mr-3 cursor-pointer">
-                                    <img src={assets.dollar} className="w-6 h-6" />
-                                </div>
-                            </div>
-                            <div className="relative mt-5 flex justify-between items-center  border rounded-lg border-secondaryThirty px-3">
-                                <input
-                                    className={`block pt-4 shadow-sm focus:outline-none font-PJSmedium text-sm  bg-white  w-full h-[54px]`} type="text" />
-                                <label htmlFor="FieldName" className="absolute top-2 left-4 text-secondary font-PJSmedium text-xs">Price for 120 min</label>
-                                <div className="mr-3 cursor-pointer">
-                                    <img src={assets.dollar} className="w-6 h-6" />
-                                </div>
-                            </div>
-                            <div className="h-[1px] w-full my-3 bg-secondaryTwenty mt-4"></div>
-
-                            <div className="flex items-center gap-2 font-PJSbold text-sm mt-2">
-                                <div className="bg-lime p-1 rounded-full">
-                                    <img className="w-3 h-3" src={assets.Plus} alt="" />
-                                </div>
-
-                                <p>Add Time Slot</p>
-                                <div className="ml-auto">
-                                    <img src={assets.Next} alt="" />
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        {/* <div>
-                            <div className="mt-7 flex items-center gap-3">
-                                <p className=" text-[16px] font-PJSextra">
-                                    Monday , Tuesday , Wednesday
-                                </p>
-                                <div className="bg-lime rounded-full p-1">
-                                    <img src={assets.checkMark} alt="" />
-                                </div>
-                            </div>
-                            <div className="relative mt-5">
-                                <input
-                                    type="text"
-                                    className="block w-full h-[67px] px-4 pt-5 border border-secondaryThirty rounded-lg shadow-sm focus:outline-none font-PJSbold placeholder-black"
-                                    placeholder="$140 for 60 minutes - $240 for 120 minutes"
-                                />
-                                <label
-                                    className="absolute top-[-5px] text-secondary px-4 py-5 font-PJSmedium text-xs"
+                              <div style={{ flex: "1" }}>
+                                <span
+                                  style={{
+                                    color: colors.black,
+                                    fontSize: "10px",
+                                  }}
                                 >
-                                    Morning price (6:00 am to 12:00 pm)
-                                </label>
-                            </div>
-                            <div className="relative mt-5">
-                                <input
-                                    type="text"
-                                    className="block w-full h-[67px] px-4 pt-5 border border-secondaryThirty rounded-lg shadow-sm focus:outline-none font-PJSbold placeholder-black"
-                                    placeholder="$150 for 60 minutes - $250 for 120 minutes"
-                                />
-                                <label
-                                    className="absolute top-[-5px] text-secondary px-4 py-5 font-PJSmedium text-xs"
+                                  {`${timing.name} (${timing.from} to ${timing.to})`}
+                                </span>
+                                <span
+                                  style={{
+                                    color: colors.black,
+                                    fontSize: "14px",
+                                  }}
                                 >
-                                    Afternoon price (12:00 pm-5:00 pm)
-                                </label>
-                            </div>
-                            <div className="relative mt-5">
-                                <input
-                                    type="text"
-                                    className="block w-full h-[67px] px-4 pt-5 border border-secondaryThirty rounded-lg shadow-sm focus:outline-none font-PJSbold placeholder-black"
-                                    placeholder="$170 for 60 minutes - $270 for 120 minutes"
-                                />
-                                <label
-                                    className="absolute top-[-5px] text-secondary px-4 py-5 font-PJSmedium text-xs"
-                                >
-                                    Night price (5:00 pm-Until close)
-                                </label>
-                            </div>
+                                  {timing.prices &&
+                                    timing.prices
+                                      .map((t, i) => {
+                                        return `$${t.price} for ${
+                                          t.bookingDuration
+                                        }${
+                                          i <= timing.prices.length - 2
+                                            ? " - "
+                                            : ""
+                                        }`;
+                                      })
+                                      .join("")}
+                                </span>
+                              </div>
 
-                        </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setTimings(
+                                    timings.filter(
+                                      (t) => t.name !== timing.name
+                                    )
+                                  );
+                                }}
+                                style={{
+                                  background: "none",
+                                  border: "none",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <img
+                                  className="w-6"
+                                  src={assets.cross}
+                                  alt="Cross Icon"
+                                />
+                              </button>
+                            </div>
+                          );
+                        })}
+                  </div>
+                )}
 
-                        <div>
-                            <div className="mt-7 flex items-center gap-3">
-                                <p className=" text-[16px] font-PJSextra">
-                                    Thursday , Friday
-                                </p>
-                                <div className="bg-lime rounded-full p-1">
-                                    <img src={assets.checkMark} alt="" />
-                                </div>
-                            </div>
-                            <div className="relative mt-5">
-                                <input
-                                    type="text"
-                                    className="block w-full h-[67px] px-4 pt-5 border border-secondaryThirty rounded-lg shadow-sm focus:outline-none font-PJSbold placeholder-black"
-                                    placeholder="$150 for 60 minutes - $250 for 120 minutes"
-                                />
-                                <label
-                                    className="absolute top-[-5px] text-secondary px-4 py-5 font-PJSmedium text-xs"
-                                >
-                                    Morning price (6:00 am to 12:00 pm)
-                                </label>
-                            </div>
-                            <div className="relative mt-5">
-                                <input
-                                    type="text"
-                                    className="block w-full h-[67px] px-4 pt-5 border border-secondaryThirty rounded-lg shadow-sm focus:outline-none font-PJSbold placeholder-black"
-                                    placeholder="$170 for 60 minutes - $270 for 120 minutes"
-                                />
-                                <label
-                                    className="absolute top-[-5px] text-secondary px-4 py-5 font-PJSmedium text-xs"
-                                >
-                                    Afternoon price (12:00 pm-5:00 pm)
-                                </label>
-                            </div>
-                            <div className="relative mt-5">
-                                <input
-                                    type="text"
-                                    className="block w-full h-[67px] px-4 pt-5 border border-secondaryThirty rounded-lg shadow-sm focus:outline-none font-PJSbold placeholder-black"
-                                    placeholder="$180 for 60 minutes - $280 for 120 minutes"
-                                />
-                                <label
-                                    className="absolute top-[-5px] text-secondary px-4 py-5 font-PJSmedium text-xs"
-                                >
-                                    Night price (5:00 pm-Until close)
-                                </label>
-                            </div>
+              <div>
+                <div
+                  style={{
+                    height: "1px",
+                    backgroundColor: colors.secondary,
+                    width: "100%",
+                    alignSelf: "center",
+                    marginTop: "20px",
+                  }}
+                />
 
-                        </div>
+                {((customisedPrices.filter(
+                  (cP) => cP.isEnabled && cP.isSelected
+                ).length > 0 &&
+                  !isFinished) ||
+                  (customisedPrices.filter(
+                    (cP) => !cP.isEnabled && cP.isSelected
+                  ).length > 0 &&
+                    outerIndex !== null &&
+                    innerIndex !== null)) && (
+                  <div>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        width: "100%",
+                      }}
+                    >
+                      <div style={{ flex: "0.48" }}>
+                        <select
+                          defaultValue={
+                            outerIndex !== null && innerIndex !== null
+                              ? timings[timings.length - 1].from
+                              : null
+                          }
+                          style={{
+                            borderWidth: "1px",
+                            borderColor: colors.secondary,
+                            height: "60px",
+                            width: "100%",
+                            marginTop: "25px",
+                            borderRadius: "12px",
+                            paddingLeft: "20px",
+                            fontSize: "14px",
+                            color: colors.secondary,
+                          }}
+                          onChange={(e) => {
+                            // if (outerIndex !== null && innerIndex !== null) {
+                            //   savedPrices[outerIndex].timings[innerIndex].from =
+                            //     e.target.value;
+                            // } else {
+                            timings[timings.length - 1].from = e.target.value;
+                            setTimings([...timings]);
+                            // }
+                          }}
+                        >
+                          <option value="" disabled selected>
+                            From
+                          </option>
+                          {timeSlots.map((slot, index) => (
+                            <option key={index} value={slot.key}>
+                              {slot.value}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
 
-                        <div>
-                            <div className="mt-7 flex items-center gap-3">
-                                <p className=" text-[16px] font-PJSextra">
-                                    Saturday , Sunday
-                                </p>
-                                <div className="bg-lime rounded-full p-1">
-                                    <img src={assets.checkMark} alt="" />
-                                </div>
-                            </div>
-                            <div className="relative mt-5">
-                                <input
-                                    type="text"
-                                    className="block w-full h-[67px] px-4 pt-5 border border-secondaryThirty rounded-lg shadow-sm focus:outline-none font-PJSbold placeholder-black"
-                                    placeholder="$140 for 60 minutes - $240 for 120 minutes"
-                                />
-                                <label
-                                    className="absolute top-[-5px] text-secondary px-4 py-5 font-PJSmedium text-xs"
-                                >
-                                    Morning price (6:00 am to 12:00 pm)
-                                </label>
-                            </div>
-                            <div className="relative mt-5">
-                                <input
-                                    type="text"
-                                    className="block w-full h-[67px] px-4 pt-5 border border-secondaryThirty rounded-lg shadow-sm focus:outline-none font-PJSbold placeholder-black"
-                                    placeholder="$150 for 60 minutes - $250 for 120 minutes"
-                                />
-                                <label
-                                    className="absolute top-[-5px] text-secondary px-4 py-5 font-PJSmedium text-xs"
-                                >
-                                    Afternoon price (12:00 pm-5:00 pm)
-                                </label>
-                            </div>
-                            <div className="relative mt-5">
-                                <input
-                                    type="text"
-                                    className="block w-full h-[67px] px-4 pt-5 border border-secondaryThirty rounded-lg shadow-sm focus:outline-none font-PJSbold placeholder-black"
-                                    placeholder="$170 for 60 minutes - $270 for 120 minutes"
-                                />
-                                <label
-                                    className="absolute top-[-5px] text-secondary px-4 py-5 font-PJSmedium text-xs"
-                                >
-                                    Night price (5:00 pm-Until close)
-                                </label>
-                            </div>
+                      <div style={{ flex: "0.48" }}>
+                        <select
+                          defaultValue={
+                            outerIndex !== null && innerIndex !== null
+                              ? timings[timings.length - 1].to
+                              : null
+                          }
+                          style={{
+                            borderWidth: "1px",
+                            borderColor: colors.secondary,
+                            height: "60px",
+                            width: "100%",
+                            marginTop: "25px",
+                            borderRadius: "12px",
+                            paddingLeft: "20px",
+                            fontSize: "14px",
+                            color: colors.secondary,
+                          }}
+                          onChange={(e) => {
+                            // if (outerIndex !== null && innerIndex !== null) {
+                            //   savedPrices[outerIndex].timings[innerIndex].to =
+                            //     e.target.value;
+                            // } else {
+                            timings[timings.length - 1].to = e.target.value;
+                            setTimings([...timings]);
+                            // }
+                          }}
+                        >
+                          <option value="" disabled selected>
+                            To
+                          </option>
+                          {timeSlots.map((slot, index) => (
+                            <option key={index} value={slot.key}>
+                              {slot.value}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
 
-                        </div> */}
-                        <div className="flex mt-12 gap-4 w-full justify-center font-PJSMedium items-center">
-                            <button onClick={handleBack}
-                                className="w-full  transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full bg-secondaryTen font-PJSmedium justify-center items-center "
+                    <div
+                      style={{
+                        marginTop: "10px",
+                      }}
+                    >
+                      <input
+                        type="text"
+                        style={{
+                          backgroundColor: "white",
+                          borderColor: colors.secondary,
+                          height: "60px",
+                          width: "100%",
+                          marginTop: "20px",
+                          borderRadius: "16px",
+                          paddingLeft: "20px",
+                          fontSize: "14px",
+                          color: colors.secondary,
+                          border: "1px solid grey",
+                        }}
+                        onChange={(e) => {
+                          // if (outerIndex !== null && innerIndex !== null) {
+                          //   if (
+                          //     savedPrices[outerIndex].timings[innerIndex]
+                          //       .name !== "General"
+                          //   ) {
+                          //     savedPrices[outerIndex].timings[innerIndex].name =
+                          //       e.target.value;
+                          //   }
+                          // } else {
+                          if (
+                            customisedPrices.filter(
+                              (cP) =>
+                                cP.day === "General" &&
+                                cP.isEnabled &&
+                                cP.isSelected
+                            ).length === 0
+                          ) {
+                            timings[timings.length - 1].name = e.target.value;
+                          } else {
+                            timings[timings.length - 1].name = "General";
+                          }
+                          setTimings([...timings]);
+                          // }
+                        }}
+                        value={
+                          // outerIndex !== null && innerIndex !== null
+                          //   ? savedPrices[outerIndex].timings[innerIndex].name
+                          //   :
+                          customisedPrices.filter(
+                            (cP) =>
+                              cP.day === "General" &&
+                              cP.isEnabled &&
+                              cP.isSelected
+                          ).length > 0
+                            ? "General"
+                            : timings[timings.length - 1]?.name || ""
+                        }
+                        placeholder="Time Slot Name"
+                        disabled={
+                          // outerIndex !== null && innerIndex !== null
+                          //   ? savedPrices[outerIndex].timings[innerIndex]
+                          //       .name === "General"
+                          //   :
+                          customisedPrices.filter(
+                            (cP) =>
+                              cP.day === "General" &&
+                              cP.isEnabled &&
+                              cP.isSelected
+                          ).length > 0
+                        }
+                      />
+                    </div>
+
+                    <div
+                      style={{
+                        marginTop: "10px",
+                      }}
+                    >
+                      {timings[timings.length - 1].prices &&
+                        timings[timings.length - 1].prices.length ===
+                          timings[timings.length - 1].prices.map((p) => {
+                            return p.bookingDuration;
+                          }).length &&
+                        bookingDurations
+                          .filter(
+                            (b) =>
+                              outerIndex === null || innerIndex === null
+                                ? b.isSelected
+                                : timings[timings.length - 1].prices
+                                    .map((p) => p.bookingDuration)
+                                    .find(
+                                      (bookingDuration) =>
+                                        bookingDuration === b.name
+                                    ) // Return the result
+                          )
+                          .map((b, i) => (
+                            <div
+                              key={i}
+                              style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                justifyContent: "center",
+                                alignItems: "center",
+                              }}
                             >
-                                Back
-                            </button>
-                            <button
-                                className="w-full  h-[54px] text-[14px] rounded-full bg-secondaryTen font-PJSmedium justify-center items-center text-secondaryThirty"
-                                disabled={true}
-                            >
-                                Finish
-                            </button>
-                        </div>
-                    </form>
-                </>
-            )}
+                              <input
+                                type="number"
+                                style={{
+                                  borderColor: colors.secondary,
+                                  height: "60px",
+                                  width: "100%",
+                                  marginTop: "20px",
+                                  borderRadius: "16px",
+                                  paddingLeft: "20px",
+                                  fontSize: "14px",
+                                  color: colors.secondary,
+                                  backgroundColor: "white",
+                                  border: "1px solid grey",
+                                }}
+                                onChange={(e) => {
+                                  // if (
+                                  //   outerIndex !== null &&
+                                  //   innerIndex !== null
+                                  // ) {
+                                  //   savedPrices[outerIndex].timings[
+                                  //     innerIndex
+                                  //   ].prices[i].price = e.target.value;
+                                  // } else {
+                                  var lastTimingPrice = timings[
+                                    timings.length - 1
+                                  ]?.prices[i] || {
+                                    price: "",
+                                    bookingDuration: "",
+                                  };
+                                  lastTimingPrice.price = e.target.value;
+                                  lastTimingPrice.bookingDuration = b.name;
+                                  setTimings([...timings]);
+                                  // }
+                                }}
+                                value={
+                                  // outerIndex !== null && innerIndex !== null
+                                  //   ? savedPrices[outerIndex].timings[
+                                  //       innerIndex
+                                  //     ].prices[i].price
+                                  //   :
+                                  timings[timings.length - 1]?.prices[i]
+                                    ?.price || ""
+                                }
+                                placeholder={`Price for ${b.name}`}
+                              />
+                            </div>
+                          ))}
+                    </div>
+                  </div>
+                )}
 
+                {(customisedPrices.filter((cP) => cP.isEnabled && cP.isSelected)
+                  .length > 0 ||
+                  savedPrices.length > 0) &&
+                  !isFinished &&
+                  (outerIndex === null || innerIndex === null) && (
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginTop: "20px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          flex: 1,
+                          display: "flex",
+                          flexDirection: "row",
+                          gap: "10px",
+                          alignItems: "center",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => {
+                          if (validateForm()) {
+                            timings.push(timingObject);
+                            setTimings([...timings]);
+                          }
+                        }}
+                      >
+                        +
+                        <span
+                          style={{
+                            fontSize: "14px",
+                            color: isFinished ? colors.white : colors.primary,
+                          }}
+                        >
+                          Add Time Slot
+                        </span>
+                      </div>
 
+                      {timings.length > 0 &&
+                        customisedPrices.filter(
+                          (cP) => cP.isEnabled && cP.isSelected
+                        ).length !== 0 && (
+                          <div
+                            style={{
+                              width: "30%",
+                              height: "55px",
+                              borderRadius: "30px",
+                              backgroundColor: colors.cancel,
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              cursor: "pointer",
+                            }}
+                            onClick={() => {
+                              if (validateForm()) {
+                                timings.push(timingObject);
+                                setTimings([...timings]);
+                                setIsFinished(true);
+                              }
+                            }}
+                          >
+                            <span style={{ fontSize: "14px", color: "black" }}>
+                              Finish
+                            </span>
+                          </div>
+                        )}
+                    </div>
+                  )}
+              </div>
 
+              <div>
+                {outerIndex !== null && innerIndex !== null && (
+                  <button
+                    type="button"
+                    style={{
+                      width: "25%",
+                      borderRadius: 30,
+                      backgroundColor: colors.lime,
+                      display: "flex",
+                      marginHorizontal: 10,
+                      marginTop: 20,
+                      padding: 5,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      alignSelf: "flex-end",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
+                    onClick={saveEditedPrice}
+                  >
+                    <p
+                      style={{
+                        color: colors.primary,
+                        fontSize: 11,
+                        margin: 0,
+                      }}
+                    >
+                      Done
+                    </p>
+                  </button>
+                )}
 
-        </div>
-    );
+                {isFinished && (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      marginTop: 20,
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <p
+                      style={{
+                        color: "black",
+                        fontSize: 12,
+                        margin: 0,
+                      }}
+                    >
+                      {`You've set prices for ${customisedPrices
+                        .filter((cP) => cP.isSelected && cP.isEnabled)
+                        .map((c, i) => {
+                          return `${c.name}${
+                            i !==
+                            customisedPrices.filter((cP) => cP.isSelected)
+                              .length -
+                              1
+                              ? ", "
+                              : ""
+                          }`;
+                        })
+                        .join("")}`}
+                    </p>
+
+                    <button
+                      type="button"
+                      style={{
+                        flex: 0.25,
+                        borderRadius: 30,
+                        backgroundColor: colors.lime,
+                        display: "flex",
+                        marginHorizontal: 10,
+                        padding: 5,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        border: "none",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        // Adding the data to saved prices list
+                        savedPrices.push({
+                          days: customisedPrices.filter(
+                            (cP) => cP.isSelected && cP.isEnabled
+                          ),
+                          timings: timings.slice(0, timings.length - 1),
+                        });
+                        setSavedPrices([...savedPrices]);
+
+                        setTimeout(() => {
+                          customisedPrices.forEach((cP) => {
+                            if (cP.isEnabled && cP.isSelected) {
+                              cP.isEnabled = false;
+                            }
+                          });
+                          bookingDurations.forEach((bD) => {
+                            if (bD.isSelected) {
+                              bD.isSelected = false;
+                            }
+                          });
+
+                          // resetting timings array
+                          setTimings([timingObject]);
+                          // Disabling already selected days
+                          setCustomisedPrices([...customisedPrices]);
+                          // clearing booking durations
+                          setBookingDurations([...bookingDurations]);
+
+                          setIsFinished(false);
+                        }, 300);
+                      }}
+                    >
+                      <p
+                        style={{
+                          color: colors.primary,
+                          fontSize: 11,
+                          margin: 0,
+                        }}
+                      >
+                        Save
+                      </p>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          {!showFieldsSection && (
+            <div className="flex mt-12 gap-4 w-full justify-center font-PJSMedium items-center">
+              <button
+                type="button"
+                onClick={handleBack}
+                className="w-full  transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full bg-secondaryTen font-PJSmedium justify-center items-center "
+              >
+                Back
+              </button>
+              <button
+                type={"submit"}
+                style={{
+                  backgroundColor: colors.lime,
+                  color: "#000",
+                }}
+                className="w-full  h-[54px] text-[14px] rounded-full bg-secondaryTen font-PJSmedium justify-center items-center text-secondaryThirty"
+                disabled={!(step !== 2 || savedPrices.length > 0)}
+              >
+                {step === 1 ? "Next" : "Add Field"}
+              </button>
+            </div>
+          )}
+
+          {loading && <Loader />}
+        </form>
+      </FormProvider>
+    </div>
+  );
 };
-export default FieldPrice
+export default FieldPrice;

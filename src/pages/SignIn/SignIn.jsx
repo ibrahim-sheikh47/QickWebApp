@@ -5,16 +5,33 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import assets from "../../assets/assets"
+import assets from "../../assets/assets";
 
 //react
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 //router
 import { useNavigate } from "react-router-dom";
+import { login } from "../../api/services/authService";
+import Toast from "../../components/Toast/Toast";
+import Loader from "../../components/Loader/Loader";
+import { useStateContext } from "../../context";
 
 const SignIn = () => {
+  const { setUser } = useStateContext();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [type, setType] = useState("success");
+
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    if (isLoggedIn) {
+      navigate("/Dashboard/Reports");
+    }
+  }, []);
+
   const formSchema = yup.object().shape({
     email: yup
       .string()
@@ -28,8 +45,30 @@ const SignIn = () => {
   });
 
   const { errors } = formState;
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
+    setLoading(true);
+    try {
+      const response = await login(data);
+      showToast(response.message, "success");
+      localStorage.setItem("authToken", response.token);
+      localStorage.setItem("isLoggedIn", true);
+      setUser(response.existingUser);
+      
+      navigate("/Dashboard/Reports");
+    } catch (err) {
+      if (err.response && err.response.data) {
+        showToast(err.response.data.message, "error");
+      }
+      console.log(err.response);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const showToast = (message, type = "success") => {
+    setMessage(message);
+    setType(type);
+    setOpen(true);
   };
 
   const [showPassword, setShowPassword] = useState(false);
@@ -54,10 +93,17 @@ const SignIn = () => {
                 {...register("email")}
                 className={`border outline-none border-secondaryThirty w-full mt-4 pt-4 rounded-[10px] h-[50px] px-4 font-PJSmedium text-primary text-sm`}
               />
-              <label htmlFor="email" className="absolute top-6 left-4 w-full text-secondary font-PJSmedium text-xs">
+              <label
+                htmlFor="email"
+                className="absolute top-6 left-4 w-full text-secondary font-PJSmedium text-xs"
+              >
                 Email Address
               </label>
-              {/* {errors.email && <span className="error text-sm font-PJSmedium  text-redbutton">{errors.email.message}</span>} */}
+              {errors.email && (
+                <span className="error text-sm font-PJSmedium  text-redbutton">
+                  {errors.email.message}
+                </span>
+              )}
             </div>
             <div className="relative mt-5 flex items-center border border-secondaryThirty h-[50px] rounded-[10px]">
               <input
@@ -66,24 +112,40 @@ const SignIn = () => {
                 {...register("password")}
                 className={`outline-none w-full mt-4 px-4 font-PJSmedium text-primary text-sm`}
               />
-              <label htmlFor="password" className="absolute top-[6px] left-4 text-secondary font-PJSmedium text-xs">
+              <label
+                htmlFor="password"
+                className="absolute top-[6px] left-4 text-secondary font-PJSmedium text-xs"
+              >
                 Password
               </label>
-              <div className="mr-3 cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
-                <img src={showPassword ? assets.eyeOpen : assets.eye} className="w-6 h-6" />
+              <div
+                className="mr-3 cursor-pointer"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <img
+                  src={showPassword ? assets.eyeOpen : assets.eye}
+                  className="w-6 h-6"
+                />
               </div>
             </div>
-            {/* {errors.password && <span className="error text-sm font-PJSmedium  text-redbutton">{errors.password.message}</span>} */}
+            {errors.password && (
+              <span className="error text-sm font-PJSmedium  text-redbutton">
+                {errors.password.message}
+              </span>
+            )}
             <button
               type="submit"
-              onClick={() => navigate("/Dashboard/Reports")}
+              // onClick={() => navigate("/Dashboard/Reports")}
               className="bg-lime w-full h-[50px] rounded-[100px] mt-4 text-[14px] font-PJSmedium transition duration-300 ease-in-out transform hover:scale-105"
             >
               Sign In
             </button>
             <div className="flex justify-center items-center gap-1 bg-secondaryTen w-full h-[50px] rounded-[100px] mt-4 text-[14px] font-PJSregular transition duration-300 ease-in-out transform hover:scale-105">
               Don't have an account?
-              <button onClick={() => navigate("/SignUp")} className="flex w-[60px] font-PJSbold">
+              <button
+                onClick={() => navigate("/SignUp")}
+                className="flex w-[60px] font-PJSbold"
+              >
                 Sign Up
               </button>
             </div>
@@ -97,8 +159,15 @@ const SignIn = () => {
         </div>
       </div>
       <div className="min-w-[508px] h-[560px] ">
-        <img src={assets.bgImage} className="w-[508px] h-full object-cover rounded-r-[20px]" />
+        <img
+          src={assets.bgImage}
+          className="w-[508px] h-full object-cover rounded-r-[20px]"
+        />
       </div>
+
+      <Toast open={open} setOpen={setOpen} message={message} type={type} />
+
+      {loading && <Loader />}
     </div>
   );
 };

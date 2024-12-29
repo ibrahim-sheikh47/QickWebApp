@@ -2,65 +2,162 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @font-face {
-    font-family: "PJSregular" ;
-    src: url(../src/assets/fonts/Regular.ttf);
+  font-family: "PJSregular";
+  src: url(../src/assets/fonts/Regular.ttf);
 }
 @font-face {
-    font-family: "PJSbold" ;
-    src: url(../src/assets/fonts/Bold.ttf);
+  font-family: "PJSbold";
+  src: url(../src/assets/fonts/Bold.ttf);
 }
 @font-face {
-    font-family: "PJSextra" ;
-    src: url(../src/assets/fonts/ExtraBold.ttf);
+  font-family: "PJSextra";
+  src: url(../src/assets/fonts/ExtraBold.ttf);
 }
 @font-face {
-    font-family: "PJSmedium" ;
-    src: url(../src/assets/fonts/Medium.ttf);
+  font-family: "PJSmedium";
+  src: url(../src/assets/fonts/Medium.ttf);
 }
 
 .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .no-scrollbar::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 @keyframes zoomIn {
-    0% {
-        transform: scale(0);
-        opacity: 0;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 .animate-zoom-in {
-    animation: zoomIn 0.3s ease-in-out;
+  animation: zoomIn 0.3s ease-in-out;
 }
-.selectIcon{
-    background-image: url('assets/svgs/Down.svg');
-    background-size: 20px;
-    background-position: right 20px center;
-    background-repeat: no-repeat;
+.selectIcon {
+  background-image: url("assets/svgs/Down.svg");
+  background-size: 20px;
+  background-position: right 20px center;
+  background-repeat: no-repeat;
 }
 .placeholder-black::placeholder {
-    color: black;
+  color: black;
 }
-  .bg-image::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url("./assets/bg-image.jpg");
-    background-repeat: no-repeat;
-    background-size: cover;
-    filter: blur(10px);
-    z-index: -1;
-  }
+.bg-image::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("./assets/bg-image.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  filter: blur(10px);
+  z-index: -1;
+}
 
+h2 {
+  color: #333;
+  text-align: left;
+}
+
+.rbc-event {
+  background-color: transparent !important;
+  border: none !important;
+  color: #333 !important;
+  box-shadow: none;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+.rbc-header {
+  margin-top: 15px;
+}
+
+/* Remove borders between columns in the time grid */
+.rbc-time-content > * + * {
+  border-left: none;
+}
+
+/* Remove borders from the time sidebar (left column with time labels) */
+.rbc-time-column {
+  border: none;
+}
+
+/* Remove border below the toolbar for time-based views (day/week) */
+.rbc-time-view {
+  border: none;
+}
+
+/* Optional: Remove borders from the entire time grid */
+.rbc-time-content {
+  border: none;
+}
+
+/* .rbc-row {
+  display: none;
+} */
+
+.rbc-current-time-indicator {
+  background-color: red; /* Bright red line for visibility */
+  height: 1px; /* Thickness of the line */
+  z-index: 10; /* Ensure it appears on top */
+}
+
+.rbc-event-label {
+  display: none;
+}
+
+/* Adjust height for time slot rows */
+.rbc-time-slot {
+  height: 60px; /* Set this to your preferred height for each time slot */
+  background-color: #f7f7f7;
+  width: 5.5rem;
+}
+
+/* If you also want to increase the overall row height for each hour, 
+   you may want to adjust .rbc-timeslot-group */
+.rbc-timeslot-group {
+  height: auto;
+  min-height: 60px; /* Ensure the time slot group can expand properly */
+}
+
+.rbc-events-container,
+.rbc-day-slot {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+/* Target the time labels specifically in the calendar */
+.rbc-label {
+  padding-right: 20px;
+  font-size: 11px !important; /* Adjust the size as needed */
+}
+
+.rbc-allday-cell {
+  display: none; /* Hides the all-day section cells */
+}
+
+.rbc-time-header {
+  display: none; /* Hides the all-day section rows */
+}
+
+.ant-form-item {
+  margin-bottom: 12px; /* Reduce the default gap */
+  height: auto;
+  padding: 0px;
+}

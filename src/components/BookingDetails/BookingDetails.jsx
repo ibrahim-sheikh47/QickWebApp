@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 // BookingDetails.js
 
-
 const BookingDetails = ({ court, date, time, price, bookingId }) => {
   return (
     <div className="flex text-start items-center gap-5 mt-5 text-secondary font-PJSregular text-[14px] font-semibold">

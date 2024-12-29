@@ -1,9 +1,12 @@
 import { AppNavigation } from "./navigation/AppNavigation";
+import { StateContextProvider } from "./context";
 
 function App() {
   return (
     <>
-      <AppNavigation />
+      <StateContextProvider>
+        <AppNavigation />
+      </StateContextProvider>
     </>
   );
 }
