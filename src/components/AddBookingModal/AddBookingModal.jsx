@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   Button,
@@ -13,13 +13,23 @@ import {
 import { SearchOutlined } from "@ant-design/icons";
 import AddUserOrTeamModal from "../AddUserOrTeamModal/AddUserOrTeamModal"; // Ensure the path is correct
 import moment from "moment";
-import { createBooking } from "../../api/services/bookingService";
+import {
+  createBooking,
+  updateBooking,
+} from "../../api/services/bookingService";
 import Loader from "../Loader/Loader";
 
 const { RangePicker } = TimePicker;
 const { Option } = Select;
 
-const AddBookingModal = ({ fields, isVisible, onClose, onNext }) => {
+const AddBookingModal = ({
+  fields,
+  isVisible,
+  onClose,
+  onNext,
+  mode = "add",
+  initialValues = {},
+}) => {
   const [form] = Form.useForm();
   const [bookingType, setBookingType] = useState("Add Users"); // Default to "Add Users"
   const [recurringType, setRecurringType] = useState("Never");
@@ -38,6 +48,27 @@ const AddBookingModal = ({ fields, isVisible, onClose, onNext }) => {
     { label: "Sat", value: "Saturday" },
     { label: "Sun", value: "Sunday" },
   ];
+
+  useEffect(() => {
+    if (mode === "edit" && initialValues) {
+      // selectedUsers.push(initialValues.rivals[0]);
+      setSelectedUsers([initialValues.team]);
+
+      form.setFieldsValue({
+        ...initialValues,
+        field: initialValues.field._id,
+        startDateTime: getMomentDate(initialValues.startDateTime),
+        endDateTime: getMomentDate(initialValues.endDateTime),
+      });
+
+      if (initialValues.recurring) {
+        handleRecurringChange(initialValues.recurring);
+      }
+      if (initialValues.repeatedDays) {
+        setRepeatedDays(initialValues.repeatedDays);
+      }
+    }
+  }, [initialValues, form, mode]);
 
   const handleBookingTypeChange = (e) => {
     setBookingType(e.target.value);
@@ -60,6 +91,10 @@ const AddBookingModal = ({ fields, isVisible, onClose, onNext }) => {
     setUserModalVisible(false);
   };
 
+  const getMomentDate = (date) => {
+    return moment.isMoment(date) ? date : moment(date);
+  };
+
   const handleSubmit = () => {
     setLoading(true);
     try {
@@ -80,9 +115,15 @@ const AddBookingModal = ({ fields, isVisible, onClose, onNext }) => {
           team: selectedUsers[0],
           rivals: [selectedUsers[1]],
           repeatedDays: repeatedDays,
+          recurringType: values.recurringType,
         };
-        console.log(JSON.stringify(data));
-        const response = await createBooking(data);
+
+        let response;
+        if (mode === "add") {
+          response = await createBooking(data);
+        } else if (mode === "edit") {
+          response = await updateBooking(data, initialValues._id);
+        }
         onNext(response);
       });
     } catch (err) {
@@ -95,7 +136,7 @@ const AddBookingModal = ({ fields, isVisible, onClose, onNext }) => {
   return (
     <>
       <Modal
-        title="Add Booking"
+        title={mode === "add" ? "Add Booking" : "Edit Booking"}
         visible={isVisible}
         onCancel={onClose}
         footer={
@@ -120,7 +161,7 @@ const AddBookingModal = ({ fields, isVisible, onClose, onNext }) => {
               }}
               onClick={handleSubmit}
             >
-              Add
+              {mode === "add" ? "Add" : "Update"}
             </Button>
           </div>
         }
@@ -316,7 +357,12 @@ const AddBookingModal = ({ fields, isVisible, onClose, onNext }) => {
                 }}
                 disabledDate={(current) => {
                   const startDateTime = form.getFieldValue("startDateTime");
-                  return current && startDateTime && current.isBefore(startDateTime, "day");
+                  return (
+                    current &&
+                    startDateTime &&
+                    moment.isMoment(startDateTime) &&
+                    current.isBefore(startDateTime, "day")
+                  );
                 }}
               />
             </Form.Item>

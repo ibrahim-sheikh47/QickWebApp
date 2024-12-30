@@ -29,3 +29,15 @@ export const createBooking = async (body) => {
     throw error;
   }
 };
+
+export const updateBooking = async (body, bookingId) => {
+  try {
+    const response = await apiClient.patch(
+      `${endpoints.booking}/${bookingId}`,
+      body
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

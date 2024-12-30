@@ -1,8 +1,15 @@
+import moment from "moment";
 import user1 from "../assets/user.png";
 import user2 from "../assets/user2.png";
 import user3 from "../assets/user3.png";
 import user4 from "../assets/user4.png";
 import user5 from "../assets/user5.png";
+
+export const DATE_FORMAT = "yyyy-MM-DD";
+
+export const formattedDate = (date) => {
+  return moment(date).format("yyyy-MM-DD");
+};
 
 export const UserData = [
   {

@@ -11,6 +11,7 @@ import { getFieldsBookingStats } from "../../../api/services/bookingService";
 import Loader from "../../../components/Loader/Loader";
 import moment from "moment";
 import AddNewFacilityModal from "../../../components/AddNewFacilityModal/AddNewFacilityModal";
+import { formattedDate } from "../../../constants";
 
 const Section = ({ title, children, date, onDateClick }) => (
   <div className="md:w-1/2 w-full h-[400px] rounded-xl bg-white shadow-sm drop-shadow-sm p-4">
@@ -136,11 +137,9 @@ const Reports = () => {
       setStats(
         await getFieldsBookingStats(
           currentFacility._id,
-          `startDate=${moment(dateRangeBookings[0].startDate).format(
-            "yyyy-MM-DD"
-          )}&endDate=${moment(dateRangeBookings[0].endDate).format(
-            "yyyy-MM-DD"
-          )}`
+          `startDate=${formattedDate(
+            dateRangeBookings[0].startDate
+          )}&endDate=${formattedDate(dateRangeBookings[0].endDate)}`
         )
       );
     } catch (error) {

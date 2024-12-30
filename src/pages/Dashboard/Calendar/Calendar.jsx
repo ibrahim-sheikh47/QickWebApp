@@ -17,6 +17,7 @@ import {
   getAllBookings,
 } from "../../../api/services/bookingService";
 import { getFacilityFields } from "../../../api/services/facilityService";
+import { formattedDate } from "../../../constants";
 
 const locales = { "en-US": enUS };
 const localizer = dateFnsLocalizer({
@@ -130,6 +131,7 @@ const CustomToolbar = ({
 const CalendarComponent = () => {
   const { currentFacility, setCurrentFacility, myFacilities } =
     useStateContext();
+  const [mode, setMode] = useState("add");
   const [loading, setLoading] = useState(false);
   const [currentDate, setCurrentDate] = useState(moment());
   const [showAddBookingModal, setShowAddBookingModal] = useState(false);
@@ -138,6 +140,8 @@ const CalendarComponent = () => {
   const [resources, setResources] = useState([]);
   const [events, setEvents] = useState([]);
   const [allFields, setAllFields] = useState([]);
+
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   const handleMonthChange = (newDate) => {
     setCurrentDate(newDate);
@@ -165,12 +169,13 @@ const CalendarComponent = () => {
     }
   }, [resources]);
 
-  const startBookingFlow = () => {
+  const startBookingFlow = (mode = "add", event = null) => {
+    setMode(mode);
+    setSelectedEvent(event);
     setShowAddBookingModal(true);
   };
 
   const handleAddBookingNext = async (data) => {
-    console.log(data);
     handleCancel();
     // setLoading(true);
     getAllBookings();
@@ -183,22 +188,30 @@ const CalendarComponent = () => {
   const fetchAllBookings = async () => {
     try {
       let booking = await getAllBookings(
-        `startDate=${currentDate.format(
-          "yyyy-MM-DD"
-        )}&endDate=${currentDate.format("yyyy-MM-DD")}`
+        `startDate=${formattedDate(currentDate)}&endDate=${formattedDate(
+          currentDate
+        )}`
       );
-      let bookings = booking.bookings;
+      // let bookings = booking.bookings;
 
-      resources.forEach((r) => {
-        bookings.forEach((b) => {
-          if (b.field._id === r.label) {
-            b.resourceId = r.label;
-            b.start = new Date(b.startDateTime);
-            b.end = new Date(b.endDateTime);
-            b.title = b.name || "Untitled Event";
-          }
-        });
-      });
+      const bookings = booking.bookings.map((b) => ({
+        ...b,
+        resourceId: b.field._id,
+        start: new Date(b.startDateTime),
+        end: new Date(b.endDateTime),
+        title: b.name || "Untitled Event",
+      }));
+
+      // resources.forEach((r) => {
+      //   bookings.forEach((b) => {
+      //     if (b.field._id === r.label) {
+      //       b.resourceId = r.label;
+      //       b.start = new Date(b.startDateTime);
+      //       b.end = new Date(b.endDateTime);
+      //       b.title = b.name || "Untitled Event";
+      //     }
+      //   });
+      // });
 
       setEvents(bookings);
     } catch (error) {
@@ -276,6 +289,7 @@ const CalendarComponent = () => {
           event: BookingCard,
         }}
         dayLayoutAlgorithm="no-overlap"
+        onSelectEvent={(event) => startBookingFlow("edit", event)}
       />
 
       {/* Add Booking Modal */}
@@ -285,6 +299,8 @@ const CalendarComponent = () => {
           isVisible={showAddBookingModal}
           onClose={handleCancel}
           onNext={handleAddBookingNext}
+          mode={mode}
+          initialValues={selectedEvent}
         />
       )}
 
