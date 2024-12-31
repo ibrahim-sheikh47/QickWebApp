@@ -94,7 +94,7 @@ export const createFacilityField = async (body, facilityId) => {
 
 export const getFacilityFields = async (facilityId) => {
   try {
-    const response = await apiClient.get(`${endpoints.fields}/${facilityId}`);
+    const response = await apiClient.get(`${endpoints.fields}${facilityId}`);
     return response.data;
   } catch (error) {
     throw error;

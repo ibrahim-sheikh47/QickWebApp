@@ -65,7 +65,27 @@ const BookingCard = ({ event }) => {
         }}
       >
         <div className="font-PJSbold">{formattedBookingType(bookingType)}</div>
-        <div className="font-PJSregular" style={{fontSize: "12px", marginTop: "6px"}}>{event.user.name}</div>
+        <div style={{ display: "flex" }}>
+          <div
+            className="font-PJSregular"
+            style={{ fontSize: "12px", marginTop: "6px" }}
+          >
+            {event.user.name}
+          </div>
+
+          {event.status === "cancelled" && (
+            <div
+              className="font-PJSregular"
+              style={{
+                fontSize: "10px",
+                marginInlineStart: "6px",
+                color: "red",
+              }}
+            >
+              Cancelled
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

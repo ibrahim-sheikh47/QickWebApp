@@ -73,7 +73,6 @@ const SignIn = () => {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  console.log("rerender");
   return (
     <div className="flex justify-center items-center min-w-full min-h-screen bg-image relative">
       <div className="flex flex-col bg-white min-w-[508px] h-[560px] rounded-l-[20px] overflow-hidden">

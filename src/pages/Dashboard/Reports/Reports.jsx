@@ -144,6 +144,7 @@ const Reports = () => {
       );
     } catch (error) {
       console.log(error);
+      setStats([]);
     } finally {
       setLoading(false);
     }
@@ -159,7 +160,7 @@ const Reports = () => {
             onClick={() => openModal("facility")}
             className="font-PJSextra text-3xl text-primary flex items-center gap-3"
           >
-            {currentFacility.name}
+            {currentFacility ? currentFacility.name : ""}
             <img
               src={assets.down}
               className="w-6"
@@ -193,7 +194,9 @@ const Reports = () => {
                 return (
                   <div
                     className="flex items-center justify-between mt-6 cursor-pointer"
-                    onClick={() => setCurrentFacility(facility)}
+                    onClick={() => {
+                      setCurrentFacility(facility);
+                    }}
                   >
                     <div className="flex items-center gap-3">
                       <img

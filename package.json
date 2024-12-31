@@ -20,6 +20,9 @@
     "axios": "^1.7.9",
     "chart.js": "^4.4.3",
     "date-fns": "^4.1.0",
+    "file-saver": "^2.0.5",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
     "react": "^18.2.0",
     "react-big-calendar": "^1.17.0",
     "react-chartjs-2": "^5.2.0",
@@ -34,6 +37,7 @@
     "react-window": "^1.8.10",
     "styled-components": "^6.1.11",
     "tailwind-scrollbar-hide": "^1.1.7",
+    "xlsx": "^0.18.5",
     "yup": "^1.4.0"
   },
   "devDependencies": {

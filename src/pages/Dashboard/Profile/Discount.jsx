@@ -399,7 +399,7 @@ const Discount = () => {
                   htmlFor="expiryDate"
                   className="absolute top-2 left-4 text-secondary font-PJSmedium text-xs"
                 >
-                  Discount Amount*
+                  Expiry Date*
                 </label>
                 {errors.expiryDate && (
                   <span className="error text-sm font-PJSmedium  text-redbutton">

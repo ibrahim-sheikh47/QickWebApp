@@ -27,6 +27,7 @@ const AddBookingModal = ({
   isVisible,
   onClose,
   onNext,
+  onCancel,
   mode = "add",
   initialValues = {},
 }) => {
@@ -140,29 +141,47 @@ const AddBookingModal = ({
         visible={isVisible}
         onCancel={onClose}
         footer={
-          <div style={{ display: "flex", gap: "0.5rem" }}>
-            <Button
-              key="cancel"
-              style={{ flex: 1, borderRadius: "25rem", padding: "1rem" }}
-              onClick={onClose}
-            >
-              Cancel
-            </Button>
-            ,
-            <Button
-              key="add"
-              type="primary"
-              style={{
-                backgroundColor: "#9CFC38",
-                flex: 1,
-                borderRadius: "25rem",
-                color: "#000",
-                padding: "1rem",
-              }}
-              onClick={handleSubmit}
-            >
-              {mode === "add" ? "Add" : "Update"}
-            </Button>
+          <div>
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <Button
+                key="cancel"
+                style={{ flex: 1, borderRadius: "25rem", padding: "1rem" }}
+                onClick={onClose}
+              >
+                Cancel
+              </Button>
+              ,
+              <Button
+                key="add"
+                type="primary"
+                style={{
+                  backgroundColor: "#9CFC38",
+                  flex: 1,
+                  borderRadius: "25rem",
+                  color: "#000",
+                  padding: "1rem",
+                }}
+                onClick={handleSubmit}
+              >
+                {mode === "add" ? "Add" : "Update"}
+              </Button>
+            </div>
+            {mode !== "add" && (
+              <Button
+                key="cancel_booking"
+                style={{
+                  width: "100%",
+                  borderRadius: "25rem",
+                  padding: "1rem",
+                  borderColor: "red",
+                  color: "red",
+                  marginTop: "12px",
+                }}
+                onClick={() => onCancel(initialValues._id)}
+              >
+                Cancel Booking
+              </Button>
+            )}
           </div>
         }
         bodyStyle={{

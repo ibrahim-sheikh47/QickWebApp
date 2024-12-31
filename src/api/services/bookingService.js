@@ -41,3 +41,14 @@ export const updateBooking = async (body, bookingId) => {
     throw error;
   }
 };
+
+export const cancelBooking = async (bookingId) => {
+  try {
+    const response = await apiClient.patch(
+      `${endpoints.booking}/cancel-booking/${bookingId}`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

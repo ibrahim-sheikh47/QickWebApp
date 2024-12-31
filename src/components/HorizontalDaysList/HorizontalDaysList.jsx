@@ -11,12 +11,15 @@ const HorizontalDaysList = React.memo(
     const [itemWidth, setItemWidth] = useState(0);
 
     useEffect(() => {
-      // Ensure the ref is set before calculating width
       if (itemRef.current) {
         setItemWidth(itemRef.current.offsetWidth);
       }
     }, [daysList]);
 
+    // Keep track of the last scrolled-to day
+    const lastDayRef = useRef(null);
+
+    // Set the initial selected day
     useEffect(() => {
       if (selectedMonth) {
         setSelectedDay(moment(selectedMonth).date());
@@ -27,31 +30,36 @@ const HorizontalDaysList = React.memo(
       (day) => {
         const container = containerRef.current;
         const selectedIndex = daysList.findIndex((d) => d.date === day);
+
         if (container && selectedIndex !== -1) {
           const selectedElement = container.children[selectedIndex];
           if (selectedElement) {
             const containerWidth = container.offsetWidth;
             const elementWidth = selectedElement.offsetWidth;
             const scrollPosition =
-              selectedElement.offsetLeft -
-              containerWidth / 2 +
-              elementWidth / 2;
+              selectedElement.offsetLeft - containerWidth / 2 + elementWidth / 2;
 
             container.scrollTo({
               left: scrollPosition,
               behavior: "smooth",
             });
+
+            // Save the last scrolled-to day
+            lastDayRef.current = day;
           }
         }
       },
       [daysList]
     );
 
+    // Scroll to the selected day on change
     useEffect(() => {
-      scrollToSelectedDay(selectedDay);
-    }, [selectedDay, scrollToSelectedDay]);
+      if (selectedDay && daysList.length > 0) {
+        scrollToSelectedDay(selectedDay);
+      }
+    }, [selectedDay, daysList, scrollToSelectedDay]);
 
-    // Generate the days from the selected month
+    // Generate the list of days for the selected month
     useEffect(() => {
       const generateDays = () => {
         const startOfMonth = moment(selectedMonth).startOf("month");
@@ -61,52 +69,53 @@ const HorizontalDaysList = React.memo(
         const days = [];
         let day = startOfMonth;
 
-        // Loop through the entire month
         while (day.isBefore(endOfMonth) || day.isSame(endOfMonth, "day")) {
           days.push({
-            day: day.format("ddd"), // e.g., Mon, Tue, ...
+            day: day.format("ddd"),
             date: day.date(),
             fullDate: day.format("YYYY-MM-DD"),
-            isToday: currentDate.isSame(day, "day"), // Only mark 'today' if it's the current date in the selected month
+            isToday: currentDate.isSame(day, "day"),
           });
           day = day.add(1, "days");
         }
 
         setDaysList(days);
-        // setSelectedDay(currentDate.date()); // Set the selected day as today initially
       };
 
       generateDays();
-    }, [selectedMonth]); // Re-run when selectedMonth changes
+    }, [selectedMonth]);
 
-    // Scroll to the next day (one item to the right)
     const scrollNext = () => {
-      if (containerRef.current && itemWidth > 0) {
-        const nextScrollPosition =
-          containerRef.current.scrollLeft + (itemWidth + 10);
-        containerRef.current.scrollTo({
-          left: nextScrollPosition,
-          behavior: "smooth",
-        });
+      if (lastDayRef.current === null) {
+        lastDayRef.current = selectedDay;
+      }
+
+      const nextDay = lastDayRef.current + 1;
+      const nextDayIndex = daysList.findIndex((d) => d.date === nextDay);
+
+      if (nextDayIndex !== -1) {
+        handleDayClick(nextDay);
       }
     };
 
-    // Scroll to the previous day (one item to the left)
     const scrollPrev = () => {
-      if (containerRef.current && itemWidth > 0) {
-        const prevScrollPosition =
-          containerRef.current.scrollLeft - (itemWidth + 10);
-        containerRef.current.scrollTo({
-          left: prevScrollPosition,
-          behavior: "smooth",
-        });
+      if (lastDayRef.current === null) {
+        lastDayRef.current = selectedDay;
+      }
+
+      const prevDay = lastDayRef.current - 1;
+      const prevDayIndex = daysList.findIndex((d) => d.date === prevDay);
+
+      if (prevDayIndex !== -1) {
+        handleDayClick(prevDay);
       }
     };
 
     const handleDayClick = (day) => {
       setSelectedDay(day);
+      lastDayRef.current = day; // Update last scrolled-to day
       if (onDayChange) {
-        const selectedDate = moment(selectedMonth).date(day); // Construct the full date
+        const selectedDate = moment(selectedMonth).date(day);
         onDayChange(selectedDate);
       }
     };
@@ -163,7 +172,6 @@ const HorizontalDaysList = React.memo(
   (prevProps, nextProps) => prevProps.selectedMonth === nextProps.selectedMonth
 );
 
-// Inline styles
 const styles = {
   wrapper: {
     display: "flex",
@@ -173,10 +181,9 @@ const styles = {
   },
   container: {
     display: "flex",
-    overflowX: "auto", // Enable horizontal scrolling
+    overflowX: "auto",
     padding: "10px",
     whiteSpace: "nowrap",
-    // scrollbarWidth: "none", // Hide scrollbar in Firefox
   },
   dayCard: {
     height: "80px",
@@ -209,23 +216,6 @@ const styles = {
     cursor: "pointer",
     borderRadius: "20px",
     transition: "background-color 0.3s ease",
-  },
-};
-
-const scrollbarStyles = {
-  // Use the ::-webkit-scrollbar pseudo-element to style the scrollbar
-  "::webkit-scrollbar": {
-    width: "8px", // Set the width of the scrollbar
-  },
-  "::webkit-scrollbar-track": {
-    background: "#f1f1f1", // Track color
-  },
-  "::webkit-scrollbar-thumb": {
-    background: "#888", // Thumb color
-    borderRadius: "4px",
-  },
-  "::webkit-scrollbar-thumb:hover": {
-    background: "#555", // Thumb hover color
   },
 };
 

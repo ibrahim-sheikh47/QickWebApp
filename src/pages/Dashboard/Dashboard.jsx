@@ -57,7 +57,8 @@ const Dashboard = () => {
     setLoading(true);
     try {
       const response = await getFacilities(user._id);
-      if (response.length > 0) setCurrentFacility(response[0]);
+      if (response.length > 0 && !currentFacility)
+        setCurrentFacility(response[0]);
       setMyFacilities(response);
     } catch (err) {
       if (err.response && err.response.data) {

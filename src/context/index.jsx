@@ -16,6 +16,7 @@ export const StateContextProvider = ({ children }) => {
 
   // Save state to localStorage whenever it changes
   useEffect(() => {
+    console.log(currentFacility);
     localStorage.setItem("currentFacility", JSON.stringify(currentFacility));
   }, [currentFacility]);
 

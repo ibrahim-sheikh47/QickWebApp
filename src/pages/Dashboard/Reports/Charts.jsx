@@ -108,12 +108,11 @@ const SalesBar = () => {
       "October",
       "November",
       "December",
-      "January",
     ],
     datasets: [
       {
         label: "",
-        data: [15, 35, 45, 25, 38, 24, 55, 60, 22, 41, 31, 51, 43],
+        data: [15, 35, 45, 25, 38, 24, 55, 60, 22, 41, 31, 51],
         backgroundColor: (context) => {
           const index = context.dataIndex;
           return index === activeIndex ? "#1F2933" : "#9CFC38";

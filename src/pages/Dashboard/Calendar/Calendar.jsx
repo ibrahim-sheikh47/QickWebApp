@@ -13,6 +13,7 @@ import AddBookingModal from "../../../components/AddBookingModal/AddBookingModal
 import Loader from "../../../components/Loader/Loader";
 import { useStateContext } from "../../../context";
 import {
+  cancelBooking,
   createBooking,
   getAllBookings,
 } from "../../../api/services/bookingService";
@@ -68,7 +69,7 @@ const CustomToolbar = ({
 
           <button
             className={"text-sm font-PJSmedium"}
-            onClick={onAddBooking}
+            onClick={() => onAddBooking()}
             style={{
               padding: "0.5rem 1rem",
               backgroundColor: "#9CFC38",
@@ -171,7 +172,7 @@ const CalendarComponent = () => {
 
   const startBookingFlow = (mode = "add", event = null) => {
     setMode(mode);
-    setSelectedEvent(event);
+    if (event) setSelectedEvent(event);
     setShowAddBookingModal(true);
   };
 
@@ -185,12 +186,24 @@ const CalendarComponent = () => {
     setShowAddBookingModal(false);
   };
 
+  const handleCancelBooking = async (bookingId) => {
+    setLoading(true);
+    try {
+      await cancelBooking(bookingId);
+      window.location.reload();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchAllBookings = async () => {
     try {
       let booking = await getAllBookings(
         `startDate=${formattedDate(currentDate)}&endDate=${formattedDate(
           currentDate
-        )}`
+        )}&facilityId=${currentFacility._id}`
       );
       // let bookings = booking.bookings;
 
@@ -289,7 +302,10 @@ const CalendarComponent = () => {
           event: BookingCard,
         }}
         dayLayoutAlgorithm="no-overlap"
-        onSelectEvent={(event) => startBookingFlow("edit", event)}
+        onSelectEvent={(event) => {
+          if (event && event.status !== "cancelled")
+            startBookingFlow("edit", event);
+        }}
       />
 
       {/* Add Booking Modal */}
@@ -301,6 +317,7 @@ const CalendarComponent = () => {
           onNext={handleAddBookingNext}
           mode={mode}
           initialValues={selectedEvent}
+          onCancel={(id) => handleCancelBooking(id)}
         />
       )}
 
