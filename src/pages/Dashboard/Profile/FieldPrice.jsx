@@ -4,6 +4,7 @@ import {
   createFacilityField,
   deleteFacilityFields,
   getFacilityFields,
+  updateFacilityField,
 } from "../../../api/services/facilityService";
 import { useForm, FormProvider } from "react-hook-form";
 import * as yup from "yup";
@@ -14,17 +15,20 @@ import { useNavigate } from "react-router-dom";
 import { MdDeleteOutline, MdDragHandle } from "react-icons/md";
 import AppModal from "../../../components/AppModal/AppModal";
 import { uploadFile } from "../../../api/services/uploadService";
+import Toast from "../../../components/Toast/Toast";
 
 const FieldPrice = () => {
-  const navigate = useNavigate();
   const { currentFacility } = useStateContext();
+  const [currentField, setCurrentField] = useState(null);
   const [fields, setFields] = useState([]);
   const [step, setStep] = useState(0);
   const [showFieldsSection, setShowFieldsSection] = useState(true);
   const [loading, setLoading] = useState(true);
   const dataX = useRef();
 
-  const [photos, setPhotos] = useState([]);
+  const [photos, setPhotos] = useState(
+    currentField ? currentField.fieldImages : []
+  );
   const [modalOpen, setModalOpen] = useState(null);
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [fieldNames, setFieldNames] = useState([]);
@@ -35,9 +39,6 @@ const FieldPrice = () => {
     setShowFieldsSection(false);
   };
 
-  const handleSubmitStep2 = () => {
-    setStep(2);
-  };
   const handleBack = () => {
     if (step > 1) setStep(1);
     else {
@@ -46,10 +47,8 @@ const FieldPrice = () => {
     }
   };
   const [selectedSize, setSelectedSize] = useState(null);
-  const [selectedTimes, setSelectedTimes] = useState([]);
 
   const fieldSizes = ["5v5", "6v6", "7v7", "8v8", "9v9", "11v11"];
-  const timeDuration = ["30mins", "60mins", "90mins", "120mins"];
 
   const timingObject = {
     from: "",
@@ -78,6 +77,9 @@ const FieldPrice = () => {
   const [outerIndex, setOuterIndex] = useState(null);
   const [innerIndex, setInnerIndex] = useState(null);
   const [isFinished, setIsFinished] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [type, setType] = useState("success");
 
   const colors = {
     primary: "#141F2B",
@@ -149,6 +151,19 @@ const FieldPrice = () => {
   ];
 
   useEffect(() => {
+    if (currentField) {
+      if (step == 1) {
+        reset({
+          name: currentField.name || "",
+          fieldType: currentField.fieldType || "",
+          surfaceType: currentField.surfaceType || "",
+        });
+        setSelectedSize(currentField.fieldSize || null);
+      }
+    }
+  }, [step, currentField]);
+
+  useEffect(() => {
     if (outerIndex === null || innerIndex === null) {
       timings[timings.length - 1].prices = [];
 
@@ -177,10 +192,6 @@ const FieldPrice = () => {
       console.log(timings);
     }
   }, [bookingDurations, timings.length, customisedPrices]);
-
-  useEffect(() => {
-    console.log("timings: ", JSON.stringify(timings));
-  }, [timings]);
 
   useEffect(() => {
     fetchFields();
@@ -227,6 +238,7 @@ const FieldPrice = () => {
   const {
     handleSubmit,
     register,
+    reset,
     formState: { errors },
   } = methods;
 
@@ -236,53 +248,171 @@ const FieldPrice = () => {
       setShowFieldsSection(false);
     } else if (step == 1) {
       if (!selectedSize) {
-        alert("You must select at least one option for Combo fields");
+        showToast(
+          "You must select at least one option for field size",
+          "error"
+        );
         return;
       }
 
-      dataX.current = { ...data };
+      dataX.current = { ...data, fieldSize: selectedSize };
+
+      if (currentField) {
+        //General Price
+        if (
+          currentField.generalPrice &&
+          currentField.generalPrice.bookingDurations.length > 0
+        ) {
+          let price = customisedPrices.find(
+            (cP) => cP.name === currentField.generalPrice.timeSlotName
+          );
+          let index = customisedPrices.indexOf(price);
+          price.isEnabled = false;
+          price.isSelected = true;
+          customisedPrices[index] = price;
+
+          const test = {
+            from: currentField.generalPrice.from,
+            to: currentField.generalPrice.to,
+            name: currentField.generalPrice.timeSlotName,
+            prices: currentField.generalPrice.pricing.map((p) => {
+              return {
+                price: parseFloat(p.split("for")[0].trim().replace("$", "")),
+                bookingDuration: p.split("for")[1].trim(),
+              };
+            }),
+          };
+          savedPrices.push({
+            days: [price],
+            timings: [test],
+          });
+
+          setCustomisedPrices([...customisedPrices]);
+          setSavedPrices([...savedPrices]);
+        }
+
+        //Specific Prices
+        if (currentField.specificPrice.length > 0) {
+          const groupedData = [];
+
+          currentField.specificPrice.forEach((entry) => {
+            customisedPrices.forEach((customisedPrice) => {
+              if (customisedPrice.name === entry.day) {
+                customisedPrice.isSelected = true;
+                customisedPrice.isEnabled = false;
+              }
+            });
+
+            const daysGroup = groupedData.find((group) =>
+              group.days.includes(entry.day)
+            );
+
+            const timing = {
+              name: entry.timeSlotName,
+              from: entry.from,
+              to: entry.to,
+              prices: entry.pricing.map((price) => {
+                const [priceValue, duration] = price.split(" for ");
+                return {
+                  price: parseFloat(priceValue.replace("$", "")),
+                  bookingDuration: duration,
+                };
+              }),
+            };
+
+            if (daysGroup) {
+              daysGroup.timings.push(timing);
+            } else {
+              groupedData.push({
+                days: [entry.day],
+                timings: [timing],
+              });
+            }
+          });
+
+          // Step 2: Map short days to full names and merge days with identical timings
+          const finalData = [];
+
+          groupedData.forEach((group) => {
+            const fullDays = group.days.map((shortDay) => {
+              const match = customisedPrices.find((cp) => cp.name === shortDay);
+              return match ? match : shortDay;
+            });
+
+            const existingGroup = finalData.find(
+              (data) =>
+                JSON.stringify(data.timings) === JSON.stringify(group.timings)
+            );
+
+            if (existingGroup) {
+              existingGroup.days.push(...fullDays);
+            } else {
+              finalData.push({
+                days: fullDays,
+                timings: group.timings,
+              });
+            }
+          });
+
+          setCustomisedPrices([...customisedPrices]);
+          setSavedPrices([...finalData]);
+        }
+      }
+
       setStep(2);
-      console.log(dataX);
     } else {
-      if (photoFiles.length > 0) {
-        uploadFiles();
-      } else {
-        saveField();
+      try {
+        let uploadedUrls = [];
+        if (photoFiles.length > 0) {
+          uploadedUrls = await uploadFiles(); // Wait for file uploads to complete
+        }
+
+        saveField(uploadedUrls); // Proceed to saving the field with uploaded URLs
+      } catch (error) {
+        showToast("File upload failed. Please try again.", "error");
       }
     }
   };
 
   const uploadFiles = async () => {
-    let urls = [];
-    photoFiles.forEach(async (file) => {
-      const formData = new FormData();
-      formData.append("file", file);
+    try {
+      // Use Promise.all to wait for all file uploads to complete
+      const uploadPromises = photoFiles.map(async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        try {
+          const url = await uploadFile(formData); // Assuming uploadFile returns the URL
+          return url;
+        } catch (error) {
+          console.error("File upload failed:", error);
+          throw error; // Stop execution if any upload fails
+        }
+      });
 
-      try {
-        urls.push(await uploadFile(formData));
-      } catch (error) {
-        console.log(error);
-      }
-    });
-
-    saveField(urls);
+      const uploadedUrls = await Promise.all(uploadPromises);
+      return uploadedUrls;
+    } catch (error) {
+      console.error("Error during file uploads:", error);
+      throw new Error("File upload failed"); // Handle errors as needed
+    }
   };
 
   const validateForm = () => {
     if (!timings[timings.length - 1].from.trim().length) {
-      alert("Missing required field: Kindly select FROM TIME");
+      showToast("Missing required field: Kindly select FROM TIME", "error");
       return false;
     } else if (!timings[timings.length - 1].to.trim().length) {
-      alert("Missing required field: Kindly select TO TIME");
+      showToast("Missing required field: Kindly select TO TIME", "error");
       return false;
     } else if (!timings[timings.length - 1].name.trim().length) {
-      alert("Missing required field: Kindly enter NAME");
+      showToast("Missing required field: Kindly enter NAME", "error");
       return false;
     } else if (
       !timings[timings.length - 1].prices.filter((p) => p.price !== "").length
     ) {
-      alert(
-        "Missing required field: Kindly add prices for selected booking durations"
+      showToast(
+        "Missing required field: Kindly add prices for selected booking durations",
+        "error"
       );
       return false;
     }
@@ -346,7 +476,11 @@ const FieldPrice = () => {
       body.generalPrice = generalPrice;
       body.specificPrice = specificPrices;
 
-      const response = await createFacilityField(body, currentFacility._id);
+      if (currentField) {
+        await updateFacilityField(body, currentField._id);
+      } else {
+        await createFacilityField(body, currentFacility._id);
+      }
       window.location.reload();
     } catch (error) {
       console.log(error);
@@ -460,6 +594,18 @@ const FieldPrice = () => {
     }
   };
 
+  const showToast = (message, type = "success") => {
+    setMessage(message);
+    setType(type);
+    setOpen(true);
+  };
+
+  const editField = (index) => {
+    setCurrentField(fields[index]);
+    setPhotos(fields[index].fieldImages);
+    handleSubmitStep1();
+  };
+
   return (
     <div>
       {showFieldsSection && (
@@ -476,7 +622,7 @@ const FieldPrice = () => {
               }}
             >
               {fields.length > 0 &&
-                fields.map((field) => {
+                fields.map((field, index) => {
                   let price = field.generalPrice;
                   if (!price.bookingDurations.length || !price.pricing.length) {
                     price = "No general price mentioned.";
@@ -486,6 +632,7 @@ const FieldPrice = () => {
 
                   return (
                     <div
+                      onClick={() => editField(index)}
                       key={field._id}
                       style={{
                         display: "flex",
@@ -643,7 +790,7 @@ const FieldPrice = () => {
               </div>
               <div className="mt-10">
                 <p className="font-PJSbold text-[16px] mb-3">Field Size</p>
-                <div className="flex gap-4">
+                <div className="flex gap-4" style={{ overflowX: "auto" }}>
                   {fieldSizes.map((size, index) => (
                     <div key={`${index}`}>
                       <button
@@ -661,6 +808,7 @@ const FieldPrice = () => {
                             selectedSize === size ? colors.clock : colors.white,
                           marginTop: 10,
                           gap: 10,
+                          margin: "10px",
                         }}
                         onClick={() => handleSizeSelect(size)} // Update the selected value
                       >
@@ -1732,7 +1880,11 @@ const FieldPrice = () => {
                 className="w-full  h-[54px] text-[14px] rounded-full bg-secondaryTen font-PJSmedium justify-center items-center text-secondaryThirty"
                 disabled={!(step !== 2 || savedPrices.length > 0)}
               >
-                {step === 1 ? "Next" : "Add Field"}
+                {step === 1
+                  ? "Next"
+                  : currentField
+                  ? "Update Field"
+                  : "Add Field"}
               </button>
             </div>
           )}
@@ -1740,6 +1892,8 @@ const FieldPrice = () => {
           {loading && <Loader />}
         </form>
       </FormProvider>
+
+      <Toast open={open} setOpen={setOpen} message={message} type={type} />
     </div>
   );
 };

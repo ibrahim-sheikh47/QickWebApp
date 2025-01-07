@@ -19,9 +19,9 @@ const Toast = ({ message, open, setOpen, type }) => {
       {/* Snackbar (Toast) component */}
       <Snackbar
         open={open}
-        autoHideDuration={3000} // Toast will hide after 6 seconds
+        autoHideDuration={5000} // Toast will hide after 6 seconds
         onClose={handleClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }} // Position of the toast
+        anchorOrigin={{ vertical: "top", horizontal: "right" }} // Position of the toast
       >
         {/* Alert for custom styling */}
         <Alert onClose={handleClose} severity={type}>

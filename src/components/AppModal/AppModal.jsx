@@ -7,7 +7,6 @@ import cross from "../../assets/svgs/Cross.svg";
 
 const AppModal = ({ onClose, children, modalopen, height, width , customStyles }) => {
   if (!modalopen) return null;
-  console.log(width + height);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50  " style={customStyles?.overlay}>

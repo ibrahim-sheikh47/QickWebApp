@@ -18,6 +18,7 @@ import {
   updateBooking,
 } from "../../api/services/bookingService";
 import Loader from "../Loader/Loader";
+import AppModal from "../AppModal/AppModal";
 
 const { RangePicker } = TimePicker;
 const { Option } = Select;
@@ -53,7 +54,7 @@ const AddBookingModal = ({
   useEffect(() => {
     if (mode === "edit" && initialValues) {
       // selectedUsers.push(initialValues.rivals[0]);
-      setSelectedUsers([initialValues.team]);
+      setSelectedUsers([initialValues.team, ...initialValues.rivals]);
 
       form.setFieldsValue({
         ...initialValues,
@@ -88,6 +89,7 @@ const AddBookingModal = ({
   };
 
   const handleUserModalNext = (data) => {
+    console.log(data.selectedUsers);
     setSelectedUsers(data.selectedUsers); // Update selected users/teams
     setUserModalVisible(false);
   };
@@ -113,8 +115,10 @@ const AddBookingModal = ({
           size: 4,
           totalAmount: 0,
           type: values.type,
-          team: selectedUsers[0],
-          rivals: [selectedUsers[1]],
+          team: selectedUsers[0]._id,
+          rivals: selectedUsers.slice(1).map((sU) => {
+            return sU._id;
+          }),
           repeatedDays: repeatedDays,
           recurringType: values.recurringType,
         };
@@ -136,8 +140,17 @@ const AddBookingModal = ({
 
   return (
     <>
-      <Modal
-        title={mode === "add" ? "Add Booking" : "Edit Booking"}
+      <AppModal
+        modalopen={isVisible}
+        onClose={onClose}
+        height={"auto"}
+        width={"35rem"}
+        customStyles={{
+          overlay: { position: "fixed" },
+          modal: { position: "absolute" },
+        }}
+      >
+        {/* title={mode === "add" ? "Add Booking" : "Edit Booking"}
         visible={isVisible}
         onCancel={onClose}
         footer={
@@ -192,8 +205,12 @@ const AddBookingModal = ({
         style={{
           top: 20, // Adjust the modal's position
         }}
-      >
+      > */}
         <Form form={form} layout="vertical">
+          <h1 style={{ fontWeight: "600", marginBottom: "1rem" }}>
+            {mode === "add" ? "Add Booking" : "Edit Booking"}
+          </h1>
+
           {/* Booking Type */}
           <Form.Item
             name="type"
@@ -272,7 +289,7 @@ const AddBookingModal = ({
                   Selected Users:{" "}
                   {selectedUsers.map((user) => (
                     <span
-                      key={user._id}
+                      key={user ? user._id : ""}
                       style={{
                         display: "inline-block",
                         margin: "0.25rem",
@@ -281,7 +298,7 @@ const AddBookingModal = ({
                         borderRadius: "5px",
                       }}
                     >
-                      {user.name}
+                      {user ? user.name : ""}
                     </span>
                   ))}
                 </div>
@@ -365,6 +382,22 @@ const AddBookingModal = ({
                   required: true,
                   message: "Please select an end date and time!",
                 },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    const startDateTime = getFieldValue("startDateTime");
+                    if (!value || !startDateTime) {
+                      return Promise.resolve();
+                    }
+                    if (value.isAfter(startDateTime.add(1, "hour"))) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(
+                      new Error(
+                        "End date must be at least 1 hour later than the start date."
+                      )
+                    );
+                  },
+                }),
               ]}
             >
               <DatePicker
@@ -385,6 +418,33 @@ const AddBookingModal = ({
                 }}
               />
             </Form.Item>
+            {/* <Form.Item
+              name="endDateTime"
+              rules={[
+                {
+                  required: true,
+                  message: "Please select an end date and time!",
+                },
+              ]}
+            >
+              <DatePicker
+                showTime={{ minuteStep: 5 }}
+                format="YYYY-MM-DD HH:mm"
+                onChange={(value) => {
+                  // Store end date-time in the form state
+                  form.setFieldsValue({ endDateTime: value });
+                }}
+                disabledDate={(current) => {
+                  const startDateTime = form.getFieldValue("startDateTime");
+                  return (
+                    current &&
+                    startDateTime &&
+                    moment.isMoment(startDateTime) &&
+                    current.isBefore(startDateTime, "day")
+                  );
+                }}
+              />
+            </Form.Item> */}
 
             {/* <Form.Item
               name="endTime"
@@ -479,8 +539,51 @@ const AddBookingModal = ({
               </Form.Item>
             </>
           )}
+
+          <div>
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <Button
+                key="cancel"
+                style={{ flex: 1, borderRadius: "25rem", padding: "1rem" }}
+                onClick={onClose}
+              >
+                Cancel
+              </Button>
+              ,
+              <Button
+                key="add"
+                type="primary"
+                style={{
+                  backgroundColor: "#9CFC38",
+                  flex: 1,
+                  borderRadius: "25rem",
+                  color: "#000",
+                  padding: "1rem",
+                }}
+                onClick={handleSubmit}
+              >
+                {mode === "add" ? "Add" : "Update"}
+              </Button>
+            </div>
+            {mode !== "add" && (
+              <Button
+                key="cancel_booking"
+                style={{
+                  width: "100%",
+                  borderRadius: "25rem",
+                  padding: "1rem",
+                  borderColor: "red",
+                  color: "red",
+                  marginTop: "12px",
+                }}
+                onClick={() => onCancel(initialValues._id)}
+              >
+                Cancel Booking
+              </Button>
+            )}
+          </div>
         </Form>
-      </Modal>
+      </AppModal>
 
       {/* AddUserOrTeamModal */}
       <AddUserOrTeamModal

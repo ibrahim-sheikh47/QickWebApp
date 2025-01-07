@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -8,25 +8,42 @@ import { Checkbox, FormControlLabel, FormGroup } from "@mui/material";
 import { useStateContext } from "../../../context";
 import { editFacility } from "../../../api/services/facilityService";
 import Loader from "../../../components/Loader/Loader";
+import DatePickerModal from "../../../components/DatePickerModal/DatePickerModal";
+import moment from "moment";
+import TimePickerModal from "../../../components/TimePickerModal/TimePickerModal";
+import Toast from "../../../components/Toast/Toast";
 
 const HrsOperation = () => {
   const { user, currentFacility, setCurrentFacility } = useStateContext();
+  const [timePickType, setTimePickType] = useState(null);
+  const [dateModal, setDateModal] = useState(false);
+  const [timeModal, setTimeModal] = useState(false);
+  const [selectedDates, setSelectedDates] = useState(
+    currentFacility && currentFacility.holidays
+      ? currentFacility.holidays.split(",")
+      : []
+  );
   const [days, setDays] = useState(
     initialDays.map((dayObj) => {
-      const matchingDay = currentFacility.hoursOfOperation?.find(
+      const matchingDay = currentFacility.hoursOfOperation.find(
         (h) => h.day === dayObj.day
       );
 
-      return {
+      const res = {
         ...dayObj,
-        open: matchingDay ? matchingDay.open : "9:00am", // Default to "9:00am"
-        close: matchingDay ? matchingDay.close : "6:00pm", // Default to "6:00pm"
+        open: matchingDay ? matchingDay.open : "9:00 AM", // Default to "9:00am"
+        close: matchingDay ? matchingDay.close : "6:00 PM", // Default to "6:00pm"
         checked: !!matchingDay, // Checked if a matching day exists
       };
+      return res;
     })
   );
   const [editMode, setEditMode] = useState(false); // State to control edit mode
   const [loading, setLoading] = useState(false);
+  const tempTime = useRef(null);
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [type, setType] = useState("success");
 
   const handleCheckboxChange = (index) => {
     if (editMode) {
@@ -58,23 +75,84 @@ const HrsOperation = () => {
     try {
       const body = {
         hoursOfOperation: days.filter((d) => d.checked),
+        holidays: selectedDates
+          .map((sd) => moment(sd).format("yyyy-MM-DD"))
+          .join(","),
       };
-      console.log(JSON.stringify(body));
-      console.log(JSON.stringify(body));
       const facility = await editFacility(body, currentFacility._id);
-      console.log(facility);
       setCurrentFacility(facility);
-      // window.location.reload();
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (err) {
+      console.log(err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleInputChange = (e, index, field) => {
-    const updatedDays = [...days];
-    updatedDays[index][field] = e.target.value;
-    setDays(updatedDays); // Assuming setDays is the state updater
+  const handleInputChange = (time, index, field) => {
+    setDays((prevDays) => {
+      const updatedDays = [...prevDays];
+      const currentDay = updatedDays[index];
+
+      if (field === "open") {
+        currentDay.open = time;
+
+        if (currentDay.close) {
+          const openTime = moment(time, "hh:mm A");
+          const closeTime = moment(currentDay.close, "hh:mm A");
+          const duration = moment.duration(closeTime.diff(openTime));
+
+          if (duration.asHours() < 5) {
+            showToast(
+              "The opening and closing times must differ by at least 5 hours.",
+              "error"
+            );
+            currentDay.close = ""; // Reset close time if invalid
+          }
+        }
+      } else if (field === "close") {
+        if (!currentDay.open) {
+          showToast("Please set the opening time first.", "error");
+          return prevDays; // Return previous state without changes
+        }
+
+        const openTime = moment(currentDay.open, "hh:mm A");
+        const closeTime = moment(time, "hh:mm A");
+        const duration = moment.duration(closeTime.diff(openTime));
+
+        if (closeTime.isBefore(openTime)) {
+          showToast(
+            "Close time cannot be earlier than the open time.",
+            "error"
+          );
+          return prevDays; // Return previous state without changes
+        }
+
+        if (duration.asHours() < 5) {
+          showToast(
+            "The opening and closing times must differ by at least 5 hours.",
+            "error"
+          );
+          return prevDays; // Return previous state without changes
+        }
+
+        currentDay.close = time;
+      }
+
+      return updatedDays;
+    });
+  };
+
+  const handleSingleDateChange = (date) => {
+    setSelectedDates([...selectedDates, date]);
+  };
+
+  const showToast = (message, type = "success") => {
+    setMessage(message);
+    setType(type);
+    setOpen(true);
   };
 
   return (
@@ -128,16 +206,26 @@ const HrsOperation = () => {
             <input
               className="block px-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm bg-white border-secondaryThirty w-full h-[54px]"
               type="text"
-              disabled={!editMode ? true : false} // Explicit condition for clarity
+              disabled={!editMode ? true : false}
+              readOnly
               value={entry.open}
-              onChange={(e) => handleInputChange(e, index, "open")}
+              onClick={() => {
+                setTimePickType(`${index}-open`);
+                setTimeModal(true);
+              }}
+              // onChange={(e) => handleInputChange(e, index, "open")}
             />
             <input
               className="block px-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm bg-white border-secondaryThirty w-full h-[54px]"
               type="text"
               disabled={!editMode ? true : false}
+              readOnly
               value={entry.close}
-              onChange={(e) => handleInputChange(e, index, "close")}
+              onClick={() => {
+                setTimePickType(`${index}-close`);
+                setTimeModal(true);
+              }}
+              // onChange={(e) => handleInputChange(e, index, "close")}
             />
           </React.Fragment>
         ))}
@@ -150,11 +238,27 @@ const HrsOperation = () => {
           </button>
         </div>
         <div className="relative mt-5">
-          <input
-            {...register("holidays")}
-            className="block px-4 pt-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm bg-white border-secondaryThirty w-full h-[54px]"
-            type="text"
-          />
+          <div className="relative">
+            <input
+              onClick={() => setDateModal(true)}
+              {...register("holidays")}
+              value={selectedDates
+                .map((sd) => moment(sd).format("yyyy-MM-DD"))
+                .join(",")}
+              className="block px-4 pt-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm bg-white border-secondaryThirty w-full h-[54px]"
+              type="text"
+              readOnly
+            />
+            {selectedDates.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setSelectedDates([])} // Clear the dates
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary hover:text-red-500 focus:outline-none"
+              >
+                X
+              </button>
+            )}
+          </div>
           <label
             htmlFor="holidays"
             className="absolute top-2 left-4 text-secondary font-PJSmedium text-xs"
@@ -179,6 +283,49 @@ const HrsOperation = () => {
 
         {loading && <Loader />}
       </form>
+
+      <DatePickerModal
+        isOpen={dateModal}
+        onClose={() => {
+          setDateModal(!dateModal);
+        }}
+        selectedDate={null}
+        handleDataChange={handleSingleDateChange}
+        onApply={() => setDateModal(!dateModal)}
+      />
+
+      {timeModal && (
+        <TimePickerModal
+          isOpen={timeModal}
+          onClose={() => {
+            setTimeModal(!timeModal);
+            setTimePickType(null);
+            tempTime.current = null;
+          }}
+          selectedTime={
+            timePickType
+              ? days[parseInt(timePickType.split("-")[0])][
+                  timePickType.split("-")[1]
+                ]
+              : null
+          }
+          handleTimeChange={(e) => {
+            tempTime.current = e;
+          }}
+          onApply={() => {
+            handleInputChange(
+              tempTime.current,
+              parseInt(timePickType.split("-")[0]),
+              timePickType.split("-")[1]
+            );
+            setTimeModal(!timeModal);
+            tempTime.current = null;
+            setTimePickType(null);
+          }}
+        />
+      )}
+
+      <Toast open={open} setOpen={setOpen} message={message} type={type} />
     </div>
   );
 };

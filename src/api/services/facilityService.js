@@ -13,6 +13,17 @@ export const createFacility = async (body, userId) => {
   }
 };
 
+export const getFacility = async (facilityId) => {
+  try {
+    const response = await apiClient.get(
+      `${endpoints.facilities}/${facilityId}`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const editFacility = async (body, facilityId) => {
   try {
     const response = await apiClient.patch(
@@ -84,6 +95,18 @@ export const createFacilityField = async (body, facilityId) => {
   try {
     const response = await apiClient.post(
       `${endpoints.fields}/${facilityId}`,
+      body
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateFacilityField = async (body, fieldId) => {
+  try {
+    const response = await apiClient.patch(
+      `${endpoints.fields}/${fieldId}`,
       body
     );
     return response.data;

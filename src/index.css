@@ -161,3 +161,12 @@ html {
   height: auto;
   padding: 0px;
 }
+
+.react-time-picker__wrapper {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 16px;
+  box-sizing: border-box;
+}

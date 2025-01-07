@@ -16,6 +16,8 @@ import {
   updateVoucherById,
 } from "../../../api/services/voucherService";
 import moment from "moment";
+import DatePickerModal from "../../../components/DatePickerModal/DatePickerModal";
+import Toast from "../../../components/Toast/Toast";
 
 const Discount = () => {
   const { currentFacility } = useStateContext();
@@ -32,6 +34,9 @@ const Discount = () => {
   const [showAdditionalInput, setShowAdditionalInput] = useState(false);
   const [manualError, setManualError] = useState("");
   const [multipleRedemptions, setMultipleRedemptions] = useState("");
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [type, setType] = useState("success");
 
   useEffect(() => {
     fetchFieldsAndDiscounts();
@@ -50,6 +55,35 @@ const Discount = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (currentDiscount) {
+      reset({
+        discountType: currentDiscount.discountType || "",
+        description: currentDiscount.description || "",
+        code: currentDiscount.code || "",
+        discountAmount: currentDiscount.discountAmount || "",
+        discountedFields: currentDiscount.discountedFields || "",
+        expiryDate: currentDiscount.expiryDate
+          ? moment(currentDiscount.expiryDate).format("yyyy-MM-DD")
+          : "",
+      });
+
+      if (!currentDiscount.singleUse) {
+        setShowAdditionalInput(true);
+        setMultipleRedemptions(currentDiscount.maxRedemption);
+      }
+    } else {
+      reset({
+        discountType: "",
+        description: "",
+        code: "",
+        discountAmount: "",
+        discountedFields: "",
+        expiryDate: moment(selectedDate).format("yyyy-MM-DD"),
+      });
+    }
+  }, [currentDiscount]);
 
   const handleSingleDateChange = (date) => {
     setSelectedDate(date);
@@ -77,13 +111,14 @@ const Discount = () => {
 
   const methods = useForm({
     resolver: yupResolver(schema),
-    defaultValues: currentDiscount || {},
+    defaultValues: {},
   });
 
   const {
     handleSubmit,
     register,
     control,
+    reset,
     formState: { errors },
   } = methods;
 
@@ -173,6 +208,12 @@ const Discount = () => {
         setLoading(false);
       }
     }
+  };
+
+  const showToast = (message, type = "success") => {
+    setMessage(message);
+    setType(type);
+    setOpen(true);
   };
 
   return (
@@ -268,6 +309,21 @@ const Discount = () => {
                   <button
                     type="button"
                     className="flex absolute bottom-2 right-2 items-center rounded-lg gap-2 p-2 bg-secondaryTen "
+                    onClick={() => {
+                      const discountCode = methods.getValues("code");
+                      if (discountCode) {
+                        navigator.clipboard
+                          .writeText(discountCode)
+                          .then(() => {
+                            showToast("Discount code copied to clipboard!");
+                          })
+                          .catch(() => {
+                            showToast("Failed to copy discount code.", "error");
+                          });
+                      } else {
+                        showToast("No discount code to copy!", "error");
+                      }
+                    }}
                   >
                     <p className="w-[max-content]">Copy</p>
                     <img className="w-3" src={assets.copy} alt="" />
@@ -346,6 +402,14 @@ const Discount = () => {
                   {...register("discountAmount")}
                   type={"number"}
                   className={`block px-4 pt-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm  bg-white border-secondaryThirty w-full h-[54px]`}
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  onKeyDown={(e) =>
+                    e.key === "ArrowUp" || e.key === "ArrowDown"
+                      ? e.preventDefault()
+                      : null
+                  }
+                  onWheel={(e) => e.target.blur()}
                 />
                 <label
                   htmlFor="discountType"
@@ -430,6 +494,14 @@ const Discount = () => {
                     className={`block px-4 pt-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm  bg-white border-secondaryThirty w-full h-[54px]`}
                     value={multipleRedemptions}
                     onChange={(e) => setMultipleRedemptions(e.target.value)}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    onKeyDown={(e) =>
+                      e.key === "ArrowUp" || e.key === "ArrowDown"
+                        ? e.preventDefault()
+                        : null
+                    }
+                    onWheel={(e) => e.target.blur()}
                   />
                   <label
                     htmlFor="multipleRedemptions"
@@ -494,48 +566,18 @@ const Discount = () => {
         </FormProvider>
       )}
 
-      <AppModal
-        modalopen={dateModal}
-        onClose={() => setDateModal(!dateModal)}
-        height="420px"
-        width="380px"
-        customStyles={{
-          overlay: { position: "absolute", top: 0, right: 0, left: 0 },
-          modal: {
-            position: "absolute",
-            top: "0",
-            right: "50%",
-            margin: "0",
-          },
+      <DatePickerModal
+        isOpen={dateModal}
+        onClose={() => {
+          setSelectedDate(new Date());
+          setDateModal(!dateModal);
         }}
-      >
-        <Calendar
-          date={selectedDate} // Replace with your state for the selected date
-          onChange={handleSingleDateChange} // A function to handle the date change
-          color="#33C0DB"
-          minDate={new Date()}
-          showMonthAndYearPickers={false}
-          showDateDisplay={false}
-        />
-        <div className="flex gap-4 w-full justify-center font-PJSMedium items-center ">
-          <button
-            className="w-full transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full bg-secondaryTen font-PJSmedium justify-center items-center"
-            onClick={() => {
-              setSelectedDate(new Date());
-              setDateModal(!dateModal);
-            }}
-          >
-            Cancel
-          </button>
-          <button
-            className="w-full transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full bg-lime font-PJSmedium justify-center items-center"
-            onClick={() => setDateModal(!dateModal)}
-          >
-            Apply
-          </button>
-        </div>
-      </AppModal>
+        selectedDate={selectedDate}
+        handleDataChange={handleSingleDateChange}
+        onApply={() => setDateModal(!dateModal)}
+      />
 
+      <Toast open={open} setOpen={setOpen} message={message} type={type} />
       {loading && <Loader />}
     </div>
   );

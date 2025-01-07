@@ -18,6 +18,7 @@ const FacilityRules = () => {
   const [loading, setLoading] = useState(false);
   const [rules, setRules] = useState(null);
   const [step, setStep] = useState(1);
+  const [waiverContent, setWaiverContent] = useState("");
 
   const defaultValues = {
     currency: rules?.currency || "",
@@ -96,6 +97,18 @@ const FacilityRules = () => {
     }),
   ];
 
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setWaiverContent(e.target.result); // Set the file content as the input value
+      };
+      reader.readAsText(file); // Read file as text
+    }
+  };
+
   const currentSchema = schemas[step - 1];
   const methods = useForm({
     resolver: yupResolver(currentSchema),
@@ -165,6 +178,9 @@ const FacilityRules = () => {
     try {
       const facilityRules = await getFacilityRules(currentFacility._id);
       setRules(facilityRules.length > 0 ? facilityRules[0] : null);
+      setWaiverContent(
+        facilityRules.length > 0 ? facilityRules[0].bookingAcceptanceWaiver : ""
+      );
     } catch (err) {
       console.log(err);
     } finally {
@@ -607,10 +623,25 @@ const FacilityRules = () => {
                         className="mt-2 focus:outline-none border-2 w-full rounded-xl h-[67px] px-5 "
                         placeholder="Paste text or attach text file to read waiver..."
                         {...register("waiverLink")}
+                        value={waiverContent}
+                        onChange={(e) => setWaiverContent(e.target.value)}
                       />
 
-                      <div className="border-2 cursor-pointer rounded-full p-5">
-                        <img src={assets.linkicon} alt="" />
+                      <div
+                        onClick={() => {}}
+                        className="border-2 cursor-pointer rounded-full p-5"
+                      >
+                        {/* <img src={assets.linkicon} alt="" /> */}
+                        <label htmlFor="fileInput" className="cursor-pointer">
+                          <img src={assets.linkicon} alt="Attach File" />
+                        </label>
+                        <input
+                          type="file"
+                          id="fileInput"
+                          accept=".txt"
+                          className="hidden"
+                          onChange={handleFileChange}
+                        />
                       </div>
                     </div>
                     <p className="text-secondary text-sm font-PJSregular mt-5">
@@ -631,6 +662,7 @@ const FacilityRules = () => {
             <div className="row mt-10 flex justify-between gap-x-4">
               {step > 1 && (
                 <button
+                  type="button"
                   style={{ backgroundColor: "#03180F", color: "white" }}
                   className="w-[30%] transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full font-PJSmedium justify-center items-center"
                   onClick={stepBack}

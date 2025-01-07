@@ -131,6 +131,10 @@ const Reports = () => {
     closeModal(section);
   };
 
+  useEffect(() => {
+    console.log(stats);
+  }, [stats]);
+
   const getStats = async () => {
     setLoading(true);
     try {

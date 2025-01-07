@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import assets from "../../../assets/assets";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -10,7 +10,6 @@ import { uploadFile } from "../../../api/services/uploadService";
 import Toast from "../../../components/Toast/Toast";
 import Loader from "../../../components/Loader/Loader";
 import { editFacility } from "../../../api/services/facilityService";
-import endpoints from "../../../api/endpoints";
 
 const MyFacility = () => {
   const { user, currentFacility, setCurrentFacility } = useStateContext();
@@ -126,19 +125,38 @@ const MyFacility = () => {
     let facilityPhoto = image;
     let bannerPhoto = bannerImage;
     let facilityPhotos = photos.filter((p) => p.includes("https"));
+
     try {
+      // Prepare upload promises
+      const uploadPromises = [];
+
       if (
         facilityPhoto !== assets.placeholder &&
         !facilityPhoto.includes("https")
       ) {
-        facilityPhoto = await upload(imageFile);
+        uploadPromises.push(
+          upload(imageFile).then((url) => {
+            facilityPhoto = url;
+          })
+        );
       }
       if (bannerPhoto != null && !bannerPhoto.includes("https")) {
-        bannerPhoto = await upload(bannerImageFile);
+        uploadPromises.push(
+          upload(bannerImageFile).then((url) => {
+            bannerPhoto = url;
+          })
+        );
       }
       if (photoFiles.length > 0) {
-        facilityPhotos = await Promise.all(photoFiles.map((p) => upload(p)));
+        uploadPromises.push(
+          Promise.all(photoFiles.map((file) => upload(file))).then((urls) => {
+            facilityPhotos = [...facilityPhotos, ...urls];
+          })
+        );
       }
+
+      // Wait for all uploads to complete
+      await Promise.all(uploadPromises);
 
       const body = {
         name: data.facilityName,
