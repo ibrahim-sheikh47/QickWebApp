@@ -129,7 +129,7 @@ html {
   width: 5.5rem;
 }
 
-/* If you also want to increase the overall row height for each hour, 
+/* If you also want to increase the overall row height for each hour,
    you may want to adjust .rbc-timeslot-group */
 .rbc-timeslot-group {
   height: auto;
@@ -169,4 +169,46 @@ html {
   padding: 8px;
   font-size: 16px;
   box-sizing: border-box;
+}
+
+/* Custom Checkbox Styling */
+.custom-checkbox .ant-checkbox-inner {
+  border-radius: 100px !important; /* Make checkbox fully rounded */
+  color: rgba(51, 192, 219, 1) !important; /* Green border color */
+}
+/* Custom styles for the Select component */
+.custom-select .ant-select-selector {
+  border-radius: 14px !important; /* Make select fully rounded */
+  height: 67px !important;
+  padding-top: 15px !important;
+  border-color: rgba(132, 154, 184, 0.3) !important;
+  padding-left: 15px !important;
+}
+.custom-multiple-select .ant-select-selector {
+  border-radius: 14px !important; /* Fully rounded corners */
+  height: 67px !important; /* Allow height to adjust based on content */
+  padding-top: 25px !important;
+  padding-left: 15px !important;
+  border-color: rgba(132, 154, 184, 0.3) !important;
+}
+
+.custom-multiple-select .ant-select-selection-item {
+  background-color: white; /* Slightly tinted background for selected items */
+  border-radius: 8px; /* Rounded tags */
+  color: #000; /* Text color for tags */
+}
+
+
+
+/* Center the arrow */
+.custom-select .ant-select-arrow {
+  margin: 11px 0 !important;
+  font-weight: bold !important; /* Make the arrow bold */
+  color: #000 !important; /* Change the color of the arrow, if needed */
+}
+
+.custom-date .ant-picker-suffix {
+  color: #000; /* Replace with your desired color */
+  margin-bottom: 16px;
+  font-size: 20px;
 }

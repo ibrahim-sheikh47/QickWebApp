@@ -17,6 +17,9 @@ import {
   Users,
   UsersReport,
 } from "../pages";
+import EventReport from "../pages/Dashboard/Reports/EventReport";
+import Events from "../pages/Dashboard/Events/Events";
+import AddEvent from "../pages/Dashboard/Events/AddEvent";
 
 export const AppNavigation = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1000);
@@ -59,6 +62,10 @@ export const AppNavigation = () => {
           Component={CreditHolderReport}
           path="Reports/CreditHolderReport"
         />
+        <Route Component={EventReport} path="Reports/EventReport" />
+
+        <Route Component={Events} path="Events" />
+        <Route Component={AddEvent} path="Events/AddEvent" />
       </Route>
     </Routes>
   );
