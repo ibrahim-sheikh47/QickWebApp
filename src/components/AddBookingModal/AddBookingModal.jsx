@@ -59,8 +59,12 @@ const AddBookingModal = ({
       form.setFieldsValue({
         ...initialValues,
         field: initialValues.field._id,
-        startDateTime: getMomentDate(initialValues.startDateTime),
-        endDateTime: getMomentDate(initialValues.endDateTime),
+        startDateTime: initialValues.startDateTime
+          ? moment(initialValues.startDateTime)
+          : null,
+        endDateTime: initialValues.endDateTime
+          ? moment(initialValues.endDateTime)
+          : null,
       });
 
       if (initialValues.recurring) {
@@ -69,6 +73,19 @@ const AddBookingModal = ({
       if (initialValues.repeatedDays) {
         setRepeatedDays(initialValues.repeatedDays);
       }
+    } else if (
+      mode == "add" &&
+      initialValues.startDateTime &&
+      initialValues.endDateTime
+    ) {
+      form.setFieldsValue({
+        startDateTime: initialValues.startDateTime
+          ? moment(initialValues.startDateTime)
+          : null,
+        endDateTime: initialValues.endDateTime
+          ? moment(initialValues.endDateTime)
+          : null,
+      });
     }
   }, [initialValues, form, mode]);
 

@@ -29,13 +29,12 @@ const HrsOperation = () => {
         (h) => h.day === dayObj.day
       );
 
-      const res = {
+      return {
         ...dayObj,
-        open: matchingDay ? matchingDay.open : "9:00 AM", // Default to "9:00am"
-        close: matchingDay ? matchingDay.close : "6:00 PM", // Default to "6:00pm"
+        open: matchingDay ? matchingDay.open : null, // Set to null if no matching day
+        close: matchingDay ? matchingDay.close : null, // Set to null if no matching day
         checked: !!matchingDay, // Checked if a matching day exists
       };
-      return res;
     })
   );
   const [editMode, setEditMode] = useState(false); // State to control edit mode
@@ -73,8 +72,19 @@ const HrsOperation = () => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
+      const transformedDays = days.map((day) => {
+        if (!day.checked) {
+          return {
+            ...day,
+            open: null,
+            close: null,
+          };
+        }
+        return day;
+      });
+
       const body = {
-        hoursOfOperation: days.filter((d) => d.checked),
+        hoursOfOperation: transformedDays,
         holidays: selectedDates
           .map((sd) => moment(sd).format("yyyy-MM-DD"))
           .join(","),

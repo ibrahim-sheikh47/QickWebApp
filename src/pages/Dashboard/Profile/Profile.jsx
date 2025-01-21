@@ -1,12 +1,32 @@
 import { useState } from "react";
 import { profileItems } from "../../../constants/profile-index";
 import assets from "../../../assets/assets";
+import { useStateContext } from "../../../context";
+import Toast from "../../../components/Toast/Toast";
 
 const Profile = () => {
+  const { currentFacility } = useStateContext();
   const [selectedItem, setSelectedItem] = useState(profileItems[0]);
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [type, setType] = useState("success");
 
   const handleItemClick = (item) => {
+    if (
+      item.heading === "Fields and Prices" &&
+      currentFacility.hoursOfOperation.length === 0
+    ) {
+      showToast("Kindly set the hours of operations first", "error");
+      return;
+    }
+
     setSelectedItem(item);
+  };
+
+  const showToast = (message, type = "success") => {
+    setMessage(message);
+    setType(type);
+    setOpen(true);
   };
 
   return (
@@ -55,6 +75,8 @@ const Profile = () => {
             <div>{selectedItem.content}</div>
           </div>
         </div>
+
+        <Toast open={open} setOpen={setOpen} message={message} type={type} />
       </div>
     </>
   );

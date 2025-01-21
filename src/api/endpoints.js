@@ -12,6 +12,7 @@ const endpoints = {
   bookingStats: "api/booking/field-booking-stats",
   booking: "api/booking",
   dicounts: "api/voucher",
+  chats: "api/chat",
 };
 
 export default endpoints;

@@ -3,7 +3,7 @@ import { Card, Typography } from "@mui/material";
 import assets from "../../assets/assets";
 
 const BookingCard = ({ event }) => {
-  const bookingType = event.bookingType;
+  const bookingType = event?.bookingType || "";
 
   const getBookingIconFromType = () => {
     if (bookingType === "pickup") {
@@ -70,10 +70,10 @@ const BookingCard = ({ event }) => {
             className="font-PJSregular"
             style={{ fontSize: "12px", marginTop: "6px" }}
           >
-            {event.user.name}
+            {event?.user?.name || ""}
           </div>
 
-          {event.status === "cancelled" && (
+          {event?.status === "cancelled" && (
             <div
               className="font-PJSregular"
               style={{

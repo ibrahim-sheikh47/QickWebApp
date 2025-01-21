@@ -10,6 +10,7 @@ import { useStateContext } from "../../context";
 import { getFacilities } from "../../api/services/facilityService";
 import Loader from "../../components/Loader/Loader";
 import Toast from "../../components/Toast/Toast";
+import PopupMenu from "../../components/PopupMenu/PopupMenu";
 
 // Utility Function
 function classNames(...classes) {
@@ -73,6 +74,10 @@ const Dashboard = () => {
     setMessage(message);
     setType(type);
     setOpen(true);
+  };
+
+  const handleItemClick = (item) => {
+    alert(`You clicked: ${item.label}`);
   };
 
   return (
@@ -210,6 +215,23 @@ const Dashboard = () => {
                   </span>
                 )}
               </button>
+
+              {/* <PopupMenu
+                trigger={
+                  
+                }
+                menuItems={[
+                  { label: "Option 1", value: "1" },
+                  { label: "Option 2", value: "2" },
+                  { label: "Option 3", value: "3" },
+                ]}
+                onItemClick={handleItemClick}
+                position={{ top: "50px", left: "20px" }}
+                customStyles={{
+                  backgroundColor: "#f9f9f9",
+                  border: "1px solid #ddd",
+                }}
+              /> */}
 
               <div
                 className="flex items-center gap-2 cursor-pointer"

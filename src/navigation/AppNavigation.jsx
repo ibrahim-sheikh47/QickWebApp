@@ -16,6 +16,7 @@ import {
   SplashScreen,
   Users,
   UsersReport,
+  CommunicationHistory,
 } from "../pages";
 
 export const AppNavigation = () => {
@@ -58,6 +59,10 @@ export const AppNavigation = () => {
         <Route
           Component={CreditHolderReport}
           path="Reports/CreditHolderReport"
+        />
+        <Route
+          Component={CommunicationHistory}
+          path="/Dashboard/Chats/CommunicationHistory"
         />
       </Route>
     </Routes>

@@ -114,7 +114,7 @@ export const formattedDate = (date) => {
 };
 
 export const formattedTime = (time) => {
-  return moment(time).format("HH:mm A");
+  return moment(time).format("hh:mm A");
 };
 
 export const formatDate = (dateString) => {
@@ -135,6 +135,38 @@ export const formatDate = (dateString) => {
       "Dec",
     ][date.getMonth()]
   } ${date.getFullYear().toString().slice(-2)}`;
+};
+
+export const splitEventByDays = (event) => {
+  const { start, end, ...rest } = event; // Extract start, end, and other event properties
+  const events = [];
+
+  let currentStart = new Date(start);
+  const eventEnd = new Date(end);
+
+  while (currentStart < eventEnd) {
+    const currentEnd = new Date(currentStart);
+    currentEnd.setHours(23, 59, 59, 999); // End of the current day
+
+    // If the event ends before the day ends, adjust the current end time
+    if (currentEnd > eventEnd) {
+      currentEnd.setTime(eventEnd.getTime());
+    }
+
+    // Push the split event for the current day
+    events.push({
+      ...rest,
+      start: new Date(currentStart),
+      end: new Date(currentEnd),
+    });
+
+    // Move to the next day
+    currentStart = new Date(currentStart);
+    currentStart.setDate(currentStart.getDate() + 1);
+    currentStart.setHours(0, 0, 0, 0); // Start of the next day
+  }
+
+  return events;
 };
 
 export const capitalizeFirstLetter = (word) => {
