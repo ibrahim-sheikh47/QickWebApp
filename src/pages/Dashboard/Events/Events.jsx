@@ -1,19 +1,21 @@
 import { useState } from "react";
 import assets from "../../../assets/assets";
 import { AppModal } from "../../../components";
-import { Button, Checkbox } from "antd";
-import { PlusCircleOutlined } from "@ant-design/icons";
+import { Button, Checkbox, Divider } from "antd";
+import { PlusCircleFilled, UnorderedListOutlined } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import EventCard from "../../../components/EventCard/EventCard";
+import TabSelector from "../../../components/TabSelector/TabSelector";
 
 const Events = () => {
   const location = useLocation();
   const eventData = location.state;
-  console.log("Event Data from location:", eventData); // Log the data
+  const formValues = location.state;
 
   const navigate = useNavigate();
   const [sortModal, setSortModal] = useState(false);
-  const [selectedSort, setSelectedSort] = useState("All"); // State to track selected sort option
+  const [selectedSort, setSelectedSort] = useState("All");
+  const [listView, setListView] = useState(false); // State for toggling view
 
   const openSortModal = () => {
     setSortModal(true);
@@ -24,10 +26,13 @@ const Events = () => {
   };
 
   const handleSortChange = (option) => {
-    setSelectedSort(option); // Update the selected sort option
+    setSelectedSort(option);
   };
 
-  // List of sort options
+  const toggleListView = () => {
+    setListView(!listView); // Toggle between grid and list views
+  };
+
   const sortOptions = [
     "All",
     "Recent First",
@@ -38,6 +43,14 @@ const Events = () => {
     "KOs",
     "By Progress",
   ];
+
+  const handleClickInfo = () => {
+    navigate("/Dashboard/Events/EventInfo", { state: { ...formValues } });
+  };
+
+  const handleClickCardDetail = () => {
+    navigate("/Dashboard/Events/EventDetail", { state: { ...formValues } });
+  };
 
   return (
     <>
@@ -53,7 +66,7 @@ const Events = () => {
             onClick={openSortModal}
             className="gap-2 font-PJSregular text-[14px] h-10 w-full px-5 rounded-full border border-secondaryThirty flex justify-center items-center"
           >
-            Sort: {selectedSort} {/* Display the selected sort title */}
+            Sort: {selectedSort}
             <img src={assets.down} alt="Down" />
           </button>
 
@@ -84,9 +97,9 @@ const Events = () => {
                   <div key={index} className="flex items-center">
                     <p>{option}</p>
                     <Checkbox
-                      onChange={() => handleSortChange(option)} // Update selected sort option
-                      checked={selectedSort === option} // Highlight the selected option
-                      className="custom-checkbox ml-auto" // Custom class for checkbox
+                      onChange={() => handleSortChange(option)}
+                      checked={selectedSort === option}
+                      className="custom-checkbox ml-auto"
                     />
                   </div>
                 ))}
@@ -94,13 +107,13 @@ const Events = () => {
 
               <div className="flex mt-8 gap-4 w-full justify-center items-center">
                 <button
-                  onClick={closeSortModal} // Close modal on cancel
+                  onClick={closeSortModal}
                   className="flex w-[125px] h-[50px] text-[14px] rounded-full bg-secondaryTen font-PJSmedium justify-center items-center"
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={closeSortModal} // Close modal after clicking sort
+                  onClick={closeSortModal}
                   className="flex w-[125px] h-[50px] text-[14px] rounded-full bg-lime font-PJSmedium justify-center items-center"
                 >
                   Sort
@@ -113,7 +126,7 @@ const Events = () => {
           className="bg-lime hover:scale-105"
           shape="round"
           size={"large"}
-          icon={<PlusCircleOutlined />}
+          icon={<PlusCircleFilled />}
           type="none"
           onClick={() => navigate("AddEvent")}
         >
@@ -121,20 +134,48 @@ const Events = () => {
         </Button>
       </div>
 
-      <div className="bg-white p-10 mt-10 rounded-2xl">
+      <div className="bg-white px-10 py-5 mt-10 rounded-2xl">
+        <div className="flex justify-between">
+          <TabSelector
+            tabs={["Active", "Completed"]}
+            initialActiveTab={"Active"}
+          />
+
+          <div className="flex items-center gap-2 relative">
+            <input
+              type="search"
+              className="font-PJSregular text-[14px] cursor-pointer relative z-10 h-12 w-12 rounded-full border border-secondaryThirty bg-transparent pl-12 outline-none focus:w-[220px] focus:cursor-text focus:pr-4"
+            />
+            <img
+              src={assets.search}
+              alt=""
+              className="absolute inset-y-0 my-auto h-8 w-12 border-r border-transparent stroke-gray-500 px-3.5"
+            />
+            <UnorderedListOutlined
+              className="rounded-full border bg-secondaryThirty cursor-pointer border-secondaryThirty p-4"
+              onClick={toggleListView} // Attach event handler
+            />
+          </div>
+        </div>
+        <Divider className=" border-secondaryThirty" />
         {eventData ? (
-          <div className="grid grid-cols-2 gap-x-5 gap-y-7">
-            <div>
-              <EventCard
-                leagueName={eventData.leagueName}
-                maxPlayers={eventData.maxPlayers}
-                eventStart={eventData.eventStart}
-                eventEnd={eventData.eventEnd}
-                playableFields={eventData.playableFields}
-                imageSrc={eventData.imageSrc}
-                eventType={eventData.eventType}
-              />
-            </div>
+          <div
+            className={`${listView ? "" : "grid grid-cols-2 gap-x-5 gap-y-7"}`}
+          >
+            <EventCard
+              viewType={listView ? "list" : "card"}
+              leagueName={eventData.leagueName}
+              maxTeams={eventData.maxTeams}
+              knockoutTeams={eventData.knockoutTeams}
+              numberOfGroups={eventData.numberOfGroups}
+              eventStart={eventData.eventStart}
+              eventEnd={eventData.eventEnd}
+              playableFields={eventData.playableFields}
+              imageSrc={eventData.imageSrc}
+              eventType={eventData.eventType}
+              onClickInfo={handleClickInfo}
+              onClickCardDetail={handleClickCardDetail}
+            />
           </div>
         ) : (
           <p className="text-center font-PJSbold text-xl">

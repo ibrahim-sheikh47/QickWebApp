@@ -15,18 +15,14 @@ export const AddEventForm = ({ eventType }) => {
 
   const handlePublish = () => {
     const eventData = {
-      leagueName: formValues.leagueName,
-      maxPlayers: formValues.maxPlayers,
-      eventStart: formValues.eventStart,
-      eventEnd: formValues.eventEnd,
-      playableFields: formValues.playableFields,
+      ...formValues, // Spread all formValues
       imageSrc: imageSrc, // Include imageSrc if needed
       eventType: eventType,
     };
 
     console.log("Event Data being passed:", eventData); // Log the data
 
-    navigate("/Dashboard/Events/", { state: eventData });
+    navigate("/Dashboard/Events/", { state: eventData, formValues });
   };
 
   const [formValues, setFormValues] = useState({
@@ -56,7 +52,7 @@ export const AddEventForm = ({ eventType }) => {
     finalHomeOrAway: null,
     cardCleanStages: null,
     numberOfGroups: null,
-    numberOfTeams: null,
+    knockoutTeams: null,
     teamsPerGrpAdvToKnockout: null,
     InGrpsTeamsFaceEachOther: null,
     freeAgents: null,
@@ -125,8 +121,10 @@ export const AddEventForm = ({ eventType }) => {
           name="description"
           value={formValues.description}
           onChange={handleInputChange}
-          placeholder="Enter Description"
+          placeholder="Include details such as match duration, rules, presence of referees, and prize information"
+          textarea={true} // Pass true to render a textarea
         />
+
         <div className="flex items-center w-full gap-5">
           <div className="flex-1 mt-3">
             <Selectable
@@ -217,10 +215,10 @@ export const AddEventForm = ({ eventType }) => {
               )}
               {eventType === "Knockouts" && (
                 <Selectable
-                  options={getOptions("numberOfTeams")}
-                  value={formValues.numberOfTeams}
+                  options={getOptions("knockoutTeams")}
+                  value={formValues.knockoutTeams}
                   onChange={(value) =>
-                    handleSelectChange("numberOfTeams", value)
+                    handleSelectChange("knockoutTeams", value)
                   }
                   label="Number of Teams"
                 />
@@ -565,11 +563,10 @@ export const AddEventForm = ({ eventType }) => {
           </div>
           <div className="flex-1">
             <InputField
+              name="pricePerFreeAgent"
               label={"Price per free agent"}
               value={formValues.pricePerFreeAgent}
-              onChange={(value) =>
-                handleInputChange("pricePerFreeAgent", value)
-              }
+              onChange={handleInputChange}
             />
           </div>
         </div>
@@ -631,12 +628,12 @@ export const AddEventForm = ({ eventType }) => {
         <p className="text-sm font-PJSregular text-secondary">
           Be sure all details are good before you publish this event:
         </p>
-        <div className="w-1/2 h-[350px] flex justify-center items-center bg-gray-100 relative mt-10 rounded-2xl">
+        <div className="w-1/2 h-[350px] flex justify-center items-center bg-gray-100 relative mt-10 rounded-2xl cursor-pointer ">
           {imageSrc ? (
             <img
               src={imageSrc}
               alt="Uploaded"
-              className="w-full h-full object-cover rounded-2xl"
+              className="w-full h-full object-cover rounded-t-2xl"
             />
           ) : (
             <button
@@ -658,11 +655,13 @@ export const AddEventForm = ({ eventType }) => {
         <div className="flex flex-col gap-1">
           <EventCard
             leagueName={formValues.leagueName}
-            maxPlayers={formValues.maxPlayers}
+            knockoutTeams={formValues.knockoutTeams}
+            maxTeams={formValues.maxTeams}
+            numberOfGroups={formValues.numberOfGroups}
             eventStart={formValues.eventStart}
             eventEnd={formValues.eventEnd}
             playableFields={formValues.playableFields}
-            cardStyle={"w-1/2"}
+            cardStyle={"w-1/2 pb-4"}
           />
           <div
             className="h-[67px] border-secondaryThirty rounded-2xl mt-10 w-[49%]

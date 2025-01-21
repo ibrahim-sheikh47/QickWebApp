@@ -84,7 +84,7 @@ import academy from "../assets/svgs/academy.svg";
 import recurring from "../assets/svgs/recurring.svg";
 import newBooking from "../assets/svgs/new_booking.svg";
 import users from "../assets/svgs/Users.svg";
-
+import usersBlack from "../assets/svgs/UsersBlack.svg";
 import team1 from "../assets/team1.png";
 import team2 from "../assets/team2.png";
 import team3 from "../assets/team3.png";
@@ -96,9 +96,48 @@ import player1 from "../assets/player1.png";
 import player2 from "../assets/player2.png";
 import player3 from "../assets/player3.png";
 import player4 from "../assets/player4.png";
-// Export all assets
+import cost from "../assets/svgs/cost.svg";
+import access from "../assets/svgs/access.svg";
+import eventStarts from "../assets/svgs/eventStarts.svg";
+import eventEnds from "../assets/svgs/eventEnds.svg";
+import regStarts from "../assets/svgs/regStarts.svg";
+import regEnds from "../assets/svgs/regEnds.svg";
+import playableFields from "../assets/svgs/PlayableFields.svg";
+import level from "../assets/svgs/TeamLevel.svg";
+import gender from "../assets/svgs/gender.svg";
+import ages from "../assets/svgs/ages.svg";
+import time from "../assets/svgs/Clock.svg";
+import versus from "../assets/svgs/versus.svg";
+import knockoutStage from "../assets/svgs/knockoutStage.svg";
+import rules from "../assets/svgs/rules.svg";
+import cards from "../assets/svgs/cards.svg";
+import randomize from "../assets/svgs/randomize.svg";
+import chatBlack from "../assets/svgs/chatBlack.svg";
+import option from "../assets/svgs/option.svg";
+import share from "../assets/svgs/share.svg";
+
 export default {
+  option,
+  share,
+  chatBlack,
+  versus,
+  randomize,
+  knockoutStage,
+  rules,
+  cards,
+  cost,
+  time,
+  access,
+  eventStarts,
+  eventEnds,
+  regStarts,
+  regEnds,
+  playableFields,
+  level,
+  gender,
+  ages,
   player1,
+  usersBlack,
   player2,
   player3,
   player4,

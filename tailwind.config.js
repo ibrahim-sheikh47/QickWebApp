@@ -29,6 +29,10 @@ export default {
         13: "repeat(13, minmax(0, 1fr))",
         14: "repeat(14, minmax(0, 1fr))",
       },
+      boxShadow: {
+        custom:
+          "0 2px 4px 0 rgba(204, 204, 204, 0.3), 0 -2px 4px 0 rgba(204, 204, 204, 0.3), 0 0 4px 0 rgba(204, 204, 204, 0.3)",
+      },
     },
   },
   plugins: [require("tailwind-scrollbar-hide")],
