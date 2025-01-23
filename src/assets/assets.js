@@ -116,7 +116,10 @@ import chatBlack from "../assets/svgs/chatBlack.svg";
 import option from "../assets/svgs/option.svg";
 import share from "../assets/svgs/share.svg";
 
+import goals from "../assets/svgs/goals.svg";
+
 export default {
+  goals,
   option,
   share,
   chatBlack,

@@ -3,7 +3,7 @@
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import assets from "../../../assets/assets";
 import TabSelector from "../../../components/TabSelector/TabSelector";
-import { Button, Table } from "antd";
+import { Button, Modal, Table } from "antd";
 import { useState } from "react";
 import AddTeamModal from "../../../components/AddTeamModal/AddTeamModal";
 import AddTeamSection from "../../../components/AddTeamSection/AddTeamSection";
@@ -17,6 +17,8 @@ import {
   tableTeams,
   teams,
 } from "../../../constants/leagueIndex";
+import PlayerDetailsModal from "../../../components/PlayerDetailsModal/PlayerDetailsModal";
+import Fixtures from "./Fixtures";
 
 const CardDetailPage = () => {
   const navigate = useNavigate();
@@ -24,30 +26,17 @@ const CardDetailPage = () => {
   const formValues = location.state || {}; // Safe fallback for state
 
   const [mainTab, setMainTab] = useState("Fixtures");
-  const [activeMatchday, setActiveMatchday] = useState("Matchday 1");
   const [tableTab, setTableTab] = useState("League");
-  const [isModalOpen, setIsModalOpen] = useState({
-    team1: false,
-    team2: false,
-  });
 
   const [searchQuery, setSearchQuery] = useState("");
 
   // Track selected teams for team1 and team2
-  const [selectedTeams, setSelectedTeams] = useState({
-    team1: null,
-    team2: null,
-  });
 
   // Handle modal open and close
-  const handleToggleModal = (teamType, isOpen) => {
-    setIsModalOpen((prevState) => ({
-      ...prevState,
-      [teamType]: isOpen,
-    }));
-  };
 
   // Handle main tab change
+
+  const [activeMatchday, setActiveMatchday] = useState("Matchday 1");
   const handleMainTabChange = (tab) => {
     setMainTab(tab);
   };
@@ -63,24 +52,6 @@ const CardDetailPage = () => {
   // Handle search input change
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
-  };
-
-  const handleTeamSelection = (teamId, teamType) => {
-    if (teamType === "team1") {
-      // If team1 is selected, update the team1 state
-      setSelectedTeams((prevTeams) => ({
-        ...prevTeams,
-        team1: teamId,
-      }));
-    } else if (teamType === "team2") {
-      // Ensure team2 isn't the same as team1
-      if (selectedTeams.team1 !== teamId) {
-        setSelectedTeams((prevTeams) => ({
-          ...prevTeams,
-          team2: teamId,
-        }));
-      }
-    }
   };
 
   const columns = [
@@ -129,14 +100,22 @@ const CardDetailPage = () => {
     },
   ];
   const PlayerStatsTable = ({ statColumns, statData }) => {
-    return <Table columns={statColumns} dataSource={statData} />;
+    return (
+      <Table
+        columns={statColumns}
+        dataSource={statData}
+        onRow={(record) => ({
+          onClick: () => handleRowClick(record, statColumns[2].title), // Pass stat type dynamically
+        })}
+      />
+    );
   };
   const generateColumns = (statType) => {
     const columnMapping = {
       Goals: "goals",
       Assists: "assists",
-      "MVP Awards": "mvpAwards",
-      "Clean Sheets": "cleanSheets",
+      "MVP Awards": "mvpawards",
+      "Clean Sheets": "cleansheets",
     };
 
     const statKey = columnMapping[statType];
@@ -174,16 +153,19 @@ const CardDetailPage = () => {
     ];
   };
 
-  const [isOptionModalOpen, setIsOptionModalOpen] = useState(false);
-  const [isMatchOptionModalOpen, setIsMatchOptionModalOpen] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState(null);
 
-  const handleOptionClick = () => {
-    setIsOptionModalOpen(true);
-  };
-
-  const handleMatchOption = () => {
-    setIsOptionModalOpen(false);
-    setIsMatchOptionModalOpen(true);
+  const handleRowClick = (record, statType) => {
+    setModalContent({
+      player: record.player,
+      team: record.team,
+      teamImg: record.teamImg,
+      dp: record.dp,
+      statType,
+      value: record[statType.toLowerCase().replace(/\s+/g, "")],
+    });
+    setModalVisible(true);
   };
 
   return (
@@ -304,93 +286,9 @@ const CardDetailPage = () => {
           />
         )}
       </div>
-      <div className="bg-white mt-5 rounded-xl">
-        {mainTab === "Fixtures" && (
-          <div className="p-4">
-            <TeamSelectionCard
-              team1={selectedTeams.team1}
-              team2={selectedTeams.team2}
-              teams={teams}
-              assets={assets}
-              handleOptionClick={handleOptionClick}
-            />
-            {isOptionModalOpen && (
-              <AppModal
-                modalopen={isOptionModalOpen}
-                onClose={() => setIsOptionModalOpen(false)}
-                width={"500px"}
-                height={"372px"}
-              >
-                <p className="font-PJSbold text-lg">Match Options</p>
-                <div className="flex flex-col gap-5 mt-5 text-[16px] ">
-                  <Button
-                    onClick={handleMatchOption}
-                    className="h-14 rounded-lg font-PJSmedium"
-                  >
-                    Match Option
-                  </Button>
-                  <Button className="h-14 rounded-lg font-PJSmedium">
-                    Match Facts
-                  </Button>
-                  <Button className="h-14 rounded-lg font-PJSmedium">
-                    Forfeit
-                  </Button>
-                  <Button
-                    type="none"
-                    className="h-14 rounded-full bg-secondaryTen font-PJSmedium"
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </AppModal>
-            )}
-            {isMatchOptionModalOpen && (
-              <AppModal
-                modalopen={isMatchOptionModalOpen}
-                onClose={() => setIsMatchOptionModalOpen(false)}
-                width={"500px"}
-                height={"318px"}
-              >
-                <p className="font-PJSbold text-lg">Match Options</p>
-                <div className="flex flex-col gap-5 mt-5 text-[16px] ">
-                  <Button className="h-14 rounded-lg font-PJSmedium">
-                    Edit Score
-                  </Button>
-                  <Button className="h-14 rounded-lg font-PJSmedium">
-                    Reschedule
-                  </Button>
-                  <Button
-                    type="none"
-                    className="h-14 rounded-full bg-secondaryTen font-PJSmedium text-redbutton"
-                  >
-                    Remove Team
-                  </Button>
-                </div>
-              </AppModal>
-            )}
+      <div className="bg-white mt-5 rounded-xl p-4">
+        {mainTab === "Fixtures" && <Fixtures />}
 
-            <AddTeamSection handleToggleModal={handleToggleModal} />
-
-            <AddTeamModal
-              isModalOpen={isModalOpen.team1}
-              onClose={() => handleToggleModal("team1", false)}
-              teamType="team1"
-              teams={teams}
-              selectedTeams={selectedTeams}
-              handleTeamSelection={handleTeamSelection}
-              activeMatchday={activeMatchday}
-            />
-            <AddTeamModal
-              isModalOpen={isModalOpen.team2}
-              onClose={() => handleToggleModal("team2", false)}
-              teamType="team2"
-              teams={teams}
-              selectedTeams={selectedTeams}
-              handleTeamSelection={handleTeamSelection}
-              activeMatchday={activeMatchday}
-            />
-          </div>
-        )}
         {mainTab === "Tables" && (
           <>
             {tableTab === "League" && (
@@ -434,6 +332,18 @@ const CardDetailPage = () => {
                   statData={mvpAwardsData}
                 />
               </>
+            )}
+            {modalContent && (
+              <PlayerDetailsModal
+                isVisible={isModalVisible}
+                player={modalContent.player}
+                team={modalContent.team}
+                dp={modalContent.dp}
+                statType={modalContent.statType}
+                value={modalContent.value}
+                leagueName={formValues.leagueName}
+                onClose={() => setModalVisible(false)}
+              />
             )}
           </>
         )}

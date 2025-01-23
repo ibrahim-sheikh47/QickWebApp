@@ -14,7 +14,7 @@ const AddTeamSection = ({ handleToggleModal }) => {
           className="rounded-full border-none bg-lime"
           type="none"
         />
-        <p className="text-sm text-primary font-PJSbold">Add Team</p>
+        <p className="text-sm text-primary font-PJSbold">Add Team 1</p>
       </div>
       <div className="border-t border-secondaryThirty w-[80%] my-3"></div>
       <div
@@ -27,7 +27,7 @@ const AddTeamSection = ({ handleToggleModal }) => {
           className="rounded-full border-none bg-lime"
           type="none"
         />
-        <p className="text-sm text-primary font-PJSbold">Add Team</p>
+        <p className="text-sm text-primary font-PJSbold">Add Team 2</p>
       </div>
     </div>
   );
