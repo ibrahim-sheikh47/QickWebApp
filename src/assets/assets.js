@@ -83,6 +83,7 @@ import closure from "../assets/svgs/closure.svg";
 import academy from "../assets/svgs/academy.svg";
 import recurring from "../assets/svgs/recurring.svg";
 import newBooking from "../assets/svgs/new_booking.svg";
+import Send from "../assets/svgs/send.svg";
 import users from "../assets/svgs/Users.svg";
 import usersBlack from "../assets/svgs/UsersBlack.svg";
 import team1 from "../assets/team1.png";
@@ -235,4 +236,5 @@ export default {
   academy,
   recurring,
   newBooking,
+  Send,
 };

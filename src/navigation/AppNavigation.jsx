@@ -16,6 +16,7 @@ import {
   SplashScreen,
   Users,
   UsersReport,
+  CommunicationHistory,
 } from "../pages";
 import EventReport from "../pages/Dashboard/Reports/EventReport";
 import Events from "../pages/Dashboard/Events/Events";
@@ -63,6 +64,10 @@ export const AppNavigation = () => {
         <Route
           Component={CreditHolderReport}
           path="Reports/CreditHolderReport"
+        />
+        <Route
+          Component={CommunicationHistory}
+          path="/Dashboard/Chats/CommunicationHistory"
         />
         <Route Component={EventReport} path="Reports/EventReport" />
 

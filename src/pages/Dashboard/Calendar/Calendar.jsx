@@ -9,6 +9,8 @@ import MonthSelector from "../../../components/MonthSelector/MonthSelector";
 import moment from "moment";
 
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
+import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import AddBookingModal from "../../../components/AddBookingModal/AddBookingModal";
 import Loader from "../../../components/Loader/Loader";
 import { useStateContext } from "../../../context";
@@ -16,9 +18,15 @@ import {
   cancelBooking,
   createBooking,
   getAllBookings,
+  updateBooking,
 } from "../../../api/services/bookingService";
 import { getFacilityFields } from "../../../api/services/facilityService";
-import { formattedDate } from "../../../constants";
+import {
+  capitalizeFirstLetter,
+  formattedDate,
+  splitEventByDays,
+} from "../../../constants";
+import { Modal, notification } from "antd";
 
 const locales = { "en-US": enUS };
 const localizer = dateFnsLocalizer({
@@ -28,6 +36,8 @@ const localizer = dateFnsLocalizer({
   getDay,
   locales,
 });
+
+const DragAndDropCalendar = withDragAndDrop(Calendar);
 
 const CustomToolbar = ({
   currentDate,
@@ -142,7 +152,13 @@ const CalendarComponent = () => {
   const [events, setEvents] = useState([]);
   const [allFields, setAllFields] = useState([]);
 
+  const [selectedSlot, setSelectedSlot] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [resizeModalVisible, setResizeModalVisible] = useState(false);
+  const [resizeEvent, setResizeEvent] = useState(null);
+  const [droppedEvent, setDroppedEvent] = useState(null);
+
+  const [isResized, setResized] = useState(false);
 
   const handleMonthChange = (newDate) => {
     setCurrentDate(newDate);
@@ -170,9 +186,10 @@ const CalendarComponent = () => {
     }
   }, [resources]);
 
-  const startBookingFlow = (mode = "add", event = null) => {
+  const startBookingFlow = (mode = "add", event = null, slot = null) => {
     setMode(mode);
     if (event) setSelectedEvent(event);
+    if (slot) setSelectedSlot(slot);
     setShowAddBookingModal(true);
   };
 
@@ -184,6 +201,104 @@ const CalendarComponent = () => {
 
   const handleCancel = () => {
     setShowAddBookingModal(false);
+    setSelectedEvent(null);
+    setSelectedSlot(null);
+  };
+
+  const handleEventResize = ({ start, end, event }) => {
+    const newEvent = {
+      ...event,
+      start,
+      end,
+    };
+
+    if (isOverlapping(newEvent, events)) {
+      openNotification(
+        "The new timing overlaps with an existing booking in the same field."
+      );
+      return;
+    }
+
+    setResizeEvent({
+      ...event,
+      startDateTime: moment(start).toISOString(true),
+      endDateTime: moment(end).toISOString(true),
+      start,
+      end,
+    });
+    setResized(true);
+    setResizeModalVisible(true); // Show the confirmation modal
+  };
+
+  const handleConfirmResize = () => {
+    updateBookingDetails(isResized ? resizeEvent : droppedEvent);
+  };
+
+  const handleCancelResize = () => {
+    // Revert any changes
+    setResizeModalVisible(false);
+    setResizeEvent(null);
+  };
+
+  const handleEventDrop = ({ start, end, event, resourceId }) => {
+    const newEvent = {
+      ...event,
+      start,
+      end,
+      resourceId,
+    };
+
+    if (isOverlapping(newEvent, events)) {
+      openNotification(
+        "The new timing overlaps with an existing booking in the same field."
+      );
+      return;
+    }
+
+    setDroppedEvent({
+      ...event,
+      startDateTime: moment(start).toISOString(true),
+      endDateTime: moment(end).toISOString(true),
+      field: resourceId,
+      start,
+      end,
+      resourceId,
+    });
+    setResized(false);
+    setResizeModalVisible(true);
+  };
+
+  const isOverlapping = (newEvent, events) => {
+    return events.some((event) => {
+      // Ignore the same event
+      if (event._id === newEvent._id) return false;
+
+      // Extract start and end times
+      const newStart = newEvent.start;
+      const newEnd = newEvent.end;
+      const existingStart = event.start;
+      const existingEnd = event.end;
+
+      // Overlap scenarios:
+      // 1. New event starts inside an existing event
+      const startsInside = newStart > existingStart && newStart < existingEnd;
+
+      // 2. New event ends inside an existing event
+      const endsInside = newEnd > existingStart && newEnd < existingEnd;
+
+      // 3. New event fully overlaps an existing event
+      const fullyOverlaps = newStart <= existingStart && newEnd >= existingEnd;
+
+      // 4. New event duration is completely inside an existing event
+      const isWithinExisting =
+        newStart >= existingStart && newEnd <= existingEnd;
+
+      // If any condition is true, there is an overlap
+      return (
+        (startsInside || endsInside || fullyOverlaps || isWithinExisting) &&
+        event.resourceId === newEvent.resourceId
+      );
+    });
   };
 
   const handleCancelBooking = async (bookingId) => {
@@ -198,6 +313,42 @@ const CalendarComponent = () => {
     }
   };
 
+  const updateBookingDetails = async (event) => {
+    try {
+      setLoading(true);
+      console.log(event);
+      await updateBooking(event, event._id);
+      if (isResized) {
+        setEvents((prevEvents) =>
+          prevEvents.map((evt) =>
+            evt.id === resizeEvent.id
+              ? { ...evt, start: resizeEvent.start, end: resizeEvent.end }
+              : evt
+          )
+        );
+      } else {
+        setEvents((prevEvents) =>
+          prevEvents.map((evt) =>
+            evt.id === droppedEvent.id
+              ? {
+                  ...evt,
+                  start: droppedEvent.start,
+                  end: droppedEvent.end,
+                  resourceId: droppedEvent.resourceId,
+                }
+              : evt
+          )
+        );
+      }
+      setResizeModalVisible(false); // Close the modal
+      fetchAllBookings();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchAllBookings = async () => {
     try {
       let booking = await getAllBookings(
@@ -205,26 +356,24 @@ const CalendarComponent = () => {
           currentDate
         )}&facilityId=${currentFacility._id}`
       );
-      // let bookings = booking.bookings;
 
-      const bookings = booking.bookings.map((b) => ({
-        ...b,
-        resourceId: b.field._id,
-        start: new Date(b.startDateTime),
-        end: new Date(b.endDateTime),
-        title: b.name || "Untitled Event",
-      }));
+      const bookings = booking.bookings.flatMap((b) => {
+        const event = {
+          ...b,
+          resourceId: b.field._id,
+          start: new Date(b.startDateTime),
+          end: new Date(b.endDateTime),
+          title: `${capitalizeFirstLetter(b.bookingType)} Event`,
+        };
 
-      // resources.forEach((r) => {
-      //   bookings.forEach((b) => {
-      //     if (b.field._id === r.label) {
-      //       b.resourceId = r.label;
-      //       b.start = new Date(b.startDateTime);
-      //       b.end = new Date(b.endDateTime);
-      //       b.title = b.name || "Untitled Event";
-      //     }
-      //   });
-      // });
+        // Split multi-day events into individual day events
+        if (event.start.toDateString() !== event.end.toDateString()) {
+          return splitEventByDays(event);
+        }
+
+        // Single-day events remain as-is
+        return event;
+      });
 
       setEvents(bookings);
     } catch (error) {
@@ -252,6 +401,14 @@ const CalendarComponent = () => {
     }
   };
 
+  const openNotification = (message) => {
+    notification.error({
+      message: "Conflict Detected",
+      description: message,
+      duration: 3, // Auto-close after 3 seconds
+    });
+  };
+
   return (
     <div
       style={{
@@ -259,7 +416,7 @@ const CalendarComponent = () => {
         padding: "1rem",
       }}
     >
-      <Calendar
+      <DragAndDropCalendar
         date={currentDate.toDate()}
         localizer={localizer}
         events={
@@ -275,8 +432,9 @@ const CalendarComponent = () => {
           height: "80vh",
           backgroundColor: "transparent",
         }}
-        step={60}
-        timeslots={1}
+        step={5} // Each grid cell represents 5 minutes
+        timeslots={12} // 12 slots per hour (5 x 12 = 60 minutes)
+        minResizeStep={5} // Resizing in 5-minute increments
         showAllDayEvents={false}
         resources={
           selectedResource === "all"
@@ -306,6 +464,13 @@ const CalendarComponent = () => {
           if (event && event.status !== "cancelled")
             startBookingFlow("edit", event);
         }}
+        onEventDrop={handleEventDrop}
+        resizable
+        onEventResize={handleEventResize}
+        selectable
+        onSelectSlot={(slot) => {
+          startBookingFlow("add", null, slot);
+        }}
       />
 
       {/* Add Booking Modal */}
@@ -316,10 +481,48 @@ const CalendarComponent = () => {
           onClose={handleCancel}
           onNext={handleAddBookingNext}
           mode={mode}
-          initialValues={selectedEvent}
+          initialValues={{
+            ...selectedEvent,
+            ...(selectedSlot && { startDateTime: selectedSlot?.start }), // Prepopulate start date/time
+            ...(selectedSlot && { endDateTime: selectedSlot?.end }), // Prepopulate start date/time
+          }}
           onCancel={(id) => handleCancelBooking(id)}
         />
       )}
+
+      <Modal
+        title={`Confirm ${isResized ? "Resize" : "Drop"}`}
+        visible={resizeModalVisible}
+        onOk={handleConfirmResize} // Confirm the resize
+        onCancel={handleCancelResize} // Cancel the resize
+        okText="Yes, Update"
+        cancelText="Cancel"
+      >
+        <p>{`Are you sure you want to update the timing${
+          isResized ? " " : " and field "
+        }for the booking?`}</p>
+        <p>
+          New Start:{" "}
+          <strong>
+            {moment(resizeEvent?.start).format("DD/MM/yyyy hh:mm")}
+          </strong>
+        </p>
+        <p>
+          New End:{" "}
+          <strong>{moment(resizeEvent?.end).format("DD/MM/yyyy hh:mm")}</strong>
+        </p>
+        {!isResized && (
+          <p>
+            New Field:{" "}
+            <strong>
+              {resources.length &&
+                droppedEvent &&
+                resources.find((r) => r.label === droppedEvent.resourceId)
+                  .title}
+            </strong>
+          </p>
+        )}
+      </Modal>
 
       {loading && <Loader />}
     </div>

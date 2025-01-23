@@ -33,7 +33,7 @@ const MyFacility = () => {
   const [selectedAmenities, setSelectedAmenities] = useState(
     currentFacility && currentFacility.amenities
   );
-  const [photos, setPhotos] = useState(currentFacility.facilityPhotos);
+  const [photos, setPhotos] = useState(currentFacility?.facilityPhotos || []);
   const [photoFiles, setPhotoFiles] = useState([]);
   const [modalOpen, setModalOpen] = useState(null);
   const [hoveredIndex, setHoveredIndex] = useState(null);

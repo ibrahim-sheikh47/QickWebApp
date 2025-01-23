@@ -60,7 +60,9 @@ const BarChart = ({ data, selectedBar, setSelectedBar }) => {
 };
 
 const BookingBar = ({ stats }) => {
-  const [selectedBar, setSelectedBar] = useState(stats[0]);
+  const [selectedBar, setSelectedBar] = useState(
+    stats.length > 0 ? stats[0].label : null
+  );
 
   const navigate = useNavigate();
   const handleNavigation = () => {

@@ -34,6 +34,70 @@ const FieldPrice = () => {
   const [fieldNames, setFieldNames] = useState([]);
   const [photoFiles, setPhotoFiles] = useState([]);
 
+  function parseTime(time) {
+    const [hourMinute, period] = time.split(/(AM|PM)/i); // Split time and period
+    const [hours, minutes] = hourMinute.trim().split(":").map(Number); // Extract hours and minutes
+    let adjustedHours = hours;
+
+    if (period.toLowerCase() === "pm" && hours !== 12) {
+      adjustedHours += 12; // Convert PM hours to 24-hour format
+    } else if (period.toLowerCase() === "am" && hours === 12) {
+      adjustedHours = 0; // Handle midnight case
+    }
+
+    return new Date(
+      `1970-01-01T${String(adjustedHours).padStart(2, "0")}:${String(
+        minutes
+      ).padStart(2, "0")}:00`
+    );
+  }
+
+  // Function to calculate the time values between the minimum and maximum times
+  function getTimeValuesBetweenMinAndMax(hoursArray) {
+    // Parse all open and close times
+    const parsedTimes = hoursArray
+      .map(({ open, close }) => {
+        // Ensure open and close values are valid before parsing
+        if (!open || !close) {
+          return null; // Skip entries with invalid or null times
+        }
+
+        return {
+          open: parseTime(open),
+          close: parseTime(close),
+        };
+      })
+      .filter((time) => time !== null);
+
+    // Find the minimum open time and maximum close time
+    const minTime = new Date(
+      Math.min(...parsedTimes.map((time) => time.open.getTime()))
+    );
+    const maxTime = new Date(
+      Math.max(...parsedTimes.map((time) => time.close.getTime()))
+    );
+
+    // Generate hourly time values between minTime and maxTime
+    const timeValues = [];
+    let currentTime = new Date(minTime);
+
+    while (currentTime <= maxTime) {
+      const timeX = currentTime.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
+      timeValues.push({
+        key: timeX,
+        value: timeX,
+      });
+
+      currentTime.setHours(currentTime.getHours() + 1); // Increment by 1 hour
+    }
+
+    return timeValues;
+  }
+
   const handleSubmitStep1 = () => {
     setStep(1);
     setShowFieldsSection(false);
@@ -1458,7 +1522,9 @@ const FieldPrice = () => {
                           <option value="" disabled selected>
                             From
                           </option>
-                          {timeSlots.map((slot, index) => (
+                          {getTimeValuesBetweenMinAndMax(
+                            currentFacility?.hoursOfOperation
+                          ).map((slot, index) => (
                             <option key={index} value={slot.key}>
                               {slot.value}
                             </option>
@@ -1497,7 +1563,9 @@ const FieldPrice = () => {
                           <option value="" disabled selected>
                             To
                           </option>
-                          {timeSlots.map((slot, index) => (
+                          {getTimeValuesBetweenMinAndMax(
+                            currentFacility?.hoursOfOperation
+                          ).map((slot, index) => (
                             <option key={index} value={slot.key}>
                               {slot.value}
                             </option>
