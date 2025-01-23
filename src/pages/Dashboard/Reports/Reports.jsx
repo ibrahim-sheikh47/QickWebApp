@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-key */
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import AppModal from "../../../components/AppModal/AppModal";
@@ -15,7 +14,7 @@ import assets from "../../../assets/assets";
 import { useStateContext } from "../../../context";
 import { getFieldsBookingStats } from "../../../api/services/bookingService";
 import Loader from "../../../components/Loader/Loader";
-// import moment from "moment";
+import moment from "moment";
 import AddNewFacilityModal from "../../../components/AddNewFacilityModal/AddNewFacilityModal";
 import { formattedDate } from "../../../constants";
 
@@ -45,7 +44,6 @@ const Reports = () => {
     users: false,
     creditHolders: false,
     addNew: false,
-    events: false,
   });
 
   const [stats, setStats] = useState([]);
@@ -82,6 +80,7 @@ const Reports = () => {
       key: "selection",
     },
   ]);
+
   const [dateRangeEvents, setDateRangeEvents] = useState([
     {
       startDate: new Date(),
@@ -112,6 +111,7 @@ const Reports = () => {
   const handleDateChangeCreditHolders = (ranges) => {
     setDateRangeCreditHolders([ranges.selection]);
   };
+
   const handleDateChangeEvents = (ranges) => {
     setDateRangeEvents([ranges.selection]);
   };
@@ -148,6 +148,10 @@ const Reports = () => {
     closeModal(section);
   };
 
+  useEffect(() => {
+    console.log(stats);
+  }, [stats]);
+
   const getStats = async () => {
     setLoading(true);
     try {
@@ -161,6 +165,7 @@ const Reports = () => {
       );
     } catch (error) {
       console.log(error);
+      setStats([]);
     } finally {
       setLoading(false);
     }
@@ -176,7 +181,7 @@ const Reports = () => {
             onClick={() => openModal("facility")}
             className="font-PJSextra text-3xl text-primary flex items-center gap-3"
           >
-            {/* {currentFacility.name} */}
+            {currentFacility ? currentFacility.name : ""}
             <img
               src={assets.down}
               className="w-6"
@@ -210,7 +215,9 @@ const Reports = () => {
                 return (
                   <div
                     className="flex items-center justify-between mt-6 cursor-pointer"
-                    onClick={() => setCurrentFacility(facility)}
+                    onClick={() => {
+                      setCurrentFacility(facility);
+                    }}
                   >
                     <div className="flex items-center gap-3">
                       <img
@@ -227,13 +234,13 @@ const Reports = () => {
                       />
                       <p className="text-sm font-PJSregular">{facility.name}</p>
                     </div>
-                    {/* {currentFacility._id === facility._id && (
+                    {currentFacility._id === facility._id && (
                       <img
                         src={assets.CheckCircle}
                         className="w-6"
                         alt="Selected"
                       />
-                    )} */}
+                    )}
                   </div>
                 );
               })}
@@ -323,7 +330,6 @@ const Reports = () => {
           >
             <SalesBar />
           </Section>
-
           <AppModal
             modalopen={isModalOpen.sales}
             onClose={() => closeModal("sales")}
@@ -449,7 +455,6 @@ const Reports = () => {
               showDateDisplay={false}
               rangeColors={["#33C0DB"]}
             />
-
             <div className="flex gap-4 w-full justify-center font-PJSMedium items-center">
               <button
                 className="w-full transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full bg-secondaryTen font-PJSmedium justify-center items-center"
