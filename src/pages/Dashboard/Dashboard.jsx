@@ -51,6 +51,7 @@ const Dashboard = () => {
   const adminNavigation = [
     { name: "Reports", link: "/Dashboard/Reports", icon: assets.piesvg },
     { name: "Calendar", link: "/Dashboard/Calendar", icon: assets.calendarsvg },
+    { name: "Events", link: "/Dashboard/Events", icon: assets.league },
     { name: "Chats", link: "/Dashboard/Chats", icon: assets.chatsvg },
   ];
 
@@ -159,7 +160,7 @@ const Dashboard = () => {
         <div className="flex h-16 items-center bg-primary px-6">
           <img className="h-8 w-auto" src={assets.logo} alt="Your Company" />
         </div>
-        <nav className="flex-1 overflow-y-auto space-y-1 px-2 py-4">
+        <nav className="flex-1 overflow-y-auto space-y-2 px-2 py-4">
           {adminNavigation.map((item) => (
             <Link
               key={item.name}
@@ -174,6 +175,11 @@ const Dashboard = () => {
             >
               <img src={item.icon} className="w-auto h-6 mr-2" />
               {item.name}
+              {item.name === "Events" && (
+                <span className="ml-5 mt-1/2 px-3 py-1/2 text-xs text-white bg-blue rounded-full">
+                  Beta
+                </span>
+              )}
             </Link>
           ))}
         </nav>

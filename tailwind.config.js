@@ -7,7 +7,7 @@ export default {
       colors: {
         primary: "#1F2933",
         lime: "#9CFC38",
-        blueSecondary:"#EBF9FB",
+        blueSecondary: "#EBF9FB",
         secondaryTen: "rgba(132, 154, 184, 0.1)",
         background: "rgba(248, 248, 248, 1)",
         secondary: "rgba(132, 154, 184, 1)",
@@ -23,6 +23,15 @@ export default {
         PJSbold: ["PJSbold", "Sans-Serif"],
         PJSextra: ["PJSextra", "Sans-Serif"],
         PJSmedium: ["PJSmedium", "Sans-Serif"],
+      },
+      gridTemplateColumns: {
+        // Add a 13-column layout
+        13: "repeat(13, minmax(0, 1fr))",
+        14: "repeat(14, minmax(0, 1fr))",
+      },
+      boxShadow: {
+        custom:
+          "0 2px 4px 0 rgba(204, 204, 204, 0.3), 0 -2px 4px 0 rgba(204, 204, 204, 0.3), 0 0 4px 0 rgba(204, 204, 204, 0.3)",
       },
     },
   },

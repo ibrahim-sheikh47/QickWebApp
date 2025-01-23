@@ -1,6 +1,7 @@
 import Back from "../../../assets/svgs/back.svg";
 import { useEffect, useState } from "react";
 import {
+  LeagueModal,
   NewBookingSalesModal,
   RecurringBookingSalesModal,
 } from "./ReportsDetails";
@@ -50,6 +51,11 @@ const SalesReport = () => {
   const [bookings, setBookings] = useState([]);
   const [fields, setFields] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [modalState, setModalState] = useState({
+    new: false,
+    recurring: false,
+    league: false,
+  });
 
   useEffect(() => {
     if (currentFacility) {
@@ -143,15 +149,13 @@ const SalesReport = () => {
 
   const handleBookingClick = (booking) => {
     setSelectedBooking(booking);
-    const modalStateMap = {
-      "New Booking": setNewBookingSalesModal,
-      "Recurring Booking": setRecurringBookingSalesModal,
-    };
-
-    const modalSetter = modalStateMap[booking.type];
-    if (modalSetter) {
-      modalSetter(true);
-    }
+    setModalState({ ...modalState, new: true });
+    // if (booking.bookingType === "New Booking")
+    //   setModalState({ ...modalState, new: true });
+    // if (booking.bookingType === "Recurring Booking")
+    //   setModalState({ ...modalState, recurring: true });
+    // if (booking.bookingType === "League")
+    //   setModalState({ ...modalState, league: true });
   };
 
   function backNav() {
@@ -413,16 +417,19 @@ const SalesReport = () => {
           ))}
         </div>
 
-        {selectedBooking && (
-          <NewBookingSalesModal
-            isOpen={selectedBooking !== null}
-            onClose={() => setSelectedBooking(null)}
-            booking={selectedBooking}
-          />
-        )}
+        <NewBookingSalesModal
+          isOpen={modalState.new}
+          onClose={() => setModalState({ ...modalState, new: false })}
+          booking={selectedBooking}
+        />
         <RecurringBookingSalesModal
-          isOpen={recurringBookingSalesModal}
-          onClose={() => setRecurringBookingSalesModal(false)}
+          isOpen={modalState.recurring}
+          onClose={() => setModalState({ ...modalState, recurring: false })}
+          booking={selectedBooking}
+        />
+        <LeagueModal
+          isOpen={modalState.league}
+          onClose={() => setModalState({ ...modalState, league: false })}
           booking={selectedBooking}
         />
 

@@ -60,7 +60,7 @@ const BarChart = ({ data, selectedBar, setSelectedBar }) => {
 };
 
 const BookingBar = ({ stats }) => {
-  const [selectedBar, setSelectedBar] = useState(stats.length > 0 ? stats[0].label : null);
+  const [selectedBar, setSelectedBar] = useState(stats[0]);
 
   const navigate = useNavigate();
   const handleNavigation = () => {
@@ -108,11 +108,12 @@ const SalesBar = () => {
       "October",
       "November",
       "December",
+      "January",
     ],
     datasets: [
       {
         label: "",
-        data: [15, 35, 45, 25, 38, 24, 55, 60, 22, 41, 31, 51],
+        data: [15, 35, 45, 25, 38, 24, 55, 60, 22, 41, 31, 51, 43],
         backgroundColor: (context) => {
           const index = context.dataIndex;
           return index === activeIndex ? "#1F2933" : "#9CFC38";
@@ -434,4 +435,105 @@ const CreditHolderChart = () => {
   );
 };
 
-export { BookingBar, SalesBar, UsersChart, CreditHolderChart };
+const EventBar = () => {
+  const [activeIndex, setActiveIndex] = useState(null);
+
+  const navigate = useNavigate();
+  const handleNavigation = () => {
+    navigate("EventReport");
+  };
+
+  const data = {
+    labels: ["Active", "Completed"],
+    datasets: [
+      {
+        label: "",
+        data: [2, 6], // Replace with your data
+        backgroundColor: (context) => {
+          const index = context.dataIndex;
+          if (index === activeIndex) {
+            return "#1F2933"; // Highlight color for active bar
+          }
+          return index === 0 ? "#9CFC38" : "#33C0DB"; // Green for "Active", Blue for "Completed"
+        },
+        borderWidth: 1,
+        barThickness: 20,
+        borderRadius: 6,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    onClick: (event, elements) => {
+      if (elements.length > 0) {
+        const index = elements[0].index;
+        setActiveIndex(index === activeIndex ? null : index); // Toggle the active bar
+      }
+    },
+    scales: {
+      x: {
+        grid: {
+          display: false,
+        },
+        ticks: {
+          color: "#1f2933",
+          font: {
+            size: "14px",
+            family: "PJSregular",
+          },
+          autoSkip: false,
+          maxRotation: 0,
+          minRotation: 0,
+        },
+      },
+      y: {
+        grid: {
+          display: false,
+        },
+        ticks: {
+          callback: (value) => {
+            return `${value}`; // Display the number as-is
+          },
+          color: "#1f2933",
+          font: {
+            size: "14px",
+          },
+        },
+      },
+    },
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        displayColors: false,
+        padding: 10,
+        callbacks: {
+          label: (context) => {
+            let label = `${context.parsed.y}`; // Show the number in the tooltip
+            return label;
+          },
+        },
+      },
+    },
+  };
+
+  return (
+    <div className="flex flex-col items-center mt-4 cursor-pointer max-w-full">
+      <Bar data={data} options={options} />
+      <button
+        className="flex justify-center items-center py-2 absolute bottom-0 my-1"
+        onClick={handleNavigation}
+      >
+        <span className="text-[16px] hover:text-primary font-PJSbold text-secondary">
+          See details
+        </span>
+      </button>
+    </div>
+  );
+};
+
+export default EventBar;
+
+export { BookingBar, SalesBar, UsersChart, CreditHolderChart, EventBar };

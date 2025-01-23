@@ -195,6 +195,8 @@ const AcademyModal = ({ isOpen, onClose }) => (
 ///////////////////////////////////SALES////////////////////////////////
 
 const NewBookingSalesModal = ({ isOpen, onClose, booking }) => {
+  if (!booking) return;
+
   return (
     <AppModal
       modalopen={isOpen}
@@ -534,6 +536,8 @@ const RecurringBookingSalesModal = ({ isOpen, onClose, booking }) => {
   );
 };
 
+const LeagueModal = ({ isOpen, onClose }) => {};
+
 export {
   NewBookingModal,
   LeagueSemiFinalsModal,
@@ -542,4 +546,5 @@ export {
   AcademyModal,
   NewBookingSalesModal,
   RecurringBookingSalesModal,
+  LeagueModal,
 };
