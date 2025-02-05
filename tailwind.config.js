@@ -31,7 +31,7 @@ export default {
       },
       boxShadow: {
         custom:
-          "0 2px 4px 0 rgba(204, 204, 204, 0.3), 0 -2px 4px 0 rgba(204, 204, 204, 0.3), 0 0 4px 0 rgba(204, 204, 204, 0.3)",
+          "0 2px 4px 0 rgba(204, 204, 204, 0.4), 0 -2px 4px 0 rgba(204, 204, 204, 0.4), 0 0 4px 0 rgba(204, 204, 204, 0.4)",
       },
     },
   },

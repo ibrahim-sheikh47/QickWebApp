@@ -49,7 +49,9 @@ const Events = () => {
   };
 
   const handleClickCardDetail = () => {
-    navigate("/Dashboard/Events/EventDetail", { state: { ...formValues } });
+    navigate("/Dashboard/Events/EventDetail", {
+      state: { ...formValues, eventType: eventData.eventType },
+    });
   };
 
   return (

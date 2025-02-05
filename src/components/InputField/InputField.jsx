@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-
 const InputField = ({
   label,
   type = "text",
@@ -31,12 +30,15 @@ const InputField = ({
           placeholder={placeholder}
         />
       )}
+
       <label
         htmlFor={name} // Updated to use 'name' instead of 'label' for 'htmlFor'
-        className="absolute top-4 left-4 text-secondary font-PJSmedium text-xs"
+        className="absolute top-4 left-4 text-secondary font-PJSmedium text-xs flex"
       >
         {label}
       </label>
+
+      {/* Modal to show on info icon click */}
     </div>
   );
 };

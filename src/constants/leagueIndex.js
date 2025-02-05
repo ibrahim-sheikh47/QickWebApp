@@ -289,7 +289,7 @@ export const cleanSheetsData = [
   {
     id: 2,
     player: "Ramos",
-    cleansheets: 4,
+    cleansheets: 0,
     dp: assets.player1,
     team: "Barcelona",
   },
@@ -307,4 +307,128 @@ export const cleanSheetsData = [
     dp: assets.player2,
     team: "Manchester City",
   },
+];
+export const cardsData = [
+  {
+    id: 1,
+    player: "John Doe",
+    dp: assets.player2,
+    team: "Bayern",
+    yellowCards: 2,
+    redCards: 1,
+  },
+  {
+    id: 2,
+    player: "Ramos",
+    dp: assets.player1,
+    team: "Barcelona",
+    yellowCards: 4,
+    redCards: 0,
+  },
+  {
+    id: 3,
+    player: "Ibrahim",
+    dp: assets.player3,
+    team: "Liverpool",
+    yellowCards: 1,
+    redCards: 0,
+  },
+  {
+    id: 4,
+    player: "Justin",
+    dp: assets.player2,
+    team: "Manchester City",
+    yellowCards: 0,
+    redCards: 0,
+  },
+];
+
+export const leagueTeamsData = [
+  {
+    icon: assets.team1, // Replace with actual image path
+    name: "The Tigers",
+    paymentStatus: "confirmed",
+    level: "Beginner",
+    wins: 5,
+    losses: 2,
+    draws: 3,
+  },
+  {
+    icon: assets.team2, // Replace with actual image path
+    name: "Arsenal Gunners",
+    paymentStatus: "pending",
+    level: "Beginner",
+    wins: 3,
+    losses: 4,
+    draws: 3,
+  },
+  {
+    icon: assets.team3, // Replace with actual image path
+    name: "FC Hanover",
+    paymentStatus: "confirmed",
+    level: "Beginner",
+    wins: 6,
+    losses: 1,
+    draws: 3,
+  },
+  {
+    icon: assets.team4, // Replace with actual image path
+    name: "FC Fulham",
+    paymentStatus: "pending",
+    level: "Beginner",
+    wins: 4,
+    losses: 3,
+    draws: 3,
+  },
+  {
+    icon: assets.team5, // Replace with actual image path
+    name: "Atlanta FC",
+    paymentStatus: "confirmed",
+    level: "Beginner",
+    wins: 7,
+    losses: 2,
+    draws: 1,
+  },
+  {
+    icon: assets.team6, // Replace with actual image path
+    name: "Strikers",
+    paymentStatus: "confirmed",
+    level: "Beginner",
+    wins: 5,
+    losses: 3,
+    draws: 2,
+  },
+  {
+    icon: assets.team7, // Replace with actual image path
+    name: "USA Soccer FC",
+    paymentStatus: "confirmed",
+    level: "Beginner",
+    wins: 6,
+    losses: 2,
+    draws: 2,
+  },
+];
+
+export const inviteTeamData = [
+  {
+    id: 1,
+    icon: assets.team7, // Replace with actual image path
+    name: "USA Soccer FC",
+    level: "Beginner",
+  },
+  {
+    id: 2,
+    icon: assets.team7, // Replace with actual image path
+    name: "USA Soccer FC",
+    level: "Intermediate",
+  },
+];
+export const freeAgentTeam = [
+  { id: 1, name: "The Tigers", players: 12, teamIcon: assets.team1 },
+  { id: 2, name: "New York City", players: 8, teamIcon: assets.team2 },
+  { id: 3, name: "FC Hanover", players: 10, teamIcon: assets.team3 },
+  { id: 4, name: "FC Fulham", players: 5, teamIcon: assets.team4 },
+  { id: 5, name: "Atlanta FC", players: 7, teamIcon: assets.team5 },
+  { id: 6, name: "Juniors Club", players: 4, teamIcon: assets.team6 },
+  { id: 7, name: "Orlando FC", players: 15, teamIcon: assets.team7 },
 ];

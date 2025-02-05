@@ -23,6 +23,8 @@ import Events from "../pages/Dashboard/Events/Events";
 import AddEvent from "../pages/Dashboard/Events/AddEvent";
 import CardInfoPage from "../pages/Dashboard/Events/CardInfoPage";
 import CardDetailPage from "../pages/Dashboard/Events/CardDetailPage";
+import AddResults from "../pages/Dashboard/Events/AddResults";
+import TeamDetailScreen from "../pages/Dashboard/Events/TeamDetail";
 
 export const AppNavigation = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1000);
@@ -76,6 +78,12 @@ export const AppNavigation = () => {
 
         <Route Component={CardInfoPage} path="Events/EventInfo" />
         <Route Component={CardDetailPage} path="Events/EventDetail" />
+        <Route Component={AddResults} path="Events/EventDetail/AddResults" />
+
+        <Route
+          path="Events/EventDetail/TeamDetail/:teamName"
+          element={<TeamDetailScreen />}
+        />
       </Route>
     </Routes>
   );

@@ -8,6 +8,7 @@ import assets from "../../assets/assets";
 import { getOptions } from "../../constants/leagueIndex";
 import EventCard from "../EventCard/EventCard";
 import { useNavigate } from "react-router-dom";
+import { strings } from "../../constants/strings";
 
 /* eslint-disable react/prop-types */
 export const AddEventForm = ({ eventType }) => {
@@ -264,6 +265,8 @@ export const AddEventForm = ({ eventType }) => {
                     handleSelectChange("faceEachOther", value)
                   }
                   label="Teams face each other"
+                  showInfo={true}
+                  modalContent={strings.faceEachOtherInfo}
                 />
               )}
               {eventType === "Group Stage + Knockouts" && (
@@ -285,6 +288,8 @@ export const AddEventForm = ({ eventType }) => {
                       handleSelectChange("doubleElimination", value)
                     }
                     label="Are these knockout rounds double elimination (e.g., Home & Away)?"
+                    showInfo={true}
+                    modalContent={strings.doubleElimination}
                   />
                 </div>
               )}
@@ -382,6 +387,8 @@ export const AddEventForm = ({ eventType }) => {
                   value={formValues.tiebreakers}
                   onChange={(value) => handleSelectChange("tiebreakers", value)}
                   label="Tiebreakers when two teams are tied in points (listed by priority):"
+                  showInfo={true}
+                  modalContent={strings.tieBreakers}
                 />
               )}
               {eventType === "Knockouts" && (
@@ -392,6 +399,8 @@ export const AddEventForm = ({ eventType }) => {
                     handleSelectChange("cardCleanStages", value)
                   }
                   label="In what stages are cards cleaned?"
+                  showInfo={true}
+                  modalContent={strings.cardCleanStages}
                 />
               )}
             </div>
@@ -412,6 +421,8 @@ export const AddEventForm = ({ eventType }) => {
                       handleSelectChange("knockoutStartFrom", value)
                     }
                     label="Knockouts start from:"
+                    showInfo={true}
+                    modalContent={strings.knockoutStartFrom}
                   />
                 )}
               </div>
@@ -424,6 +435,8 @@ export const AddEventForm = ({ eventType }) => {
                       handleSelectChange("doubleElimination", value)
                     }
                     label="Are these knockout rounds double elimination (e.g., Home & Away)?"
+                    showInfo={true}
+                    modalContent={strings.doubleElimination}
                   />
                 </div>
                 <div className="flex-1">
@@ -456,6 +469,8 @@ export const AddEventForm = ({ eventType }) => {
                       handleSelectChange("cardCleanStages", value)
                     }
                     label="In what stages are cards cleaned?"
+                    showInfo={true}
+                    modalContent={strings.cardCleanStages}
                   />
                 </div>
               </div>
@@ -559,6 +574,8 @@ export const AddEventForm = ({ eventType }) => {
               value={formValues.freeAgents}
               onChange={(value) => handleSelectChange("freeAgents", value)}
               label="Amount of Free Agents Allowed to Join"
+              showInfo={true}
+              modalContent={strings.freeAgents}
             />
           </div>
           <div className="flex-1">

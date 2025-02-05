@@ -3,6 +3,8 @@
 const TeamSelectionCard = ({
   team1,
   team2,
+  team1score,
+  team2score,
   teams,
   assets,
   handleOptionClick,
@@ -26,7 +28,7 @@ const TeamSelectionCard = ({
                 className="w-6 h-6"
               />
               <p className="font-PJSmedium">{getTeamDetails(team1)?.name}</p>
-              <span className="ml-auto">-</span>
+              <span className="ml-auto">{team1score}</span>
             </>
           ) : (
             <p className="font-PJSmedium text-secondary">Not Selected</p>
@@ -42,7 +44,7 @@ const TeamSelectionCard = ({
                 className="w-6 h-6"
               />
               <p className="font-PJSmedium">{getTeamDetails(team2)?.name}</p>
-              <span className="ml-auto">-</span>
+              <span className="ml-auto">{team2score}</span>
             </>
           ) : (
             <p className="font-PJSmedium text-secondary">Not Selected</p>
@@ -51,12 +53,17 @@ const TeamSelectionCard = ({
       </div>
 
       <div className="ml-10">
-        <img
-          src={assets.option}
-          alt="Options"
-          className="cursor-pointer"
-          onClick={handleOptionClick}
-        />
+        {/* Check if assets and assets.option exist */}
+        {assets?.option ? (
+          <img
+            src={assets.option}
+            alt="Options"
+            className="cursor-pointer"
+            onClick={handleOptionClick}
+          />
+        ) : (
+          <p>No option available</p> // Display a fallback message or element
+        )}
       </div>
     </div>
   );

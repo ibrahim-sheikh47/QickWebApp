@@ -1,38 +1,88 @@
 /* eslint-disable react/prop-types */
-import { Button } from "antd";
+import { Button, Divider } from "antd";
 import AppModal from "../AppModal/AppModal";
+import assets from "../../assets/assets";
 
-// Example mapping for stat types
 const statTypeIcons = {
-  Goals: "⚽",
-  Assists: "🎯",
-  "Clean Sheets": "🧤",
-  "MVP Awards": "🏅",
+  Goals: assets.goals,
+  Assists: assets.assists,
+  "Clean Sheets": assets.cleansheets,
+  "MVP Awards": assets.star,
+  Cards: assets.yellowCard,
 };
 
-// Example opponent team data
-const matchData = [
+const goalData = [
   {
-    opponentTeam: "Team A",
-    opponentIcon: "https://via.placeholder.com/40",
+    opponentTeam: "Bayern",
+    opponentIcon: assets.team6,
     matchDay: "Matchday 1",
-    stats: {
-      Goals: 2,
-      Assists: 1,
-      "Clean Sheets": 0,
-      "MVP Awards": 1,
-    },
+    value: 2,
   },
   {
-    opponentTeam: "Team B",
-    opponentIcon: "https://via.placeholder.com/40",
+    opponentTeam: "Barcelona",
+    opponentIcon: assets.team7,
     matchDay: "Matchday 2",
-    stats: {
-      Goals: 1,
-      Assists: 0,
-      "Clean Sheets": 1,
-      "MVP Awards": 0,
-    },
+    value: 1,
+  },
+];
+
+const assistData = [
+  {
+    opponentTeam: "Real Madrid",
+    opponentIcon: assets.team4,
+    matchDay: "Matchday 1",
+    value: 1,
+  },
+  {
+    opponentTeam: "Liverpool",
+    opponentIcon: assets.team3,
+    matchDay: "Matchday 2",
+    value: 0,
+  },
+];
+
+const cleanSheetsData = [
+  {
+    opponentTeam: "Juventus",
+    opponentIcon: assets.team1,
+    matchDay: "Matchday 1",
+  },
+  {
+    opponentTeam: "Chelsea",
+    opponentIcon: assets.team2,
+    matchDay: "Matchday 2",
+  },
+];
+
+const mvpData = [
+  {
+    opponentTeam: "Arsenal",
+    opponentIcon: assets.team5,
+    matchDay: "Matchday 1",
+    value: 1,
+  },
+  {
+    opponentTeam: "Al Nassr FC",
+    opponentIcon: assets.team6,
+    matchDay: "Matchday 2",
+    value: 0,
+  },
+];
+
+const cardsData = [
+  {
+    opponentTeam: "Villareal",
+    opponentIcon: assets.team5,
+    matchDay: "Matchday 1",
+    yellowCards: 1,
+    redCards: 0,
+  },
+  {
+    opponentTeam: "Manchester City",
+    opponentIcon: assets.team6,
+    matchDay: "Matchday 2",
+    yellowCards: 0,
+    redCards: 0,
   },
 ];
 
@@ -46,81 +96,95 @@ const PlayerDetailsModal = ({
   onClose,
   leagueName,
 }) => {
-  // Filter match data by statType
-  const filteredMatchData = matchData
-    .filter((match) => match.stats[statType] > 0) // Show matches where the stat value is greater than 0
-    .map((match) => ({
-      opponentTeam: match.opponentTeam,
-      opponentIcon: match.opponentIcon,
-      matchDay: match.matchDay,
-      statValue: match.stats[statType],
-      statIcon: statTypeIcons[statType],
-    }));
+  const filteredMatchData = {
+    Goals: goalData,
+    Assists: assistData,
+    "Clean Sheets": cleanSheetsData,
+    "MVP Awards": mvpData,
+    Cards: cardsData,
+  }[statType].filter(
+    (match) =>
+      match.value > 0 || statType === "Clean Sheets" || statType === "Cards"
+  );
 
   return (
     <AppModal
       title="Player Details"
       modalopen={isVisible}
       onClose={onClose}
-      width={"auto"}
+      width={"500px"}
       height={"auto"}
     >
       <div className="flex items-center">
-        <img
-          src={dp}
-          alt={player}
-          style={{
-            width: "48px",
-            height: "48px",
-            borderRadius: "50%",
-            marginRight: "12px",
-          }}
-        />
+        <img src={dp} alt={player} className="rounded-full mr-3 w-10 h-10" />
         <div>
-          <p>
-            {player} | {team}
+          <p className=" text-primary">
+            <span className="font-PJSbold text-xl">{player} </span>|
+            <span className="font-PJSmedium text-sm">
+              {" "}
+              {""} {team}{" "}
+            </span>
           </p>
-          <p>
+          <p className="text-sm font-PJSmedium text-secondary">
             {value} {statType} in {leagueName}
           </p>
         </div>
       </div>
 
-      <div className="mt-4">
-        <h3>Match Details:</h3>
+      <div className="mt-8">
         {filteredMatchData.length > 0 ? (
           filteredMatchData.map((match, index) => (
-            <div
-              key={index}
-              className="flex items-center mb-2 p-2 border rounded-lg"
-            >
-              <img
-                src={match.opponentIcon}
-                alt={match.opponentTeam}
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "50%",
-                  marginRight: "12px",
-                }}
-              />
-              <div className="flex-1">
-                <p className="text-primary font-bold">{match.opponentTeam}</p>
-                <p className="text-secondary text-sm">{match.matchDay}</p>
+            <>
+              <div key={index} className="flex items-center">
+                <img
+                  src={match.opponentIcon}
+                  alt={match.opponentTeam}
+                  className="rounded-full mr-3 w-10 h-10"
+                />
+                <div className="flex-1 font-PJSmedium">
+                  <p className="text-primary text-sm">{match.opponentTeam}</p>
+                  <p className="text-secondary text-xs">{match.matchDay}</p>
+                </div>
+                {statType === "Cards" ? (
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1">
+                      <img src={assets.yellowCard} alt="Yellow Card" />
+                      <span className="text-xs font-PJSmedium">
+                        {match.yellowCards}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <img src={assets.redCard} alt="Red Card" />
+                      <span className="text-xs font-PJSmedium">
+                        {match.redCards}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-PJSmedium">
+                      {match.value}
+                    </span>
+                    <img src={statTypeIcons[statType]} alt="" />
+                  </div>
+                )}
               </div>
-              <div className="flex items-center">
-                <span className="mr-2">{match.statIcon}</span>
-                <span className="font-bold">{match.statValue}</span>
-              </div>
-            </div>
+              {index !== filteredMatchData.length - 1 && <Divider />}
+            </>
           ))
         ) : (
           <p>No match data available for {statType}.</p>
         )}
       </div>
 
-      <div className="mt-4">
-        <Button onClick={onClose}>Done</Button>
+      <div className="mt-10">
+        <Button
+          onClick={onClose}
+          className="w-full bg-lime rounded-full h-[54px]"
+          type="none"
+        >
+          Done
+        </Button>
       </div>
     </AppModal>
   );
