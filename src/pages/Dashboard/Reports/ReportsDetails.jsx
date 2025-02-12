@@ -305,19 +305,22 @@ const NewBookingSalesModal = ({ isOpen, onClose, booking }) => {
             </p>
             <p className="text-left border-r border-b p-1 px-2">Sales Tax</p>
             <p className="text-left border-b p-1 px-3">Player Total</p>
-            {paymentDetails.map((detail, index) => (
+
+            {booking.participants.map((detail, index) => (
               <React.Fragment key={index}>
                 <p className="text-left text-primary border-r border-b p-2 text-sm whitespace-nowrap">
-                  {detail.user}
+                  {detail.name}
                 </p>
                 <p className="text-left text-primary border-r border-b p-2 text-sm ">
                   {detail.transactionId}
                 </p>
                 <p className="text-left text-primary border-r border-b p-2  text-sm">
-                  {detail.salesTax}
+                  0
                 </p>
                 <p className="text-left text-primary border-b p-2 text-sm">
-                  {detail.playerTotal}
+                  {booking.totalAmount /
+                    (booking.participants.length +
+                      booking.rivalParticipants.length)}
                   <span className="text-secondary text-[10px]">
                     {detail.credit}
                   </span>
@@ -326,8 +329,10 @@ const NewBookingSalesModal = ({ isOpen, onClose, booking }) => {
             ))}
             <p className="p-4 text-primary font-PJSbold">Total</p>
             <p></p>
-            <p className="p-4 text-primary font-PJSbold">$6.50</p>
-            <p className="p-4 text-primary font-PJSbold">$80</p>
+            <p className="p-4 text-primary font-PJSbold">$0</p>
+            <p className="p-4 text-primary font-PJSbold">
+              ${booking.totalAmount}
+            </p>
           </div>
           <div className="flex mt-5 gap-4 w-full justify-center font-PJSMedium items-center">
             <button className="w-full  transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full bg-secondaryTen font-PJSmedium justify-center items-center ">

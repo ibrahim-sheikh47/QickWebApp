@@ -88,6 +88,7 @@ const Chats = () => {
 
   useEffect(() => {
     if (userToChat) {
+      console.log(userToChat);
       fetchChatById();
     }
   }, [userToChat]);
@@ -195,7 +196,6 @@ const Chats = () => {
   const { errors } = formState;
   const onSubmit = async (image = null) => {
     setLoading(true);
-    console.log(image);
     try {
       let body = {
         chatId: `${user._id}-${userToChat._id}`,
@@ -1186,7 +1186,7 @@ const Chats = () => {
             </div>
             {/* Item 2 */}
             {/* Item 3 */}
-            <div className="flex flex-col  justify-between items-center font-PJSmedium text-[14px]">
+            {/* <div className="flex flex-col  justify-between items-center font-PJSmedium text-[14px]">
               <div className="flex justify-between items-center w-full">
                 <div className="flex items-center gap-2">
                   <div className="flex w-[48px] h-[48px] rounded-full bg-secondaryTen justify-center items-center">
@@ -1204,10 +1204,10 @@ const Chats = () => {
                 </button>
               </div>
               <div className="h-[1px] w-full bg-secondaryTwenty mt-4"></div>
-            </div>
+            </div> */}
             {/* Item 3 */}
             {/* Item 4 */}
-            <div className="flex flex-col  justify-between items-center font-PJSmedium text-[14px]">
+            {/* <div className="flex flex-col  justify-between items-center font-PJSmedium text-[14px]">
               <div className="flex justify-between items-center w-full">
                 <div className="flex items-center gap-2">
                   <div className="flex w-[48px] h-[48px] rounded-full bg-secondaryTen justify-center items-center">
@@ -1227,7 +1227,7 @@ const Chats = () => {
                 </div>
                 <div className="font-PJSbold">120$</div>
               </div>
-            </div>
+            </div> */}
             {/* Item 4 */}
           </div>
 

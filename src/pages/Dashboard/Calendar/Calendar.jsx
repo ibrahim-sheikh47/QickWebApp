@@ -166,10 +166,6 @@ const CalendarComponent = () => {
 
   const handleDayChange = (selectedDate) => {
     setCurrentDate(moment(selectedDate));
-    if (resources.length > 0) {
-      setLoading(true);
-      fetchAllBookings();
-    }
   };
 
   const handleResourceChange = (resourceId) => {
@@ -182,9 +178,10 @@ const CalendarComponent = () => {
 
   useEffect(() => {
     if (resources.length > 0) {
+      setLoading(true);
       fetchAllBookings();
     }
-  }, [resources]);
+  }, [resources, currentDate]);
 
   const startBookingFlow = (mode = "add", event = null, slot = null) => {
     setMode(mode);
@@ -316,7 +313,6 @@ const CalendarComponent = () => {
   const updateBookingDetails = async (event) => {
     try {
       setLoading(true);
-      console.log(event);
       await updateBooking(event, event._id);
       if (isResized) {
         setEvents((prevEvents) =>

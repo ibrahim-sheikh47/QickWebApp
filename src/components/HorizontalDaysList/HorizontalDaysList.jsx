@@ -23,41 +23,42 @@ const HorizontalDaysList = React.memo(
     useEffect(() => {
       if (selectedMonth) {
         setSelectedDay(moment(selectedMonth).date());
+        // if (onMonthChange) {
+        //   onMonthChange(selectedMonth);
+        // }
       }
     }, [selectedMonth]);
 
-    const scrollToSelectedDay = useCallback(
-      (day) => {
-        const container = containerRef.current;
-        const selectedIndex = daysList.findIndex((d) => d.date === day);
+    const scrollToSelectedDay = (day) => {
+      const container = containerRef.current;
+      const selectedIndex = daysList.findIndex((d) => d.date === day);
 
-        if (container && selectedIndex !== -1) {
-          const selectedElement = container.children[selectedIndex];
-          if (selectedElement) {
-            const containerWidth = container.offsetWidth;
-            const elementWidth = selectedElement.offsetWidth;
-            const scrollPosition =
-              selectedElement.offsetLeft - containerWidth / 2 + elementWidth / 2;
+      if (container && selectedIndex !== -1) {
+        const selectedElement = container.children[selectedIndex];
+        if (selectedElement) {
+          const containerWidth = container.offsetWidth;
+          const elementWidth = selectedElement.offsetWidth;
+          const scrollPosition =
+            selectedElement.offsetLeft - containerWidth / 2 + elementWidth / 2;
 
-            container.scrollTo({
-              left: scrollPosition,
-              behavior: "smooth",
-            });
+          container.scrollTo({
+            left: scrollPosition,
+            behavior: "smooth",
+          });
 
-            // Save the last scrolled-to day
-            lastDayRef.current = day;
-          }
+          // Save the last scrolled-to day
+          lastDayRef.current = day;
         }
-      },
-      [daysList]
-    );
+      }
+    };
 
     // Scroll to the selected day on change
     useEffect(() => {
       if (selectedDay && daysList.length > 0) {
         scrollToSelectedDay(selectedDay);
       }
-    }, [selectedDay, daysList, scrollToSelectedDay]);
+    }, [daysList]);
+    // , selectedDay, scrollToSelectedDay
 
     // Generate the list of days for the selected month
     useEffect(() => {
@@ -146,9 +147,10 @@ const HorizontalDaysList = React.memo(
                   height: "40px",
                   width: "40px",
                   backgroundColor:
-                    selectedDay === day.date &&
-                    moment(selectedMonth).month() === moment().month()
-                      ? "#9CFC38"
+                    selectedDay === day.date
+                      ? // &&
+                        // moment(selectedMonth).month() === moment().month()
+                        "#9CFC38"
                       : "transparent",
                   borderRadius: "20px",
                   display: "flex",
