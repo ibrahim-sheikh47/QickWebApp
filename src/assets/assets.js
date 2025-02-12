@@ -117,7 +117,26 @@ import chatBlack from "../assets/svgs/chatBlack.svg";
 import option from "../assets/svgs/option.svg";
 import share from "../assets/svgs/share.svg";
 
+import goals from "../assets/svgs/goals.svg";
+import assists from "../assets/svgs/assists.svg";
+import cleansheets from "../assets/svgs/cleansheets.svg";
+import star from "../assets/svgs/star.svg";
+
+import redCard from "../assets/svgs/redCard.svg";
+import yellowCard from "../assets/svgs/yellowCard.svg";
+import closeRed from "../assets/svgs/closeRed.svg";
+
+import UsersThree from "../assets/svgs/UsersThree.svg";
+
 export default {
+  star,
+  UsersThree,
+  yellowCard,
+  redCard,
+  closeRed,
+  cleansheets,
+  assists,
+  goals,
   option,
   share,
   chatBlack,

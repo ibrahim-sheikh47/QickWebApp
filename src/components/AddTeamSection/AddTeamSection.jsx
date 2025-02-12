@@ -1,9 +1,11 @@
 /* eslint-disable react/prop-types */
 import { Button } from "antd";
 import assets from "../../assets/assets";
-const AddTeamSection = ({ handleToggleModal }) => {
+const AddTeamSection = ({ handleToggleModal, customStyle }) => {
   return (
-    <div className="h-[106px] border-secondaryThirty border shadow-custom w-[430px] rounded-lg flex flex-col justify-center mt-5">
+    <div
+      className={`h-[106px] border-secondaryThirty border shadow-custom w-[430px] rounded-lg flex flex-col justify-center mt-5 ${customStyle}`}
+    >
       <div
         className="flex items-center gap-2 px-3 cursor-pointer"
         onClick={() => handleToggleModal("team1", true)}
@@ -14,7 +16,7 @@ const AddTeamSection = ({ handleToggleModal }) => {
           className="rounded-full border-none bg-lime"
           type="none"
         />
-        <p className="text-sm text-primary font-PJSbold">Add Team</p>
+        <p className="text-sm text-primary font-PJSbold">Add Team 1</p>
       </div>
       <div className="border-t border-secondaryThirty w-[80%] my-3"></div>
       <div
@@ -27,7 +29,7 @@ const AddTeamSection = ({ handleToggleModal }) => {
           className="rounded-full border-none bg-lime"
           type="none"
         />
-        <p className="text-sm text-primary font-PJSbold">Add Team</p>
+        <p className="text-sm text-primary font-PJSbold">Add Team 2</p>
       </div>
     </div>
   );

@@ -17,13 +17,14 @@ import {
   Users,
   UsersReport,
   CommunicationHistory,
+  EventReport,
+  Events,
+  AddEvent,
+  AddResults,
+  CardInfoPage,
+  TeamDetail,
 } from "../pages";
-import EventReport from "../pages/Dashboard/Reports/EventReport";
-import Events from "../pages/Dashboard/Events/Events";
-import AddEvent from "../pages/Dashboard/Events/AddEvent";
-import CardInfoPage from "../pages/Dashboard/Events/CardInfoPage";
-import CardDetailPage from "../pages/Dashboard/Events/CardDetailPage";
-
+import CardDetailPage from "../pages/Dashboard/Events/CardDetailPage/CardDetailPage";
 export const AppNavigation = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1000);
 
@@ -76,6 +77,12 @@ export const AppNavigation = () => {
 
         <Route Component={CardInfoPage} path="Events/EventInfo" />
         <Route Component={CardDetailPage} path="Events/EventDetail" />
+        <Route Component={AddResults} path="Events/EventDetail/AddResults" />
+
+        <Route
+          path="Events/EventDetail/TeamDetail/:teamName"
+          Component={TeamDetail}
+        />
       </Route>
     </Routes>
   );
