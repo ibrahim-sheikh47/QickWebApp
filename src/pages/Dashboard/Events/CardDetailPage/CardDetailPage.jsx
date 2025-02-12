@@ -1,14 +1,14 @@
 import { useLocation } from "react-router-dom";
-import assets from "../../../assets/assets";
-import TabSelector from "../../../components/TabSelector/TabSelector";
 import { useState } from "react";
-import Fixtures from "./Fixtures";
 import TablesTab from "./TablesTab";
 import TeamsTab from "./TeamsTab";
+import Fixtures from "./Fixtures";
+import assets from "../../../../assets/assets";
+import TabSelector from "../../../../components/TabSelector/TabSelector";
 
 const CardDetailPage = () => {
   const location = useLocation();
-  const { eventType } = location.state || {}; // Retrieve eventType from state
+  const { eventType } = location.state || {};
 
   const [mainTab, setMainTab] = useState("Fixtures");
 

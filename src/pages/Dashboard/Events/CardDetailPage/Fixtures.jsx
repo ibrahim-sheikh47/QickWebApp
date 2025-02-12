@@ -1,14 +1,14 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
-import AddTeamModal from "../../../components/AddTeamModal/AddTeamModal";
-import AddTeamSection from "../../../components/AddTeamSection/AddTeamSection";
-import TeamSelectionCard from "../../../components/TeamSelectionCard/TeamSelectionCard";
-import { teams } from "../../../constants/leagueIndex";
-import assets from "../../../assets/assets";
 import { Button } from "antd";
-import { AppModal } from "../../../components";
-import { useNavigate } from "react-router-dom";
-import TabSelector from "../../../components/TabSelector/TabSelector";
+import { useLocation, useNavigate } from "react-router-dom";
+import assets from "../../../../assets/assets";
+import TabSelector from "../../../../components/TabSelector/TabSelector";
+import AddTeamSection from "../../../../components/AddTeamSection/AddTeamSection";
+import AddTeamModal from "../../../../components/AddTeamModal/AddTeamModal";
+import TeamSelectionCard from "../../../../components/TeamSelectionCard/TeamSelectionCard";
+import { teams } from "../../../../constants/leagueIndex";
+import { AppModal } from "../../../../components";
 
 const MATCHDAY_TABS = [
   "Matchday 1",
@@ -24,6 +24,7 @@ const GROUPS = ["Group A", "Group B", "Group C", "Group D"];
 
 const Fixtures = ({ eventType }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const formValues = location.state || {};
 
   // Store matches for each matchday separately
@@ -134,6 +135,21 @@ const Fixtures = ({ eventType }) => {
     setIsOptionModalOpen(true);
   };
 
+  const [removeTeamModal, setRemoveTeamModal] = useState(false);
+
+  const [showFixtureModal, setShowFixtureModal] = useState(false);
+  const [showGroupModal, setShowGroupModal] = useState(false);
+
+  const handleButtonClick = () => {
+    if (eventType === "Group Stage + Knockouts") {
+      setShowGroupModal(true);
+      setShowFixtureModal(false);
+    } else {
+      setShowFixtureModal(true);
+      setShowGroupModal(false);
+    }
+  };
+
   return (
     <div>
       <div className="bg-white h-[150px] mt-10 rounded-xl p-4">
@@ -158,6 +174,7 @@ const Fixtures = ({ eventType }) => {
                 type="none"
                 className="rounded-full h-[42px] border-secondaryThirty border-2"
                 icon={<img src={assets.randomize} />}
+                onClick={handleButtonClick}
               >
                 {eventType === "Group Stage + Knockouts" ? (
                   <>Randomize Groups</>
@@ -165,6 +182,42 @@ const Fixtures = ({ eventType }) => {
                   <>Randomize Fixtures</>
                 )}
               </Button>
+              {showFixtureModal && (
+                <AppModal
+                  modalopen={showFixtureModal}
+                  onClose={() => setShowFixtureModal(false)}
+                >
+                  <h2>Fixture Modal</h2>
+                  {/* Your fixture content here */}
+                </AppModal>
+              )}
+              {/* Group Modal */}
+              {showGroupModal && (
+                <AppModal
+                  modalopen={showGroupModal}
+                  onClose={() => setShowGroupModal(false)}
+                  width={"500px"}
+                  height={"250px"}
+                >
+                  <h2 className="font-PJSbold text-xl text-primary">
+                    Randomize Groups
+                  </h2>
+                  <p className="font-PJSregular text-sm text-secondary mt-3">
+                    By proceeding, teams will be randomly assigned to groups. If
+                    the results don’t feel right, you can repeat the process
+                    unless matches have been added or the tournament has
+                    started. Alternatively, you can manually assign teams to
+                    groups.
+                  </p>
+                  <Button
+                    type="none"
+                    className="rounded-full h-[42px] bg-lime w-full mt-10"
+                    onClick={() => setShowGroupModal(false)}
+                  >
+                    Randomize Group Stage
+                  </Button>
+                </AppModal>
+              )}
             </>
 
             <div className="relative">
@@ -216,6 +269,8 @@ const Fixtures = ({ eventType }) => {
                       <div className="mt-5">
                         <TeamSelectionCard
                           team1={card.team1}
+                          team1score={1}
+                          team2score={2}
                           team2={card.team2}
                           teams={teams}
                           assets={assets}
@@ -388,6 +443,10 @@ const Fixtures = ({ eventType }) => {
                 Reschedule
               </Button>
               <Button
+                onClick={() => {
+                  setIsMatchOptionModalOpen(false);
+                  setRemoveTeamModal(true);
+                }}
                 type="none"
                 className="h-14 rounded-full bg-secondaryTen font-PJSmedium text-redbutton"
               >
@@ -396,6 +455,15 @@ const Fixtures = ({ eventType }) => {
             </div>
           </AppModal>
         )}
+        <AppModal
+          modalopen={removeTeamModal}
+          onClose={() => setRemoveTeamModal(false)}
+          width={"500px"}
+          height={"342px"}
+        >
+          <p>Remove a team</p>
+          <p>Select the team(s) you would like to remove from this match</p>
+        </AppModal>
       </div>
     </div>
   );

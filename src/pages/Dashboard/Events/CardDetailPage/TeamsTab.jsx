@@ -1,17 +1,17 @@
 /* eslint-disable react/no-unescaped-entities */
 import { Button, Divider } from "antd";
-import assets from "../../../assets/assets";
 import { useNavigate } from "react-router-dom";
 
 import { CheckOutlined } from "@ant-design/icons";
 import { AiOutlineFieldTime } from "react-icons/ai";
 import React, { useState } from "react";
-import { AppModal } from "../../../components";
+import assets from "../../../../assets/assets";
 import {
   freeAgentTeam,
   inviteTeamData,
   leagueTeamsData,
-} from "../../../constants/leagueIndex";
+} from "../../../../constants/leagueIndex";
+import { AppModal } from "../../../../components";
 const TeamsTab = () => {
   const navigate = useNavigate();
   const formValues = location.state || {};

@@ -12,6 +12,8 @@ const MatchCompletedCard = ({
   bgColor, // Accept background color as a prop
   day,
   date,
+  customStyle,
+  handleInfo,
 }) => {
   return (
     <>
@@ -21,7 +23,9 @@ const MatchCompletedCard = ({
         </p>
       </div>
 
-      <div className="h-[106px] border-secondaryThirty border shadow-custom w-[430px] rounded-[10px] flex items-center">
+      <div
+        className={`h-[106px] border-secondaryThirty border shadow-custom w-[430px] rounded-[10px] flex items-center ${customStyle}`}
+      >
         <div
           className={`h-[106px] w-[25%] rounded-l-[10px] flex justify-center items-center ${bgColor}`}
         >
@@ -40,7 +44,7 @@ const MatchCompletedCard = ({
             <span className="ml-auto">{team2score}</span>
           </div>
         </div>
-        <div className="ml-5">
+        <div className="ml-5" onClick={handleInfo}>
           <img
             src={assets.info}
             alt="Options"

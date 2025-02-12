@@ -139,14 +139,12 @@ export const AddEventForm = ({ eventType }) => {
             />
           </div>
           <div className="flex-1">
-            {eventType === "League" && (
-              <Selectable
-                options={getOptions("teamLevel")}
-                value={formValues.teamLevel}
-                onChange={(value) => handleSelectChange("teamLevel", value)}
-                label="Team Level"
-              />
-            )}
+            <Selectable
+              options={getOptions("teamLevel")}
+              value={formValues.teamLevel}
+              onChange={(value) => handleSelectChange("teamLevel", value)}
+              label="Team Level"
+            />
           </div>
         </div>
         <div className="flex items-center w-full gap-5">
@@ -182,16 +180,16 @@ export const AddEventForm = ({ eventType }) => {
         <div className="mt-10 gap-4 flex flex-col">
           <p className="text-xl font-PJSbold">
             Team Requirement and Rules
-            {eventType === "Group Stage + Knockouts" && (
-              <>
-                <span className="text-secondary"> - Group Stage</span>
-              </>
-            )}
-            {eventType === "League + Knockouts" && (
-              <>
-                <span className="text-secondary"> - League</span>
-              </>
-            )}
+            {(() => {
+              switch (eventType) {
+                case "Group Stage + Knockouts":
+                  return <span className="text-secondary"> - Group Stage</span>;
+                case "League + Knockouts":
+                  return <span className="text-secondary"> - League</span>;
+                default:
+                  return null;
+              }
+            })()}
           </p>
           <div className="flex items-center w-full gap-5">
             <div className="flex-1">

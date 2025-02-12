@@ -534,6 +534,21 @@ export const playersData = [
     isAdmin: true,
     isPro: true,
     isFreeAgent: false,
+    position: "Forward",
+    fullScore: 80,
+    technical: 72,
+    physical: 100,
+    tactical: 75,
+    defensive: 60,
+    ballControl: 10, // added
+    dribbling: 78, // added
+    awareness: 50,
+    passing: 82, // added
+    vision: 70, // added
+    acceleration: 80, // added
+    longDistanceSpeed: 85, // added
+    composure: 65, // added
+    balance: 70,
   },
   {
     name: "Jane Smith",
@@ -541,6 +556,18 @@ export const playersData = [
     isAdmin: false,
     isPro: false,
     isFreeAgent: true,
+    position: "Midfielder",
+    fullScore: 65,
+    technical: 82,
+    physical: 70,
+    tactical: 65,
+    defensive: 70,
+    ballControl: 72, // added
+    dribbling: 80, // added
+    passing: 85, // added
+    vision: 75, // added
+    acceleration: 70, // added
+    composure: 60, // added
   },
   {
     name: "Ibrahim Sheikh",
@@ -548,6 +575,18 @@ export const playersData = [
     isAdmin: false,
     isPro: false,
     isFreeAgent: false,
+    position: "Defender",
+    fullScore: 90,
+    technical: 82,
+    physical: 90,
+    tactical: 85,
+    defensive: 70,
+    ballControl: 80, // added
+    dribbling: 70, // added
+    passing: 75, // added
+    vision: 85, // added
+    acceleration: 90, // added
+    composure: 90, // added
   },
   {
     name: "John Doe",
@@ -555,10 +594,22 @@ export const playersData = [
     isAdmin: false,
     isPro: true,
     isFreeAgent: false,
+    position: "Goalkeeper",
+    fullScore: 70,
+    technical: 62,
+    physical: 60,
+    tactical: 55,
+    defensive: 50,
+    ballControl: 60, // added
+    dribbling: 50, // added
+    passing: 60, // added
+    vision: 65, // added
+    acceleration: 55, // added
+    composure: 50, // added
   },
-
   // Add more player objects as needed
 ];
+
 export const freeAgents = [
   {
     name: "John Doe",

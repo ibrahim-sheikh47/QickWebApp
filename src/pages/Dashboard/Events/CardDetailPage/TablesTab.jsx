@@ -1,11 +1,11 @@
 /* eslint-disable react/prop-types */
 
-import TabSelector from "../../../components/TabSelector/TabSelector";
-import assets from "../../../assets/assets";
 import { useState } from "react";
 import { Button, Divider, Table } from "antd";
 import { useNavigate } from "react-router-dom";
-
+import assets from "../../../../assets/assets";
+import TabSelector from "../../../../components/TabSelector/TabSelector";
+import { AppModal } from "../../../../components";
 import {
   assistsData,
   cardsData,
@@ -14,10 +14,9 @@ import {
   mvpAwardsData,
   tableTeams,
   teams,
-} from "../../../constants/leagueIndex";
-import PlayerDetailsModal from "../../../components/PlayerDetailsModal/PlayerDetailsModal";
-import AddTeamSection from "../../../components/AddTeamSection/AddTeamSection";
-import { AppModal } from "../../../components";
+} from "../../../../constants/leagueIndex";
+import PlayerDetailsModal from "../../../../components/PlayerDetailsModal/PlayerDetailsModal";
+import KnockoutTab from "./KnockoutTab";
 
 const TablesTab = ({ eventType }) => {
   const navigate = useNavigate();
@@ -464,41 +463,7 @@ const TablesTab = ({ eventType }) => {
           </>
         )}
 
-        {tableTab === "Knockouts" && (
-          <>
-            <div className="grid grid-cols-3">
-              <div className="">
-                <p>QUARTER FINALS</p>
-                <p>QF : G1</p>
-
-                <AddTeamSection customStyle={"w-[322px]"} />
-                <p>QF : G2</p>
-
-                <AddTeamSection customStyle={"w-[322px]"} />
-                <p>QF : G3</p>
-
-                <AddTeamSection customStyle={"w-[322px]"} />
-                <p>QF : G4</p>
-
-                <AddTeamSection customStyle={"w-[322px]"} />
-              </div>
-              <div>
-                <p>SEMI FINALS</p>
-                <p>SF : G1</p>
-
-                <AddTeamSection customStyle={"w-[322px]"} />
-                <p>SF : G2</p>
-                <AddTeamSection customStyle={"w-[322px]"} />
-              </div>
-              <div>
-                <p>3RD PLACE</p>
-                <p>3RD PLACE</p>
-
-                <AddTeamSection customStyle={"w-[322px]"} />
-              </div>
-            </div>
-          </>
-        )}
+        {tableTab === "Knockouts" && <KnockoutTab />}
         {tableTab === "Goals" && (
           <>
             <PlayerStatsTable
