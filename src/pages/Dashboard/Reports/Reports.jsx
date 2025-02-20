@@ -234,13 +234,14 @@ const Reports = () => {
                       />
                       <p className="text-sm font-PJSregular">{facility.name}</p>
                     </div>
-                    {currentFacility._id === facility._id && (
-                      <img
-                        src={assets.CheckCircle}
-                        className="w-6"
-                        alt="Selected"
-                      />
-                    )}
+                    {currentFacility &&
+                      currentFacility._id === facility._id && (
+                        <img
+                          src={assets.CheckCircle}
+                          className="w-6"
+                          alt="Selected"
+                        />
+                      )}
                   </div>
                 );
               })}
