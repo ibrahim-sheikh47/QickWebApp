@@ -20,7 +20,7 @@ import { createFacility } from "../../api/services/facilityService";
 import { useStateContext } from "../../context";
 
 const SignUp = () => {
-  const { setUser, setCurrentFacility } = useStateContext();
+  const { setUser, setCurrentFacility, fcmToken } = useStateContext();
   const [value, setValue] = useState();
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -74,32 +74,28 @@ const SignUp = () => {
 
   const { errors } = formState;
   const onSubmit = async (data) => {
+    const dataX = {
+      ...data,
+      role: "facility_owner",
+      deviceToken: fcmToken,
+    };
     setLoading(true);
     try {
-      const response = await signup(data);
+      const response = await signup(dataX);
       if (response.existingUser) {
-        const loginResponse = await login({
-          email: data.email,
-          password: data.password,
-        });
-        if (loginResponse.existingUser) {
-          localStorage.setItem("authToken", loginResponse.token);
-          localStorage.setItem("isLoggedIn", true);
-          setUser(loginResponse.existingUser);
+        localStorage.setItem("authToken", response.token);
+        localStorage.setItem("isLoggedIn", true);
+        setUser(response.existingUser);
 
-          const body = {
-            zip: data.zipcode,
-            name: data.facilityname,
-            location: getMyLocation(),
-          };
-          const facility = await createFacility(
-            body,
-            response.existingUser._id
-          );
-          setCurrentFacility(facility);
-          showToast(response.message);
-          navigate("/Dashboard/Reports");
-        }
+        const body = {
+          zip: data.zipcode,
+          name: data.facilityname,
+          location: getMyLocation(),
+        };
+        const facility = await createFacility(body, response.existingUser._id);
+        setCurrentFacility(facility);
+        showToast(response.message);
+        navigate("/Dashboard/Reports");
       }
     } catch (err) {
       if (err.response && err.response.data) {

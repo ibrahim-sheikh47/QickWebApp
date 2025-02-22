@@ -1,5 +1,5 @@
 const endpoints = {
-  login: "api/auth/login",
+  login: "api/auth/login/facility",
   signup: "api/auth/signup",
   forgotPassword: "api/auth/admin-forgot-password",
   getProfile: "api/auth/get-profile",

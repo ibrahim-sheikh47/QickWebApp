@@ -18,7 +18,7 @@ import Loader from "../../components/Loader/Loader";
 import { useStateContext } from "../../context";
 
 const SignIn = () => {
-  const { setUser } = useStateContext();
+  const { setUser, fcmToken } = useStateContext();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -46,14 +46,18 @@ const SignIn = () => {
 
   const { errors } = formState;
   const onSubmit = async (data) => {
+    const dataX = {
+      ...data,
+      deviceToken: fcmToken,
+    };
     setLoading(true);
     try {
-      const response = await login(data);
+      const response = await login(dataX);
       showToast(response.message, "success");
       localStorage.setItem("authToken", response.token);
       localStorage.setItem("isLoggedIn", true);
       setUser(response.existingUser);
-      
+
       navigate("/Dashboard/Reports");
     } catch (err) {
       if (err.response && err.response.data) {

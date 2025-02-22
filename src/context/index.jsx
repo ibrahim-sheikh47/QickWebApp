@@ -13,10 +13,12 @@ export const StateContextProvider = ({ children }) => {
   const [user, setUser] = useState(
     () => JSON.parse(localStorage.getItem("user")) || null
   );
+  const [fcmToken, setFCMToken] = useState(
+    () => localStorage.getItem("fcmToken") || null
+  );
 
   // Save state to localStorage whenever it changes
   useEffect(() => {
-    console.log(currentFacility);
     localStorage.setItem("currentFacility", JSON.stringify(currentFacility));
   }, [currentFacility]);
 
@@ -28,6 +30,10 @@ export const StateContextProvider = ({ children }) => {
     localStorage.setItem("user", JSON.stringify(user));
   }, [user]);
 
+  useEffect(() => {
+    localStorage.setItem("fcmToken", JSON.stringify(fcmToken));
+  }, [fcmToken]);
+
   return (
     <StateContext.Provider
       value={{
@@ -37,6 +43,8 @@ export const StateContextProvider = ({ children }) => {
         setCurrentFacility,
         user,
         setUser,
+        fcmToken,
+        setFCMToken,
       }}
     >
       {children}
