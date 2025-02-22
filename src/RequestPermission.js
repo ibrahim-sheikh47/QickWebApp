@@ -11,8 +11,7 @@ const requestPermission = async () => {
     const token = await getToken(messaging, {
       vapidKey: import.meta.env.VITE_FIREBASE_WEB_PUSH_CERTIFICATE,
     });
-    console.log("FCM Token:", token);
-    // Send the token to your server or store it for later use
+    setFCMToken(token);
   } else {
     console.log("Unable to get permission to notify.");
   }
