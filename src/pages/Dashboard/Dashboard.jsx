@@ -18,8 +18,14 @@ function classNames(...classes) {
 }
 
 const Dashboard = () => {
-  const { user, currentFacility, setCurrentFacility, setMyFacilities } =
-    useStateContext();
+  const {
+    user,
+    currentFacility,
+    setCurrentFacility,
+    setMyFacilities,
+    setUser,
+    setFCMToken,
+  } = useStateContext();
   const navigate = useNavigate();
 
   // Set "Reports" as the default tab
@@ -31,6 +37,7 @@ const Dashboard = () => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [type, setType] = useState("success");
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
 
   useEffect(() => {
     fetchMyFacilities();
@@ -42,6 +49,10 @@ const Dashboard = () => {
   };
 
   const handleLogout = () => {
+    setMyFacilities([]);
+    setCurrentFacility(null);
+    setUser(null);
+    setFCMToken(null);
     localStorage.clear();
 
     navigate("/SignIn");
@@ -156,9 +167,44 @@ const Dashboard = () => {
       </Transition.Root>
 
       {/* Static sidebar for desktop */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col bg-primary">
-        <div className="flex h-16 items-center bg-primary px-6">
-          <img className="h-8 w-auto" src={assets.logo} alt="Your Company" />
+      <div
+        className={`hidden lg:fixed lg:inset-y-0 lg:flex flex-col bg-primary transition-all duration-300 ${
+          isSidebarExpanded ? "w-64" : "w-16"
+        }`}
+      >
+        <div className="flex items-center justify-content-center">
+          <div
+            className={`flex flex-col items-center justify-center h-16 ${
+              !isSidebarExpanded ? "w-full" : ""
+            }`}
+          >
+            <button
+              onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "40px",
+                width: "40px",
+                zIndex: 5000,
+                alignSelf: "center",
+              }}
+              className={`${
+                isSidebarExpanded ? "ml-6" : ""
+              } rounded-full bg-secondary text-white hover:bg-gray-600`}
+            >
+              {isSidebarExpanded ? "<" : ">"}
+            </button>
+          </div>
+          {isSidebarExpanded && (
+            <div className="flex flex-1 h-16 items-center bg-primary px-6">
+              <img
+                className={"h-8 w-auto"}
+                src={assets.logo}
+                alt="Your Company"
+              />
+            </div>
+          )}
         </div>
         <nav className="flex-1 overflow-y-auto space-y-2 px-2 py-4">
           {adminNavigation.map((item) => (
@@ -174,10 +220,16 @@ const Dashboard = () => {
               onClick={() => setSelectedTab(item.name)}
             >
               <img src={item.icon} className="w-auto h-6 mr-2" />
-              {item.name}
-              {item.name === "Events" && (
-                <span className="ml-5 mt-1/2 px-3 py-1/2 text-xs text-white bg-blue rounded-full">
-                  Beta
+              {isSidebarExpanded && (
+                <span>
+                  {item.name}
+                  <span>
+                    {item.name === "Events" && (
+                      <span className="ml-5 mt-1/2 px-3 py-1/2 text-xs text-white bg-blue rounded-full">
+                        Beta
+                      </span>
+                    )}
+                  </span>
                 </span>
               )}
             </Link>
@@ -186,7 +238,11 @@ const Dashboard = () => {
       </div>
 
       {/* Main content */}
-      <div className="flex flex-col lg:pl-64">
+      <div
+        className={`flex flex-col transition-all duration-300 bg-background ${
+          isSidebarExpanded ? "lg:ml-64" : "lg:ml-16"
+        }`}
+      >
         <div className="sticky top-0 z-10 flex h-16 bg-white shadow">
           <button
             type="button"
@@ -197,7 +253,7 @@ const Dashboard = () => {
             <HiBars3BottomLeft className="h-6 w-6" aria-hidden="true" />
           </button>
           {/* Navbar Items i.e search bar, profile dropdown, and notifications */}
-          <div className="w-full flex justify-end items-center ">
+          <div className="w-full flex justify-end items-center">
             <div className="flex w-1/2 justify-center items-center ">
               <div className="w-[60%] flex items-center border border-secondaryThirty rounded-[100px] h-[40px] px-4 gap-4">
                 <img src={assets.search} className="w-6 h-6" alt="Search" />
@@ -207,7 +263,7 @@ const Dashboard = () => {
                 />
               </div>
               <button
-                className="flex justify-center items-center rounded-[100px] border border-secondaryThirty w-[40px] h-[40px] mx-5 relative bg-secondaryThirty hover:scale-110 transition duration-300 ease-in-out"
+                className="flex justify-center items-center rounded-[100px] border border-secondaryThirty w-[40px] h-[40px] mx-5 relative hover:scale-110 transition duration-300 ease-in-out"
                 onClick={() => navigate("/Dashboard/Notifications")}
               >
                 <img
@@ -221,23 +277,6 @@ const Dashboard = () => {
                   </span>
                 )}
               </button>
-
-              {/* <PopupMenu
-                trigger={
-                  
-                }
-                menuItems={[
-                  { label: "Option 1", value: "1" },
-                  { label: "Option 2", value: "2" },
-                  { label: "Option 3", value: "3" },
-                ]}
-                onItemClick={handleItemClick}
-                position={{ top: "50px", left: "20px" }}
-                customStyles={{
-                  backgroundColor: "#f9f9f9",
-                  border: "1px solid #ddd",
-                }}
-              /> */}
 
               <div
                 className="flex items-center gap-2 cursor-pointer"
@@ -263,18 +302,23 @@ const Dashboard = () => {
                 <div className="font-PJSmedium">
                   {currentFacility ? currentFacility.name : ""}
                 </div>
+                <img
+                  className="w-5"
+                  src={assets.down}
+                  alt="Expand date options"
+                />
               </div>
             </div>
           </div>
         </div>
 
         {/* Main Content */}
-        <main className="flex-1 bg-background">
+        <main className="flex-1">
           <div className="py-6">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               {/* Optional Heading or Content */}
             </div>
-            <div className="mx-auto max-w-[84rem] px-4 sm:px-6 lg:px-8 w-full">
+            <div className="mx-auto px-4 sm:px-6 lg:px-4 w-full">
               <Outlet />
             </div>
           </div>
@@ -295,9 +339,8 @@ const Dashboard = () => {
           },
           modal: {
             position: "absolute",
-            top: "5%",
+            top: "4rem",
             right: "0",
-            margin: "1rem",
           },
         }}
       >

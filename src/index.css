@@ -212,3 +212,17 @@ html {
   margin-bottom: 16px;
   font-size: 20px;
 }
+
+.custom-calendar .rdrDay {
+  border-radius: 50%;
+}
+
+.custom-calendar .rdrDaySelected {
+  background-color: #33C0DB !important; /* Highlight selected dates */
+  color: white !important;
+  font-weight: bold;
+}
+
+.custom-calendar .rdrDay:hover {
+  background-color: #B3E5FC !important; /* Light blue hover effect */
+}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, Controller, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -24,6 +24,7 @@ const Discount = () => {
   const [fields, setFields] = useState([]);
   const [loading, setLoading] = useState(false);
   const [dateModal, setDateModal] = useState(false);
+  const [discountedDaysModal, setDiscountedDaysModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   const [isFormVisible, setFormVisible] = useState(false);
@@ -37,6 +38,40 @@ const Discount = () => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [type, setType] = useState("success");
+  const [selectedDates, setSelectedDates] = useState(
+    currentDiscount && currentDiscount.discountedDays
+      ? currentDiscount.discountedDays.split(",")
+      : []
+  );
+  const [discountedDays, setDiscountedDays] = useState("");
+
+  useEffect(() => {
+    if (selectedDates.length > 0) {
+      setDiscountedDays(
+        selectedDates
+          .map((date) => {
+            return moment(date).format("MMM Do yyyy");
+          })
+          .join(", ")
+      );
+    } else {
+      setDiscountedDays("");
+    }
+  }, [selectedDates]);
+
+  const textareaRef = useRef(null);
+
+  // Adjust the textarea height dynamically based on its content
+  const handleHolidayChange = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto"; // Reset height
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Adjust height to fit content
+    }
+  };
+
+  useEffect(() => {
+    handleHolidayChange(); // Adjust height when the component mounts
+  }, [discountedDays]);
 
   useEffect(() => {
     fetchFieldsAndDiscounts();
@@ -64,6 +99,7 @@ const Discount = () => {
         code: currentDiscount.code || "",
         discountAmount: currentDiscount.discountAmount || "",
         discountedFields: currentDiscount.discountedFields || "",
+        numberOfUses: currentDiscount.numberOfUses || "",
         expiryDate: currentDiscount.expiryDate
           ? moment(currentDiscount.expiryDate).format("yyyy-MM-DD")
           : "",
@@ -80,6 +116,7 @@ const Discount = () => {
         code: "",
         discountAmount: "",
         discountedFields: "",
+        numberOfUses: "",
         expiryDate: moment(selectedDate).format("yyyy-MM-DD"),
       });
     }
@@ -105,6 +142,7 @@ const Discount = () => {
     code: yup.string().required("Please enter Discount Name"),
     discountAmount: yup.string().required("Please enter Discount Amount"),
     discountedFields: yup.string().required("Please select Discounted Fields"),
+    numberOfUses: yup.string().required("Please select Number of Uses"),
     // DiscountDays: yup.string().required("Please enter Discount days"),
     expiryDate: yup.string().required("Please select a valid date"),
   });
@@ -290,7 +328,7 @@ const Discount = () => {
               <div className="mb-10">
                 <div className="flex items-center justify-between">
                   <p className="font-PJSbold text-xl">
-                    Generated Discount Code
+                    Generated Discount Name
                   </p>
                 </div>
                 <div className="relative mt-5">
@@ -304,7 +342,7 @@ const Discount = () => {
                     htmlFor="code"
                     className="absolute top-2 left-4 text-secondary font-PJSmedium text-xs"
                   >
-                    Discount Code*
+                    Discount Name*
                   </label>
                   <button
                     type="button"
@@ -425,6 +463,27 @@ const Discount = () => {
               </div>
               <div className="relative mt-5">
                 <select
+                  id="numberOfUses"
+                  {...register("numberOfUses")}
+                  className={`block px-4 pt-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm appearance-none bg-white border-secondaryThirty selectIcon w-full h-[54px]`}
+                >
+                  <option value="">Choose an option</option>
+                  <option value="no_limit">No Limit</option>
+                </select>
+                <label
+                  htmlFor="numberOfUses"
+                  className="absolute top-2 left-4 text-secondary font-PJSmedium text-xs"
+                >
+                  Number of Uses*
+                </label>
+                {errors.numberOfUses && (
+                  <span className="error text-sm font-PJSmedium text-redbutton">
+                    {errors.numberOfUses.message}
+                  </span>
+                )}
+              </div>
+              <div className="relative mt-5">
+                <select
                   id="discountedFields"
                   {...register("discountedFields")}
                   className={`block px-4 pt-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm appearance-none bg-white border-secondaryThirty selectIcon w-full h-[54px]`}
@@ -449,6 +508,36 @@ const Discount = () => {
                   </span>
                 )}
               </div>
+              <div className="block px-4 pb-4 border rounded-lg shadow-sm focus:outline-none bg-white border-secondaryThirty w-full mt-4">
+                <label
+                  htmlFor="discountedDays"
+                  className="text-secondary font-PJSmedium text-xs"
+                >
+                  Discounted Days*
+                </label>
+                <div className="flex items-center gap-1 w-full">
+                  {/* Add margin-top to textarea to create space for the label */}
+                  <textarea
+                    onClick={() => setDiscountedDaysModal(true)}
+                    {...register("discountedDays")}
+                    value={discountedDays}
+                    className="font-PJSmedium text-sm w-full resize-y my-2" // Allow vertical resizing
+                    style={{ minHeight: "40px", height: "auto" }} // Set a min height and allow height to grow
+                    readOnly
+                  />
+                  {selectedDates.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedDates([]); // Clear the dates
+                      }}
+                      className="transform -translate-y-1/2 text-secondary hover:text-red-500 focus:outline-none"
+                    >
+                      X
+                    </button>
+                  )}
+                </div>
+              </div>
               <div className="relative mt-5">
                 <input
                   onClick={() => setDateModal(true)}
@@ -463,7 +552,7 @@ const Discount = () => {
                   htmlFor="expiryDate"
                   className="absolute top-2 left-4 text-secondary font-PJSmedium text-xs"
                 >
-                  Expiry Date*
+                  Valid Till*
                 </label>
                 {errors.expiryDate && (
                   <span className="error text-sm font-PJSmedium  text-redbutton">
@@ -473,48 +562,6 @@ const Discount = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <Checkbox
-                checked={showAdditionalInput}
-                onChange={(e) => {
-                  setShowAdditionalInput(e.target.checked);
-                }}
-              />
-              <span className="text-secondary text-sm">
-                Multiple Redemptions?
-              </span>
-            </div>
-
-            <div className="relative mt-5">
-              {showAdditionalInput && (
-                <div className="mt-5">
-                  <input
-                    id="multipleRedemptions"
-                    type="number"
-                    className={`block px-4 pt-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm  bg-white border-secondaryThirty w-full h-[54px]`}
-                    value={multipleRedemptions}
-                    onChange={(e) => setMultipleRedemptions(e.target.value)}
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    onKeyDown={(e) =>
-                      e.key === "ArrowUp" || e.key === "ArrowDown"
-                        ? e.preventDefault()
-                        : null
-                    }
-                    onWheel={(e) => e.target.blur()}
-                  />
-                  <label
-                    htmlFor="multipleRedemptions"
-                    className="absolute top-2 left-4 text-secondary font-PJSmedium text-xs"
-                  >
-                    Maximum Redemptions*
-                  </label>
-                  {manualError && (
-                    <p className="error text-sm text-red-500">{manualError}</p>
-                  )}
-                </div>
-              )}
-            </div>
             <div className="flex items-center justify-between mt-10">
               <p className="font-PJSmedium">
                 Notify users{" "}
@@ -575,6 +622,25 @@ const Discount = () => {
         selectedDate={selectedDate}
         handleDataChange={handleSingleDateChange}
         onApply={() => setDateModal(!dateModal)}
+      />
+
+      <DatePickerModal
+        isOpen={discountedDaysModal}
+        onClose={() => {
+          setDiscountedDaysModal(!discountedDaysModal);
+        }}
+        selectedDate={selectedDate}
+        handleDataChange={() => {
+          const formattedDate = format(date, "yyyy-MM-dd"); // Format date for easy comparison
+
+          // Toggle selection (deselect if already selected)
+          if (selectedDates.includes(formattedDate)) {
+            setSelectedDates(selectedDates.filter((d) => d !== formattedDate));
+          } else {
+            setSelectedDates([...selectedDates, formattedDate]);
+          }
+        }}
+        onApply={() => setDiscountedDaysModal(!discountedDaysModal)}
       />
 
       <Toast open={open} setOpen={setOpen} message={message} type={type} />

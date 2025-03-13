@@ -19,6 +19,8 @@ const FacilityRules = () => {
   const [rules, setRules] = useState(null);
   const [step, setStep] = useState(1);
   const [waiverContent, setWaiverContent] = useState("");
+  const [selectedFollowupHoursOne, setSelectedFollowupHoursOne] = useState(0);
+  const [selectedFollowupHoursTwo, setSelectedFollowupHoursTwo] = useState(0);
 
   const defaultValues = {
     currency: rules?.currency || "",
@@ -26,11 +28,11 @@ const FacilityRules = () => {
     generalBookingRule: rules?.generalBooking.requestToBook || "",
     autoMessage:
       rules?.generalBooking.automaticMessage ||
-      "Dear [Username], Booking confirmed! Pro tip: invite friends to form teams on the app and share this booking with them. This way, the app will seamlessly split the total cost between all those who join. See you soon! Best,[Your Organization/Team]",
+      "Suggestion.\nDear [Username], Booking confirmed! Pro tip: invite friends to form teams on the app and share this booking with them. This way, the app will seamlessly split the total cost between all those who join. See you soon! Best,[Your Organization/Team]",
     autoMessageFrequency: rules?.generalBooking.timesMessageSent || "",
     recurringBookingMessage:
       rules?.generalBooking?.automaticMessageReminder ||
-      "Dear [Username] or [Team], Kindly confirm your attendance for the upcoming booking via the app. If unable to attend, please cancel in advance and no penalties will apply. Best, [Your Organization/Team]",
+      "Suggestion.\nDear [Username] or [Team], Kindly confirm your attendance for the upcoming booking via the app. If unable to attend, please cancel in advance and no penalties will apply. Best, [Your Organization/Team]",
     recurringMessageFrequency:
       rules?.generalBooking.timesReminderMessageSent || "",
     daysInAdvance: rules?.generalBooking?.advanceDays || "",
@@ -288,6 +290,9 @@ const FacilityRules = () => {
                       <option className="text-secondary" value="USD">
                         US Dollar ($)
                       </option>
+                      <option className="text-secondary" value="HNL">
+                        Honduran Lempira (HNL)
+                      </option>
                     </select>
                     {errors.currency && (
                       <p className="text-red-500 text-sm mt-1">
@@ -338,6 +343,9 @@ const FacilityRules = () => {
                       <option className="text-secondary" value="Yes">
                         Yes
                       </option>
+                      <option className="text-secondary" value="No">
+                        No
+                      </option>
                     </select>
                     {errors.generalBookingRule && (
                       <p className="text-red-500 text-sm mt-1">
@@ -376,8 +384,23 @@ const FacilityRules = () => {
                       <option className="text-secondary" value="">
                         Select Option
                       </option>
-                      <option className="text-secondary" value="2 times">
+                      <option className="text-secondary" value="1">
+                        1 time
+                      </option>
+                      <option className="text-secondary" value="2">
                         2 times
+                      </option>
+                      <option className="text-secondary" value="3">
+                        3 times
+                      </option>
+                      <option className="text-secondary" value="4">
+                        4 times
+                      </option>
+                      <option className="text-secondary" value="5">
+                        5 times
+                      </option>
+                      <option className="text-secondary" value="permanently">
+                        Recommended permanently
                       </option>
                     </select>
                     {errors.autoMessageFrequency && (
@@ -420,6 +443,10 @@ const FacilityRules = () => {
                         Permanent
                       </option>
                     </select>
+                    <p className="font-PJSregular text-sm">
+                      qick handles follow-ups for you, ensuring players get
+                      consistent reminders they appreciate.
+                    </p>
                     {errors.recurringMessageFrequency && (
                       <p className="text-red-500 text-sm mt-1">
                         {errors.recurringMessageFrequency.message}
@@ -437,9 +464,17 @@ const FacilityRules = () => {
                       <option className="text-secondary" value="">
                         Select Option
                       </option>
-                      <option className="text-secondary" value="10 days">
-                        10 days
-                      </option>
+                      {Array.from({ length: 118 }, (_, i) => i + 3).map(
+                        (day) => (
+                          <option
+                            key={day}
+                            className="text-secondary"
+                            value={`${day}`}
+                          >
+                            {day} days
+                          </option>
+                        )
+                      )}
                     </select>
                     {errors.daysInAdvance && (
                       <p className="text-red-500 text-sm mt-1">
@@ -473,12 +508,17 @@ const FacilityRules = () => {
                       <option className="text-secondary" value="">
                         Select Option
                       </option>
-                      <option
-                        className="text-secondary"
-                        value="24 hours before the booking starts"
-                      >
-                        24 hours before the booking starts
-                      </option>
+                      {Array.from({ length: 96 }, (_, i) => i + 1).map(
+                        (day) => (
+                          <option
+                            key={day}
+                            className="text-secondary"
+                            value={`${day}`}
+                          >
+                            {day} hours
+                          </option>
+                        )
+                      )}
                     </select>
                     {errors.bookingNotes && (
                       <p className="text-red-500 text-sm mt-1">
@@ -525,16 +565,24 @@ const FacilityRules = () => {
                       name=""
                       id=""
                       {...register("recurringBookingFollowupHours")}
+                      onChange={(e) =>
+                        setSelectedFollowupHoursOne(Number(e.target.value))
+                      }
                     >
                       <option className="text-secondary" value="">
                         Select Option
                       </option>
-                      <option
-                        className="text-secondary"
-                        value="36 hours before the booking starts"
-                      >
-                        36 hours before the booking starts
-                      </option>
+                      {Array.from({ length: 43 }, (_, i) => i + 6).map(
+                        (day) => (
+                          <option
+                            key={day}
+                            className="text-secondary"
+                            value={`${day}`}
+                          >
+                            {day} hours
+                          </option>
+                        )
+                      )}
                     </select>
                     {errors.recurringBookingFollowupHours && (
                       <p className="text-red-500 text-sm mt-1">
@@ -551,16 +599,25 @@ const FacilityRules = () => {
                     <select
                       className="w-full border-2 h-[67px] px-5 rounded-xl text-secondary mt-5 selectIcon appearance-none "
                       {...register("recurringBookingCancelWithoutPenaltyHours")}
+                      onChange={(e) =>
+                        setSelectedFollowupHoursTwo(Number(e.target.value))
+                      }
                     >
                       <option className="text-secondary" value="">
                         Select Option
                       </option>
-                      <option
-                        className="text-secondary"
-                        value="24 hours or more before the booking starts"
-                      >
-                        24 hours or more before the booking starts
-                      </option>
+                      {Array.from(
+                        { length: selectedFollowupHoursOne - 1 },
+                        (_, i) => i + 1
+                      ).map((day) => (
+                        <option
+                          key={day}
+                          className="text-secondary"
+                          value={`${day}`}
+                        >
+                          {day} hours
+                        </option>
+                      ))}
                     </select>
                     {errors.recurringBookingCancelWithoutPenaltyHours && (
                       <p className="text-red-500 text-sm mt-1">
@@ -589,12 +646,18 @@ const FacilityRules = () => {
                       <option className="text-secondary" value="">
                         Select Option
                       </option>
-                      <option
-                        className="text-secondary"
-                        value="6 hours or more before the booking starts"
-                      >
-                        6 hours or more before the booking starts
-                      </option>
+                      {Array.from(
+                        { length: selectedFollowupHoursTwo - 1 },
+                        (_, i) => i + 1
+                      ).map((day) => (
+                        <option
+                          key={day}
+                          className="text-secondary"
+                          value={`${day}`}
+                        >
+                          {day} hours
+                        </option>
+                      ))}
                     </select>
                     {errors.recurringBookingCancelWithoutPenaltyAndReceiveCreditsHours && (
                       <p className="text-red-500 text-sm mt-1">

@@ -192,8 +192,8 @@ const CalendarComponent = () => {
 
   const handleAddBookingNext = async (data) => {
     handleCancel();
-    // setLoading(true);
     getAllBookings();
+    setLoading(false);
   };
 
   const handleCancel = () => {
@@ -477,6 +477,7 @@ const CalendarComponent = () => {
           onClose={handleCancel}
           onNext={handleAddBookingNext}
           mode={mode}
+          setLoading={setLoading}
           initialValues={{
             ...selectedEvent,
             ...(selectedSlot && { startDateTime: selectedSlot?.start }), // Prepopulate start date/time

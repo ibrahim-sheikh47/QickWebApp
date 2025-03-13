@@ -5,11 +5,10 @@ import AppModal from "../AppModal/AppModal";
 function DateRangeModal({
   isOpen,
   onClose,
-  height = "25rem",
   width = "24rem",
-  overlayStyles = { position: "fixed" },
-  modalStyles = { position: "absolute" },
   dateRange,
+  modalStyles,
+  overlayStyles,
   onDateChange,
   onApply,
 }) {
@@ -17,11 +16,10 @@ function DateRangeModal({
     <AppModal
       modalopen={isOpen}
       onClose={onClose}
-      height={height}
       width={width}
       customStyles={{
-        overlay: overlayStyles,
-        modal: modalStyles,
+        ...(overlayStyles && { overlay: overlayStyles }),
+        ...(modalStyles && { modal: modalStyles }),
       }}
     >
       <DateRange

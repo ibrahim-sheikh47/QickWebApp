@@ -30,6 +30,7 @@ const AddBookingModal = ({
   onNext,
   onCancel,
   mode = "add",
+  setLoading,
   initialValues = {},
 }) => {
   const [form] = Form.useForm();
@@ -39,7 +40,6 @@ const AddBookingModal = ({
   const [userModalVisible, setUserModalVisible] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [repeatedDays, setRepeatedDays] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   const days = [
     { label: "Mon", value: "Monday" },
@@ -150,8 +150,6 @@ const AddBookingModal = ({
       });
     } catch (err) {
       console.log(err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -405,7 +403,7 @@ const AddBookingModal = ({
                     if (!value || !startDateTime) {
                       return Promise.resolve();
                     }
-                    if (value.isAfter(startDateTime.add(1, "hour"))) {
+                    if (value.isAfter(startDateTime.add(59, "minute"))) {
                       return Promise.resolve();
                     }
                     return Promise.reject(
@@ -609,8 +607,6 @@ const AddBookingModal = ({
         onNext={handleUserModalNext}
         setLoading={() => {}} // Pass a loading function if needed
       />
-
-      {loading && <Loader />}
     </>
   );
 };

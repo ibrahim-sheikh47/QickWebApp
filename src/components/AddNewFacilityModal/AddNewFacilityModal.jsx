@@ -114,14 +114,14 @@ const AddNewFacilityModal = ({ isModalOpen, closeModal, setLoading }) => {
       modalopen={isModalOpen.addNew}
       onClose={() => closeModal("addNew")}
       customStyles={{
-        overlay: { position: "fixed", top: 0, left: 0, right: 0 },
+        // overlay: { position: "fixed", top: 0, left: 0, right: 0 },
         modal: {
-          position: "absolute",
-          top: "35%",
-          left: "35%",
-          transform: "translate(-50%, -50%)",
-          margin: "0",
-          maxHeight: "50vh",
+          // position: "absolute",
+          // top: "35%",
+          // left: "35%",
+          // transform: "translate(-50%, -50%)",
+          // margin: "0",
+          // maxHeight: "80vh",
           width: "40%",
           overflowY: "auto",
           borderRadius: "8px",

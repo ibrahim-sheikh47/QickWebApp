@@ -3,7 +3,6 @@ import { StateContextProvider } from "./context";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useEffect } from "react";
-import requestPermission from "./RequestPermission";
 import { onMessage } from "firebase/messaging";
 import { messaging } from "./firebase";
 import { ToastContainer, toast } from "react-toastify";
@@ -11,8 +10,6 @@ import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   useEffect(() => {
-    requestPermission();
-
     const unsubscribe = onMessage(messaging, (payload) => {
       console.log("Foreground notification received:", payload);
 

@@ -437,26 +437,30 @@ const CreditHolderChart = () => {
   );
 };
 
-const EventBar = () => {
+const EventBar = ({ labels, values, isEvent = true }) => {
   const [activeIndex, setActiveIndex] = useState(null);
 
   const navigate = useNavigate();
   const handleNavigation = () => {
-    navigate("EventReport");
+    navigate(isEvent ? "EventReport" : "BookingReport");
   };
 
   const data = {
-    labels: ["Active", "Completed"],
+    labels: labels,
     datasets: [
       {
         label: "",
-        data: [2, 6], // Replace with your data
+        data: values, // Replace with your data
         backgroundColor: (context) => {
-          const index = context.dataIndex;
-          if (index === activeIndex) {
-            return "#1F2933"; // Highlight color for active bar
+          if (isEvent) {
+            const index = context.dataIndex;
+            if (index === activeIndex) {
+              return "#1F2933"; // Highlight color for active bar
+            }
+            return index === 0 ? "#9CFC38" : "#33C0DB"; // Green for "Active", Blue for "Completed"
+          } else {
+            return "#9CFC38";
           }
-          return index === 0 ? "#9CFC38" : "#33C0DB"; // Green for "Active", Blue for "Completed"
         },
         borderWidth: 1,
         barThickness: 20,
@@ -513,7 +517,7 @@ const EventBar = () => {
         padding: 10,
         callbacks: {
           label: (context) => {
-            let label = `${context.parsed.y}`; // Show the number in the tooltip
+            let label = `${context.parsed.y}${isEvent ? "" : " Bookings"}`; // Show the number in the tooltip
             return label;
           },
         },

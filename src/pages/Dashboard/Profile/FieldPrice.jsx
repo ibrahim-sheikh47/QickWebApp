@@ -112,7 +112,7 @@ const FieldPrice = () => {
   };
   const [selectedSize, setSelectedSize] = useState(null);
 
-  const fieldSizes = ["5v5", "6v6", "7v7", "8v8", "9v9", "11v11"];
+  const fieldSizes = ["5v5", "6v6", "7v7", "8v8", "9v9", "10v10", "11v11"];
 
   const timingObject = {
     from: "",
@@ -278,6 +278,15 @@ const FieldPrice = () => {
   };
 
   const handleFormClose = () => {
+    setCurrentField(null);
+    reset({
+      name: "",
+      fieldType: "",
+      surfaceType: "",
+    });
+    setSelectedSize(null);
+    setPhotos([]);
+    setPhotoFiles([]);
     setShowFieldsSection(true);
     setStep(0);
   };
@@ -426,13 +435,15 @@ const FieldPrice = () => {
       setStep(2);
     } else {
       try {
-        let uploadedUrls = [];
+        let uploadedUrls = photos.filter((p) => p.includes("https"));
         if (photoFiles.length > 0) {
-          uploadedUrls = await uploadFiles(); // Wait for file uploads to complete
+          const urls = await uploadFiles();
+          uploadedUrls = [...uploadedUrls, ...urls]; // Wait for file uploads to complete
         }
 
         saveField(uploadedUrls); // Proceed to saving the field with uploaded URLs
       } catch (error) {
+        console.log(error);
         showToast("File upload failed. Please try again.", "error");
       }
     }
@@ -503,7 +514,7 @@ const FieldPrice = () => {
               to: timing.to,
               timeSlotName: timing.name,
               pricing: timing.prices.map((p) => {
-                return `${p.price}$ for ${p.bookingDuration}`;
+                return `$${p.price} for ${p.bookingDuration}`;
               }),
             };
           });
@@ -519,7 +530,7 @@ const FieldPrice = () => {
                 to: timing.to,
                 timeSlotName: timing.name,
                 pricing: timing.prices.map((p) => {
-                  return `${p.price}$ for ${p.bookingDuration}`;
+                  return `$${p.price} for ${p.bookingDuration}`;
                 }),
               });
             });
@@ -565,25 +576,11 @@ const FieldPrice = () => {
     }
   };
 
-  const handleDeletePhoto = (index) => {
-    const newPhotos = [...photos];
-    const newFieldNames = [...fieldNames];
-    newPhotos.splice(index, 1);
-    newFieldNames.splice(index, 1);
-    setPhotos(newPhotos);
-    setFieldNames(newFieldNames);
-    closeModal();
-  };
-
   const handleFileUpload2 = (e) => {
     const files = Array.from(e.target.files);
     setPhotoFiles(files);
     const newPhotos = files.map((file) => URL.createObjectURL(file));
     setPhotos((prevPhotos) => [...prevPhotos, ...newPhotos]);
-    setFieldNames((prevFieldNames) => [
-      ...prevFieldNames,
-      ...Array(newPhotos.length).fill(""),
-    ]);
   };
 
   const openModal = (index) => {
@@ -592,16 +589,6 @@ const FieldPrice = () => {
 
   const closeModal = () => {
     setModalOpen(null);
-  };
-
-  const handleFieldNameChange = (index, value) => {
-    const newFieldNames = [...fieldNames];
-    newFieldNames[index] = value;
-    setFieldNames(newFieldNames);
-  };
-
-  const handleSaveChanges = () => {
-    closeModal();
   };
 
   const handleEdit = (indexOut, indexInn) => {
@@ -801,6 +788,7 @@ const FieldPrice = () => {
                 >
                   <option value="">Choose an option</option>
                   <option value="Indoor">Indoor</option>
+                  <option value="Outdoor">Outdoor</option>
                 </select>
 
                 {errors.fieldType && (
@@ -829,7 +817,10 @@ const FieldPrice = () => {
                   {...register("surfaceType")}
                 >
                   <option value="">Choose an option</option>
-                  <option value="Turf">Turf</option>
+                  <option value="Turf/Synthetic Grass">
+                    Turf/Synthetic Grass
+                  </option>
+                  <option value="Natural Grass">Natural Grass</option>
                 </select>
 
                 {errors.surfaceType && (
@@ -923,29 +914,36 @@ const FieldPrice = () => {
               </div>
 
               <div className="mt-10">
-                <p className="font-PJSbold text-xl mb-3">Upload Field Images</p>
+                <p className="font-PJSbold text-xl mb-3">
+                  Upload Field Images (Max 5)
+                </p>
                 <div className="overflow-x-auto no-scrollbar w-[100%]">
                   <div className="flex gap-7 min-w-[max-content]">
-                    <div className="w-44 h-44 rounded-xl border-secondaryThirty border-2 flex justify-center items-center">
-                      <div className="text-center min-w-44">
-                        <label htmlFor="uploadInput" className="cursor-pointer">
-                          <img
-                            src={assets.PhotoIcon}
-                            alt="Upload Icon"
-                            className="mx-auto mb-2"
+                    {photos.length < 5 && (
+                      <div className="w-44 h-44 rounded-xl border-secondaryThirty border-2 flex justify-center items-center">
+                        <div className="text-center min-w-44">
+                          <label
+                            htmlFor="uploadInput"
+                            className="cursor-pointer"
+                          >
+                            <img
+                              src={assets.PhotoIcon}
+                              alt="Upload Icon"
+                              className="mx-auto mb-2"
+                            />
+                            <p className="font-PJSmedium">Upload Photos</p>
+                          </label>
+                          <input
+                            type="file"
+                            id="uploadInput"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={handleFileUpload2}
+                            multiple
                           />
-                          <p className="font-PJSmedium">Upload Photos</p>
-                        </label>
-                        <input
-                          type="file"
-                          id="uploadInput"
-                          className="hidden"
-                          accept="image/*"
-                          onChange={handleFileUpload2}
-                          multiple
-                        />
+                        </div>
                       </div>
-                    </div>
+                    )}
                     <div className="flex gap-4 flex-wrap">
                       {photos.map((photo, index) => (
                         <div
@@ -976,6 +974,45 @@ const FieldPrice = () => {
                         </div>
                       ))}
                     </div>
+                    {photos.map((photo, index) => (
+                      <AppModal
+                        key={index}
+                        onClose={closeModal}
+                        modalopen={modalOpen === index}
+                        height="auto"
+                        width="500px"
+                      >
+                        <div>
+                          <p className="text-[20px] font-PJSbold">
+                            Remove Photo
+                          </p>
+                        </div>
+                        <img
+                          src={photo}
+                          alt={`Modal photo ${index}`}
+                          className="w-full h-[230px] object-cover rounded-xl mt-5"
+                        />
+                        <div className="flex mt-5 gap-4 w-full justify-center font-PJSMedium items-center">
+                          <button
+                            type={"button"}
+                            onClick={() => {
+                              if (photos.length === photoFiles.length) {
+                                setPhotoFiles(
+                                  photoFiles.filter((p, ind) => ind !== index)
+                                );
+                              }
+                              setPhotos(
+                                photos.filter((p, ind) => ind !== index)
+                              );
+                              closeModal();
+                            }}
+                            className="w-[220px] transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full border-redbutton border-2 font-PJSmedium justify-center items-center text-redbutton"
+                          >
+                            Delete Photo
+                          </button>
+                        </div>
+                      </AppModal>
+                    ))}
                   </div>
                 </div>
               </div>

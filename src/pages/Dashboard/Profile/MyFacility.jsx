@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import assets from "../../../assets/assets";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -22,22 +22,18 @@ const MyFacility = () => {
       : assets.placeholder
   );
   const [imageFile, setImageFile] = useState(null);
-  const [bannerImage, setBannerImage] = useState(
-    currentFacility &&
-      currentFacility.bannerAdPhotos.length > 0 &&
-      currentFacility.bannerAdPhotos[0] !== null
-      ? currentFacility.bannerAdPhotos[0]
-      : null
-  );
-  const [bannerImageFile, setBannerImageFile] = useState(null);
+  const [photos, setPhotos] = useState(currentFacility?.facilityPhotos || []);
+  const [photoFiles, setPhotoFiles] = useState([]);
   const [selectedAmenities, setSelectedAmenities] = useState(
     currentFacility && currentFacility.amenities
   );
-  const [photos, setPhotos] = useState(currentFacility?.facilityPhotos || []);
-  const [photoFiles, setPhotoFiles] = useState([]);
+  const [bannerImages, setBannerImages] = useState(
+    currentFacility?.bannerAdPhotos || []
+  );
+  const [bannerImagesFiles, setBannerImagesFiles] = useState([]);
   const [modalOpen, setModalOpen] = useState(null);
+  const [modalType, setModalType] = useState(null);
   const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [fieldNames, setFieldNames] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -55,28 +51,23 @@ const MyFacility = () => {
     }
   };
 
-  const handleBannerImageUpload = (event) => {
-    const bannerFile = event.target.files[0];
-    if (bannerFile) {
-      setBannerImageFile(bannerFile);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setBannerImage(e.target.result);
-      };
-      reader.readAsDataURL(bannerFile);
-    }
-  };
-
   const handleFileUpload2 = (e) => {
     const files = Array.from(e.target.files);
     setPhotoFiles(files);
     const newPhotos = files.map((file) => URL.createObjectURL(file));
     setPhotos((prevPhotos) => [...prevPhotos, ...newPhotos]);
-    setFieldNames((prevFieldNames) => [
-      ...prevFieldNames,
-      ...Array(newPhotos.length).fill(""),
-    ]);
   };
+
+  const handleFileUpload3 = (e) => {
+    const files = Array.from(e.target.files);
+    setBannerImagesFiles(files);
+    const newPhotos = files.map((file) => URL.createObjectURL(file));
+    setBannerImages((prevPhotos) => [...prevPhotos, ...newPhotos]);
+  };
+
+  useEffect(() => {
+    console.log(bannerImages);
+  }, [bannerImages]);
 
   const openModal = (index) => {
     setModalOpen(index);
@@ -84,16 +75,7 @@ const MyFacility = () => {
 
   const closeModal = () => {
     setModalOpen(null);
-  };
-
-  const handleFieldNameChange = (index, value) => {
-    const newFieldNames = [...fieldNames];
-    newFieldNames[index] = value;
-    setFieldNames(newFieldNames);
-  };
-
-  const handleSaveChanges = () => {
-    closeModal();
+    setModalType(null);
   };
 
   const toggleAmenity = (amenity) => {
@@ -123,7 +105,7 @@ const MyFacility = () => {
   const onSubmit = async (data) => {
     setLoading(true);
     let facilityPhoto = image;
-    let bannerPhoto = bannerImage;
+    let bannerPhotos = bannerImages.filter((p) => p.includes("https"));
     let facilityPhotos = photos.filter((p) => p.includes("https"));
 
     try {
@@ -140,11 +122,13 @@ const MyFacility = () => {
           })
         );
       }
-      if (bannerPhoto != null && !bannerPhoto.includes("https")) {
+      if (bannerImagesFiles.length > 0) {
         uploadPromises.push(
-          upload(bannerImageFile).then((url) => {
-            bannerPhoto = url;
-          })
+          Promise.all(bannerImagesFiles.map((file) => upload(file))).then(
+            (urls) => {
+              bannerPhotos = [...bannerPhotos, ...urls];
+            }
+          )
         );
       }
       if (photoFiles.length > 0) {
@@ -164,27 +148,19 @@ const MyFacility = () => {
         address: data.writtenAddress,
         icon: facilityPhoto,
         facilityPhotos: facilityPhotos,
-        bannerAdPhotos: [bannerPhoto],
+        bannerAdPhotos: bannerPhotos,
         amenities: selectedAmenities,
       };
       const facility = await editFacility(body, currentFacility._id);
       setCurrentFacility(facility);
-      window.location.reload();
+
+      showToast("Facility profile successfully updated");
+      // window.location.reload();
     } catch (err) {
       console.log(err);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDeletePhoto = (index) => {
-    const newPhotos = [...photos];
-    const newFieldNames = [...fieldNames];
-    newPhotos.splice(index, 1);
-    newFieldNames.splice(index, 1);
-    setPhotos(newPhotos);
-    setFieldNames(newFieldNames);
-    closeModal();
   };
 
   const upload = async (file) => {
@@ -212,9 +188,6 @@ const MyFacility = () => {
     <div className="mx-3">
       <div className="flex items-center justify-between">
         <p className="font-PJSbold text-xl">My Facility</p>
-        <p className="text-sm border-2 border-secondaryTwenty hover:bg-secondaryTwenty rounded-full px-6 py-2 cursor-pointer font-PJSregular">
-          Edit
-        </p>
       </div>
       <div className="flex flex-col gap-4 justify-center items-center mt-10 relative">
         <img
@@ -287,7 +260,7 @@ const MyFacility = () => {
               {amenitiesData.map((amenity, index) => (
                 <div key={index} className="flex items-center">
                   <p
-                    className={`font-PJSregular text-sm whitespace-nowrap border px-4 py-3 rounded-xl cursor-pointer ${
+                    className={`font-PJSregular text-sm whitespace-nowrap border px-4 py-3 rounded-full cursor-pointer ${
                       selectedAmenities.includes(amenity)
                         ? "bg-blue text-white"
                         : "text-black"
@@ -314,7 +287,7 @@ const MyFacility = () => {
               htmlFor="WrittenAddress"
               className="absolute top-2 left-4 text-secondary font-PJSmedium text-xs"
             >
-              Written Address*
+              Facility’s Written Address*
             </label>
             {errors.writtenAddress && (
               <p className="text-red-500">{errors.writtenAddress.message}</p>
@@ -325,29 +298,33 @@ const MyFacility = () => {
           <img className="w-full" src={assets.googleMap} alt="Google Map" />
         </div>
         <div className="mt-10">
-          <p className="font-PJSbold text-xl mb-3">Upload Facility Images</p>
+          <p className="font-PJSbold text-xl mb-3">
+            Upload Facility Images (Max 5)
+          </p>
           <div className="overflow-x-auto no-scrollbar w-[100%]">
             <div className="flex gap-7 min-w-[max-content]">
-              <div className="w-44 h-44 rounded-xl border-secondaryThirty border-2 flex justify-center items-center">
-                <div className="text-center min-w-44">
-                  <label htmlFor="uploadInput" className="cursor-pointer">
-                    <img
-                      src={assets.PhotoIcon}
-                      alt="Upload Icon"
-                      className="mx-auto mb-2"
+              {photos.length < 5 && (
+                <div className="w-44 h-44 rounded-xl border-secondaryThirty border-2 flex justify-center items-center">
+                  <div className="text-center min-w-44">
+                    <label htmlFor="uploadInput" className="cursor-pointer">
+                      <img
+                        src={assets.PhotoIcon}
+                        alt="Upload Icon"
+                        className="mx-auto mb-2"
+                      />
+                      <p className="font-PJSmedium">Upload Photos</p>
+                    </label>
+                    <input
+                      type="file"
+                      id="uploadInput"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleFileUpload2}
+                      multiple
                     />
-                    <p className="font-PJSmedium">Upload Photos</p>
-                  </label>
-                  <input
-                    type="file"
-                    id="uploadInput"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={handleFileUpload2}
-                    multiple
-                  />
+                  </div>
                 </div>
-              </div>
+              )}
               <div className="flex gap-4 flex-wrap">
                 {photos.map((photo, index) => (
                   <div
@@ -366,15 +343,13 @@ const MyFacility = () => {
                         <img
                           src={assets.edit}
                           className="object-cover"
-                          onClick={() => openModal(index)}
+                          onClick={() => {
+                            setModalType("facility");
+                            openModal(index);
+                          }}
                         />
                       </div>
                     )}
-                    <div className="absolute bottom-3 left-4">
-                      <p className="text-white font-PJSbold text-sm">
-                        {fieldNames[index]}
-                      </p>
-                    </div>
                   </div>
                 ))}
               </div>
@@ -382,28 +357,12 @@ const MyFacility = () => {
                 <AppModal
                   key={index}
                   onClose={closeModal}
-                  modalopen={modalOpen === index}
+                  modalopen={modalOpen === index && modalType === "facility"}
                   height="auto"
                   width="500px"
                 >
                   <div>
-                    <p className="text-[20px] font-PJSbold">Edit Photo</p>
-                    <div className="relative mt-5">
-                      <input
-                        className={`block px-4 pt-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm bg-white border-secondaryThirty w-full h-[54px]`}
-                        type="text"
-                        value={fieldNames[index]}
-                        onChange={(e) =>
-                          handleFieldNameChange(index, e.target.value)
-                        }
-                      />
-                      <label
-                        htmlFor="FieldName"
-                        className="absolute top-2 left-4 text-secondary font-PJSmedium text-xs"
-                      >
-                        Field Name
-                      </label>
-                    </div>
+                    <p className="text-[20px] font-PJSbold">Remove Photo</p>
                   </div>
                   <img
                     src={photo}
@@ -412,16 +371,19 @@ const MyFacility = () => {
                   />
                   <div className="flex mt-5 gap-4 w-full justify-center font-PJSMedium items-center">
                     <button
-                      onClick={handleDeletePhoto}
+                      type={"button"}
+                      onClick={() => {
+                        if (photos.length === photoFiles.length) {
+                          setPhotoFiles(
+                            photoFiles.filter((p, ind) => ind !== index)
+                          );
+                        }
+                        setPhotos(photos.filter((p, ind) => ind !== index));
+                        closeModal();
+                      }}
                       className="w-[220px] transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full border-redbutton border-2 font-PJSmedium justify-center items-center text-redbutton"
                     >
                       Delete Photo
-                    </button>
-                    <button
-                      className="w-[220px] transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full bg-lime font-PJSmedium justify-center items-center"
-                      onClick={() => handleSaveChanges(index)}
-                    >
-                      Save Changes
                     </button>
                   </div>
                 </AppModal>
@@ -430,38 +392,106 @@ const MyFacility = () => {
           </div>
         </div>
         <div className="mt-10">
-          <p className="font-PJSbold text-xl mb-3">Upload Banner Ads</p>
-          <div className="w-full h-[165px] rounded-lg border-secondaryThirty border-2 flex justify-center items-center overflow-hidden relative">
-            {bannerImage ? (
-              <img
-                src={bannerImage}
-                alt="Uploaded"
-                className="w-full h-[165px] object-cover"
-              />
-            ) : (
-              <div className="text-center">
-                <img
-                  src={assets.PhotoIcon}
-                  alt="Upload Icon"
-                  className="mx-auto mb-2"
-                />
-                <p>Upload Photos</p>
+          <p className="font-PJSbold text-xl mb-3">Upload Banner Ads (Max 5)</p>
+          <div className="overflow-x-auto no-scrollbar w-[100%]">
+            <div className="flex gap-7 min-w-[max-content]">
+              {bannerImages.length < 5 && (
+                <div className="w-44 h-44 rounded-xl border-secondaryThirty border-2 flex justify-center items-center">
+                  <div className="text-center min-w-44">
+                    <label htmlFor="uploadInput2" className="cursor-pointer">
+                      <img
+                        src={assets.PhotoIcon}
+                        alt="Upload Icon"
+                        className="mx-auto mb-2"
+                      />
+                      <p className="font-PJSmedium">Upload Photos</p>
+                    </label>
+                    <input
+                      type="file"
+                      id="uploadInput2"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleFileUpload3}
+                      multiple
+                    />
+                  </div>
+                </div>
+              )}
+              <div className="flex gap-4 flex-wrap">
+                {bannerImages.map((photo, index) => (
+                  <div
+                    key={index}
+                    className="relative w-44 h-44 flex justify-center items-center cursor-pointer"
+                    onMouseEnter={() => setHoveredIndex(index)}
+                    onMouseLeave={() => setHoveredIndex(null)}
+                  >
+                    <img
+                      src={photo}
+                      alt={`Uploaded photo ${index}`}
+                      className="w-full h-full object-cover rounded-xl"
+                    />
+                    {hoveredIndex === index && (
+                      <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-50 rounded-xl">
+                        <img
+                          src={assets.edit}
+                          className="object-cover"
+                          onClick={() => {
+                            setModalType("banner");
+                            openModal(index);
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
-            )}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleBannerImageUpload}
-              className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
-            />
+              {bannerImages.map((photo, index) => (
+                <AppModal
+                  key={index}
+                  onClose={closeModal}
+                  modalopen={modalOpen === index && modalType === "banner"}
+                  height="auto"
+                  width="500px"
+                >
+                  <div>
+                    <p className="text-[20px] font-PJSbold">Remove Photo</p>
+                  </div>
+                  <img
+                    src={photo}
+                    alt={`Modal photo ${index}`}
+                    className="w-full h-[230px] object-cover rounded-xl mt-5"
+                  />
+                  <div className="flex mt-5 gap-4 w-full justify-center font-PJSMedium items-center">
+                    <button
+                      type={"button"}
+                      onClick={() => {
+                        if (bannerImages.length === bannerImagesFiles.length) {
+                          setBannerImagesFiles(
+                            bannerImagesFiles.filter((p, ind) => ind !== index)
+                          );
+                        }
+                        setBannerImages(
+                          bannerImages.filter((p, ind) => ind !== index)
+                        );
+                        closeModal();
+                      }}
+                      className="w-[220px] transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full border-redbutton border-2 font-PJSmedium justify-center items-center text-redbutton"
+                    >
+                      Delete Photo
+                    </button>
+                  </div>
+                </AppModal>
+              ))}
+            </div>
           </div>
-          <button
-            type="submit"
-            className="w-full mt-7 transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full bg-lime font-PJSmedium justify-center items-center"
-          >
-            Save Changes
-          </button>
         </div>
+
+        <button
+          type="submit"
+          className="w-full mt-7 transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full bg-lime font-PJSmedium justify-center items-center"
+        >
+          Save Changes
+        </button>
       </form>
 
       <Toast open={open} setOpen={setOpen} message={message} type={type} />

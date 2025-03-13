@@ -1,11 +1,15 @@
 import { Link, useNavigate } from "react-router-dom";
 import assets from "../assets/assets";
 import { useEffect } from "react";
+import useNotificationPermission from "../RequestPermission";
 
 const SplashScreen = () => {
   const navigate = useNavigate();
+  const requestPermission = useNotificationPermission();
 
   useEffect(() => {
+    // localStorage.clear();
+    requestPermission();
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     if (isLoggedIn) {
       navigate("/Dashboard/Reports");

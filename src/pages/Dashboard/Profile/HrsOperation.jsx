@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -12,6 +12,110 @@ import DatePickerModal from "../../../components/DatePickerModal/DatePickerModal
 import moment from "moment";
 import TimePickerModal from "../../../components/TimePickerModal/TimePickerModal";
 import Toast from "../../../components/Toast/Toast";
+import { format } from "date-fns";
+
+const hours = [
+  {
+    label: "",
+    value: "",
+  },
+  {
+    label: "12:00 AM",
+    value: "12:00 AM",
+  },
+  {
+    label: "1:00 AM",
+    value: "1:00 AM",
+  },
+  {
+    label: "2:00 AM",
+    value: "2:00 AM",
+  },
+  {
+    label: "3:00 AM",
+    value: "3:00 AM",
+  },
+  {
+    label: "4:00 AM",
+    value: "4:00 AM",
+  },
+  {
+    label: "5:00 AM",
+    value: "5:00 AM",
+  },
+  {
+    label: "6:00 AM",
+    value: "6:00 AM",
+  },
+  {
+    label: "7:00 AM",
+    value: "7:00 AM",
+  },
+  {
+    label: "8:00 AM",
+    value: "8:00 AM",
+  },
+  {
+    label: "9:00 AM",
+    value: "9:00 AM",
+  },
+  {
+    label: "10:00 AM",
+    value: "10:00 AM",
+  },
+  {
+    label: "11:00 AM",
+    value: "11:00 AM",
+  },
+  {
+    label: "12:00 PM",
+    value: "12:00 PM",
+  },
+  {
+    label: "1:00 PM",
+    value: "1:00 PM",
+  },
+  {
+    label: "2:00 PM",
+    value: "2:00 PM",
+  },
+  {
+    label: "3:00 PM",
+    value: "3:00 PM",
+  },
+  {
+    label: "4:00 PM",
+    value: "4:00 PM",
+  },
+  {
+    label: "5:00 PM",
+    value: "5:00 PM",
+  },
+  {
+    label: "6:00 PM",
+    value: "6:00 PM",
+  },
+  {
+    label: "7:00 PM",
+    value: "7:00 PM",
+  },
+  {
+    label: "8:00 PM",
+    value: "8:00 PM",
+  },
+  {
+    label: "9:00 PM",
+    value: "9:00 PM",
+  },
+  {
+    label: "10:00 PM",
+    value: "10:00 PM",
+  },
+  {
+    label: "11:00 PM",
+    value: "11:00 PM",
+  },
+];
 
 const HrsOperation = () => {
   const { user, currentFacility, setCurrentFacility } = useStateContext();
@@ -23,6 +127,7 @@ const HrsOperation = () => {
       ? currentFacility.holidays.split(",")
       : []
   );
+  const [holidays, setHolidays] = useState("");
   const [days, setDays] = useState(
     initialDays.map((dayObj) => {
       const matchingDay = currentFacility.hoursOfOperation.find(
@@ -33,27 +138,48 @@ const HrsOperation = () => {
         ...dayObj,
         open: matchingDay ? matchingDay.open : null, // Set to null if no matching day
         close: matchingDay ? matchingDay.close : null, // Set to null if no matching day
-        checked: !!matchingDay, // Checked if a matching day exists
+        checked: !!matchingDay && matchingDay.open && matchingDay.close, // Checked if a matching day exists
       };
     })
   );
-  const [editMode, setEditMode] = useState(false); // State to control edit mode
   const [loading, setLoading] = useState(false);
   const tempTime = useRef(null);
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [type, setType] = useState("success");
 
-  const handleCheckboxChange = (index) => {
-    if (editMode) {
-      const newDays = [...days];
-      newDays[index].checked = !newDays[index].checked;
-      setDays(newDays);
+  useEffect(() => {
+    if (selectedDates.length > 0) {
+      setHolidays(
+        selectedDates
+          .map((date) => {
+            return moment(date).format("MMM Do yyyy");
+          })
+          .join(", ")
+      );
+    } else {
+      setHolidays("");
+    }
+  }, [selectedDates]);
+
+  const textareaRef = useRef(null);
+
+  // Adjust the textarea height dynamically based on its content
+  const handleHolidayChange = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto"; // Reset height
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Adjust height to fit content
     }
   };
 
-  const toggleEditMode = () => {
-    setEditMode(!editMode);
+  useEffect(() => {
+    handleHolidayChange(); // Adjust height when the component mounts
+  }, [holidays]);
+
+  const handleCheckboxChange = (index) => {
+    const newDays = [...days];
+    newDays[index].checked = !newDays[index].checked;
+    setDays(newDays);
   };
 
   const validationSchema = yup.object().shape({
@@ -91,9 +217,11 @@ const HrsOperation = () => {
       };
       const facility = await editFacility(body, currentFacility._id);
       setCurrentFacility(facility);
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+
+      showToast("Hours of operation successfully updated");
+      // setTimeout(() => {
+      //   window.location.reload();
+      // }, 1000);
     } catch (err) {
       console.log(err);
     } finally {
@@ -110,8 +238,8 @@ const HrsOperation = () => {
         currentDay.open = time;
 
         if (currentDay.close) {
-          const openTime = moment(time, "hh:mm A");
-          const closeTime = moment(currentDay.close, "hh:mm A");
+          const openTime = moment(time, "h:mm A");
+          const closeTime = moment(currentDay.close, "h:mm A");
           const duration = moment.duration(closeTime.diff(openTime));
 
           if (duration.asHours() < 5) {
@@ -128,8 +256,8 @@ const HrsOperation = () => {
           return prevDays; // Return previous state without changes
         }
 
-        const openTime = moment(currentDay.open, "hh:mm A");
-        const closeTime = moment(time, "hh:mm A");
+        const openTime = moment(currentDay.open, "h:mm A");
+        const closeTime = moment(time, "h:mm A");
         const duration = moment.duration(closeTime.diff(openTime));
 
         if (closeTime.isBefore(openTime)) {
@@ -156,7 +284,40 @@ const HrsOperation = () => {
   };
 
   const handleSingleDateChange = (date) => {
-    setSelectedDates([...selectedDates, date]);
+    const formattedDate = format(date, "yyyy-MM-dd"); // Format date for easy comparison
+
+    // Toggle selection (deselect if already selected)
+    if (selectedDates.includes(formattedDate)) {
+      setSelectedDates(selectedDates.filter((d) => d !== formattedDate));
+    } else {
+      setSelectedDates([...selectedDates, formattedDate]);
+    }
+    // setSelectedDates([...selectedDates, date]);
+  };
+
+  const renderDayContent = (day) => {
+    const formattedDay = format(day, "yyyy-MM-dd");
+    const isSelected = selectedDates.includes(formattedDay);
+
+    return (
+      <div
+        style={{
+          // borderColor: isSelected ? "#33C0DB" : "transparent",
+          // borderWidth: 1,
+          color: isSelected ? "#33C0DB" : "black",
+          ...(isSelected && { fontWeight: "bold" }),
+          // borderRadius: "38%",
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          margin: 0,
+        }}
+      >
+        {format(day, "d")}
+      </div>
+    );
   };
 
   const showToast = (message, type = "success") => {
@@ -169,13 +330,6 @@ const HrsOperation = () => {
     <div className="mx-3 mt-4">
       <div className="flex items-center justify-between">
         <p className="font-PJSbold text-xl">Hours of Operation</p>
-        <button
-          onClick={toggleEditMode}
-          className="font-PJSregular transition-transform text-sm border-2 flex items-center gap-3 border-secondaryTwenty hover:bg-secondaryTwenty rounded-full px-6 py-2 cursor-pointer"
-        >
-          {editMode ? "Save Timings" : "Edit Timings"}
-          <img className="w-4" src={assets.editBlack} alt="" />
-        </button>
       </div>
       <div className="grid grid-cols-3 gap-5 mt-10">
         <div className="font-PJSbold py-4">Days</div>
@@ -194,7 +348,6 @@ const HrsOperation = () => {
                     <Checkbox
                       checked={entry.checked}
                       onChange={() => handleCheckboxChange(index)}
-                      disabled={!editMode}
                       sx={{
                         color: "rgba(132, 154, 184, 0.2)",
                         "&.Mui-checked": { color: "rgba(51, 192, 219, 1)" },
@@ -213,72 +366,69 @@ const HrsOperation = () => {
                 {entry.day}
               </div>
             </div>
-            <input
-              className="block px-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm bg-white border-secondaryThirty w-full h-[54px]"
-              type="text"
-              disabled={!editMode ? true : false}
-              readOnly
+            <select
+              onChange={(e) => handleInputChange(e.target.value, index, "open")}
+              disabled={!entry.checked ? true : false}
               value={entry.open}
-              onClick={() => {
-                setTimePickType(`${index}-open`);
-                setTimeModal(true);
-              }}
-              // onChange={(e) => handleInputChange(e, index, "open")}
-            />
-            <input
-              className="block px-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm bg-white border-secondaryThirty w-full h-[54px]"
-              type="text"
-              disabled={!editMode ? true : false}
-              readOnly
+              className={`block px-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm bg-white border-secondaryThirty w-full h-[54px]`}
+            >
+              {hours.map((h) => {
+                return <option value={h.label}>{h.value}</option>;
+              })}
+            </select>
+
+            <select
+              onChange={(e) => handleInputChange(e.target.value, index, "close")}
+              disabled={!entry.checked ? true : false}
               value={entry.close}
-              onClick={() => {
-                setTimePickType(`${index}-close`);
-                setTimeModal(true);
-              }}
-              // onChange={(e) => handleInputChange(e, index, "close")}
-            />
+              className={`block px-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm bg-white border-secondaryThirty w-full h-[54px]`}
+            >
+              {hours.map((h) => {
+                return <option value={h.label}>{h.value}</option>;
+              })}
+            </select>
           </React.Fragment>
         ))}
       </div>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="flex items-center gap-1 mt-10">
           <div className="font-PJSbold text-xl">Holidays</div>
-          <button>
-            <img src={assets.Info} className="w-[20px] h-[20px]" alt="Info" />
-          </button>
         </div>
-        <div className="relative mt-5">
-          <div className="relative">
-            <input
+
+        <div className="block px-4 pb-4 border rounded-lg shadow-sm focus:outline-none bg-white border-secondaryThirty w-full mt-4">
+          <label
+            htmlFor="holidays"
+            className="text-secondary font-PJSmedium text-xs"
+          >
+            Holidays*
+          </label>
+          <div className="flex items-center gap-1 w-full">
+            {/* Add margin-top to textarea to create space for the label */}
+            <textarea
               onClick={() => setDateModal(true)}
               {...register("holidays")}
-              value={selectedDates
-                .map((sd) => moment(sd).format("yyyy-MM-DD"))
-                .join(",")}
-              className="block px-4 pt-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm bg-white border-secondaryThirty w-full h-[54px]"
-              type="text"
+              value={holidays}
+              className="font-PJSmedium text-sm w-full resize-y my-2" // Allow vertical resizing
+              style={{ minHeight: "40px", height: "auto" }} // Set a min height and allow height to grow
               readOnly
             />
             {selectedDates.length > 0 && (
               <button
                 type="button"
-                onClick={() => setSelectedDates([])} // Clear the dates
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary hover:text-red-500 focus:outline-none"
+                onClick={() => {
+                  setSelectedDates([]); // Clear the dates
+                }}
+                className="transform -translate-y-1/2 text-secondary hover:text-red-500 focus:outline-none"
               >
                 X
               </button>
             )}
           </div>
-          <label
-            htmlFor="holidays"
-            className="absolute top-2 left-4 text-secondary font-PJSmedium text-xs"
-          >
-            Holidays*
-          </label>
           {errors.holidays && (
             <p className="text-red-500">{errors.holidays.message}</p>
           )}
         </div>
+
         <div className="flex mt-5 gap-4 w-full justify-center font-PJSMedium items-center">
           <button className="w-full transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full bg-secondaryTen font-PJSmedium justify-center items-center">
             Cancel
@@ -299,41 +449,12 @@ const HrsOperation = () => {
         onClose={() => {
           setDateModal(!dateModal);
         }}
+        dates={selectedDates}
         selectedDate={null}
         handleDataChange={handleSingleDateChange}
         onApply={() => setDateModal(!dateModal)}
+        renderDayContent={renderDayContent}
       />
-
-      {timeModal && (
-        <TimePickerModal
-          isOpen={timeModal}
-          onClose={() => {
-            setTimeModal(!timeModal);
-            setTimePickType(null);
-            tempTime.current = null;
-          }}
-          selectedTime={
-            timePickType
-              ? days[parseInt(timePickType.split("-")[0])][
-                  timePickType.split("-")[1]
-                ]
-              : null
-          }
-          handleTimeChange={(e) => {
-            tempTime.current = e;
-          }}
-          onApply={() => {
-            handleInputChange(
-              tempTime.current,
-              parseInt(timePickType.split("-")[0]),
-              timePickType.split("-")[1]
-            );
-            setTimeModal(!timeModal);
-            tempTime.current = null;
-            setTimePickType(null);
-          }}
-        />
-      )}
 
       <Toast open={open} setOpen={setOpen} message={message} type={type} />
     </div>

@@ -23,8 +23,23 @@ import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
 import { getAllBookings } from "../../../api/services/bookingService";
 
+const getStartAndEndOfWeek = () => {
+  const today = new Date();
+  const start = new Date(today);
+  start.setDate(today.getDate() - today.getDay() + 1); // Set to Monday
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date(today);
+  end.setDate(today.getDate() - today.getDay() + 7); // Set to Sunday
+  end.setHours(23, 59, 59, 999);
+
+  return { start, end };
+};
+
 const SalesReport = () => {
-  const { currentFacility } = useStateContext();
+  const { currentFacility, setCurrentFacility, myFacilities } =
+    useStateContext();
+  const [isFacilityModalOpen, setFacilityModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [newBookingSalesModal, setNewBookingSalesModal] = useState(false);
@@ -40,10 +55,11 @@ const SalesReport = () => {
   const [selectedExportOption, setSelectedExportOption] = useState(null);
 
   const [isDateModalOpen, setIsDateModalOpen] = useState(false);
+  const { start, end } = getStartAndEndOfWeek();
   const [dateRangeBookings, setDateRangeBookings] = useState([
     {
-      startDate: new Date(),
-      endDate: new Date(),
+      startDate: start,
+      endDate: end,
       key: "selection",
     },
   ]);
@@ -283,10 +299,80 @@ const SalesReport = () => {
 
   return (
     <>
+      {/* Facility selection UI */}
       <div className="">
-        <p className="font-PJSextra text-3xl text-primary">
-          {currentFacility ? currentFacility.name : ""}
-        </p>
+        {/* Facility selection dropdown and modal */}
+        <div className="relative">
+          <p
+            onClick={() => setFacilityModalOpen(true)}
+            className="font-PJSextra text-3xl text-primary inline-flex items-center gap-3 cursor-pointer"
+          >
+            {currentFacility ? currentFacility.name : ""}
+            <img
+              src={assets.down}
+              className="w-6"
+              alt="Expand facility options"
+            />
+          </p>
+          <AppModal
+            modalopen={isFacilityModalOpen}
+            onClose={() => setFacilityModalOpen(false)}
+            width="25rem"
+            customStyles={{
+              overlay: { position: "fixed", top: 0, left: 0, right: 0 },
+              modal: {
+                position: "absolute",
+                top: "30%",
+                left: "30%",
+                transform: "translate(-50%, -50%)",
+                margin: "0",
+              },
+            }}
+          >
+            <div>
+              <p
+                className="text-lg font-PJSbold mt-3"
+                style={{ overflowY: "auto" }}
+              >
+                Select a facility
+              </p>
+              {myFacilities.map((facility) => {
+                return (
+                  <div
+                    className="flex items-center justify-between mt-6 cursor-pointer"
+                    onClick={() => {
+                      setCurrentFacility(facility);
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={
+                          facility &&
+                          facility.icon &&
+                          facility.icon !== null &&
+                          facility.icon !== ""
+                            ? facility.icon
+                            : assets.placeholder
+                        }
+                        alt="Club"
+                        className="w-8 h-8 rounded-full"
+                      />
+                      <p className="text-sm font-PJSregular">{facility.name}</p>
+                    </div>
+                    {currentFacility &&
+                      currentFacility._id === facility._id && (
+                        <img
+                          src={assets.CheckCircle}
+                          className="w-6"
+                          alt="Selected"
+                        />
+                      )}
+                  </div>
+                );
+              })}
+            </div>
+          </AppModal>
+        </div>
         <p className="font-PJSregular text-sm text-secondary mt-2">
           Elevate your soccer experience
         </p>
