@@ -53,11 +53,11 @@ const CommunicationHistory = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen p-4">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen p-4">
+      <div style={{ width: "100%" }}>
         <h1 className="text-2xl font-semibold mb-6">Communication History</h1>
         {communicationData.length > 0 && (
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white rounded-lg shadow-md p-2">
             {communicationData.map((item, index) => (
               <div key={index} className="border-b pb-4 mb-4">
                 <div className="flex justify-between items-center mb-2">

@@ -21,7 +21,7 @@ import { useNavigate } from "react-router-dom";
 import DateRangeModal from "../../../components/DateRangeModal/DateRangeModal";
 
 const Section = ({ title, children, date, onDateClick, onTitleClick }) => (
-  <div className="md:w-1/2 w-full h-[400px] rounded-xl bg-white shadow-sm drop-shadow-sm p-4">
+  <div className="md:w-1/2 w-full h-full rounded-xl bg-white shadow-sm drop-shadow-sm p-4">
     <div className="flex items-center justify-between">
       <p
         className="text-2xl text-primary font-PJSextra cursor-pointer"

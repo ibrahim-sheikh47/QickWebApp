@@ -192,7 +192,7 @@ const SalesBar = () => {
   };
 
   return (
-    <div className="flex flex-col items-center mt-4 cursor-pointer max-w-full">
+    <div className="flex flex-col items-center  my-6 cursor-pointer max-w-full">
       <Bar data={data} options={options} />
       <button
         className="flex justify-center items-center py-2 absolute bottom-0 my-1"
@@ -303,7 +303,7 @@ const UsersChart = () => {
   };
 
   return (
-    <div className="flex flex-col items-center mt-4 cursor-pointer max-w-full">
+    <div className="flex flex-col items-center my-6 cursor-pointer max-w-full">
       <Line data={data} options={options} />
       <button
         onClick={handleNavigation}
@@ -423,7 +423,7 @@ const CreditHolderChart = () => {
   };
 
   return (
-    <div className="flex flex-col items-center mt-4 cursor-pointer max-w-full">
+    <div className="flex flex-col items-center my-6 cursor-pointer max-w-full">
       <Line data={data} options={options} />
       <button
         onClick={handleNavigation}
@@ -526,7 +526,7 @@ const EventBar = ({ labels, values, isEvent = true }) => {
   };
 
   return (
-    <div className="flex flex-col items-center mt-4 cursor-pointer max-w-full">
+    <div className="flex flex-col items-center my-6 cursor-pointer max-w-full">
       <Bar data={data} options={options} />
       <button
         className="flex justify-center items-center py-2 absolute bottom-0 my-1"

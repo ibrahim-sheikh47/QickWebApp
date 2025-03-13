@@ -347,10 +347,10 @@ const Chats = () => {
   };
 
   return (
-    <div className=" min-h-full min-w-full flex justify-center items-center  ">
+    <div className=" min-h-full min-w-full flex justify-center items-center">
       {screenstate === 1 ? (
         <>
-          <div className="flex flex-col w-[500px] h-[750px] bg-white rounded-l-[16px]">
+          <div className="flex flex-col w-[30vw] h-[90vh] bg-white rounded-l-[16px]">
             <div className="flex justify-between items-center px-4 mt-6 font-PJSbold text-[24px] h-[100px] w-full border-b-[1px] border-secondaryTwenty ">
               <div className="flex flex-col justify-center">
                 <div className="flex items-center gap-1">
@@ -364,7 +364,7 @@ const Chats = () => {
                   </div> */}
               </div>
               {/* icons search and new chat */}
-              <div className="flex flex-row justify-end items-center gap-3 w-[70%] ">
+              <div className="flex flex-row justify-end items-center gap-3 w-[60%] ">
                 <button className="flex justify-center items-center rounded-[100px]  ">
                   <form action="" className="relative mx-auto w-max">
                     <input
@@ -447,6 +447,10 @@ const Chats = () => {
                       }}
                       key={index}
                       className="flex justify-between px-4 hover:bg-secondaryTen cursor-pointer py-2"
+                      style={{
+                        borderBottomColor: "#e2e2e2",
+                        borderBottomWidth: 1,
+                      }}
                     >
                       <div className="flex gap-4">
                         {/* image div */}
@@ -496,6 +500,10 @@ const Chats = () => {
                   <div
                     key={index}
                     className={`flex justify-between px-4 hover:bg-secondaryTen cursor-pointer py-2 gap-4`}
+                    style={{
+                      borderBottomColor: "#e2e2e2",
+                      borderBottomWidth: 1,
+                    }}
                   >
                     <div>
                       {/* Adjust the path to be relative to the current file */}
@@ -528,7 +536,7 @@ const Chats = () => {
             </div>
           </div>
 
-          <div className="w-[700px] h-[750px] bg-chatbackground relative rounded-r-[16px]">
+          <div className="w-[60vw] h-[90vh] bg-chatbackground relative rounded-r-[16px]">
             {userToChat && (
               <div className="flex flex-col items-center h-full">
                 {/* Chat Header */}
@@ -669,7 +677,7 @@ const Chats = () => {
         </>
       ) : (
         <>
-          <div className="flex flex-col w-[500px] h-[750px] bg-white rounded-l-[16px] border-r-[1px] border-secondaryTen">
+          <div className="flex flex-col w-[35vw] h-[90vh] bg-white rounded-l-[16px] border-r-[1px] border-secondaryTen">
             <div className="flex justify-between px-4 mt-6 pb-6 font-PJSbold text-[24px] h-[100px] w-full border-b-[1px] border-secondaryTwenty ">
               <div className="flex flex-col justify-center w-[400px]  ">
                 <div
@@ -697,7 +705,7 @@ const Chats = () => {
                 </div>
               </div>
               {/* icons search and new chat */}
-              <div className="flex flex-row justify-end items-center gap-3 w-[70%] ">
+              <div className="flex flex-row justify-end items-center gap-3 w-[60%] ">
                 <button className="flex justify-center items-center rounded-[100px]  ">
                   <form action="" className="relative mx-auto w-max">
                     <input
@@ -759,7 +767,14 @@ const Chats = () => {
             {/* Recent and 3 icons filter etc */}
             <div className="overflow-y-scroll flex flex-col gap-5 mt-4 scrollbar-hide">
               {users.map((item, index) => (
-                <div key={index} className="flex justify-between px-4 py-2">
+                <div
+                  key={index}
+                  className="flex justify-between px-4 py-2"
+                  style={{
+                    borderBottomColor: "#e2e2e2",
+                    borderBottomWidth: 1,
+                  }}
+                >
                   <div className="flex gap-4">
                     {/* image div */}
                     <div>
@@ -816,7 +831,7 @@ const Chats = () => {
             </div>
           </div>
 
-          <div className="flex flex-col w-[700px] h-[750px] bg-white rounded-r-[16px]">
+          <div className="flex flex-col w-[70vw] h-[90vh] bg-white rounded-r-[16px]">
             <div className="flex justify-between px-6 mt-6 pb-6 font-PJSbold text-[24px] w-full border-b-[1px] border-secondaryTwenty ">
               <div className="flex flex-col justify-center w-full">
                 {/* Placeholder for no selected users */}

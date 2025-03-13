@@ -315,9 +315,6 @@ const Dashboard = () => {
         {/* Main Content */}
         <main className="flex-1">
           <div className="py-6">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              {/* Optional Heading or Content */}
-            </div>
             <div className="mx-auto px-4 sm:px-6 lg:px-4 w-full">
               <Outlet />
             </div>
