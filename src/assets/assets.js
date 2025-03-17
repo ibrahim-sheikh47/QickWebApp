@@ -80,6 +80,7 @@ import tournament from "../assets/svgs/tournament.svg";
 import other from "../assets/svgs/other.svg";
 import event from "../assets/svgs/event.svg";
 import closure from "../assets/svgs/closure.svg";
+import add from "../assets/svgs/add.svg";
 import academy from "../assets/svgs/academy.svg";
 import recurring from "../assets/svgs/recurring.svg";
 import newBooking from "../assets/svgs/new_booking.svg";
@@ -129,6 +130,7 @@ import closeRed from "../assets/svgs/closeRed.svg";
 import UsersThree from "../assets/svgs/UsersThree.svg";
 
 export default {
+  add,
   star,
   UsersThree,
   yellowCard,

@@ -127,13 +127,15 @@ html {
   height: 60px; /* Set this to your preferred height for each time slot */
   background-color: #f7f7f7;
   width: 5.5rem;
+  font-family: "PJSmedium";
+  color: gray;
 }
 
 /* If you also want to increase the overall row height for each hour,
    you may want to adjust .rbc-timeslot-group */
 .rbc-timeslot-group {
   height: auto;
-  min-height: 60px; /* Ensure the time slot group can expand properly */
+  min-height: 2.8rem; /* Ensure the time slot group can expand properly */
 }
 
 .rbc-events-container,
@@ -198,8 +200,6 @@ html {
   color: #000; /* Text color for tags */
 }
 
-
-
 /* Center the arrow */
 .custom-select .ant-select-arrow {
   margin: 11px 0 !important;
@@ -218,11 +218,46 @@ html {
 }
 
 .custom-calendar .rdrDaySelected {
-  background-color: #33C0DB !important; /* Highlight selected dates */
+  background-color: #33c0db !important; /* Highlight selected dates */
   color: white !important;
   font-weight: bold;
 }
 
 .custom-calendar .rdrDay:hover {
-  background-color: #B3E5FC !important; /* Light blue hover effect */
+  background-color: #b3e5fc !important; /* Light blue hover effect */
+}
+
+.scroll-container {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 0 1rem;
+  gap: 1rem;
+}
+
+.day-button {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.day-button.selected {
+  background: #9cfc38;
+}
+
+.today-indicator {
+  width: 6px;
+  height: 6px;
+  background: #33c0db;
+  border-radius: 50%;
+  margin-top: 4px;
 }

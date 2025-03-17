@@ -1,17 +1,62 @@
 import React, { useEffect, useState } from "react";
-import { Input, List, Avatar, Button } from "antd";
-import { CloseOutlined } from "@ant-design/icons";
+import { Input, List, Avatar, Button, Tabs } from "antd";
+import { CloseOutlined, SearchOutlined } from "@ant-design/icons";
 import { getAllTeamsAndUsers } from "../../api/services/socialService";
 import AppModal from "../AppModal/AppModal";
+import assets from "../../assets/assets";
 
-const AddUserOrTeamModal = ({ isVisible, onClose, onNext, setLoading }) => {
+const { TabPane } = Tabs;
+
+const AddUserOrTeamModal = ({
+  isVisible,
+  onClose,
+  onNext,
+  selectedTeamData,
+  selectedUsersData,
+  setLoading,
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [allTeamsAndUsers, setAllTeamsAndUsers] = useState([]);
-  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [activeTab, setActiveTab] = useState("teams");
+  const [selectedUsers, setSelectedUsers] = useState(
+    selectedUsersData.map((u) => u._id)
+  );
+  const [selectedTeam, setSelectedTeam] = useState(selectedTeamData);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [filteredTeams, setFilteredTeams] = useState([]);
+  const [usersList, setUsersList] = useState([]);
+  const [teamsList, setTeamsList] = useState([]);
 
   useEffect(() => {
     fetchAllTeamsAndUser();
   }, []);
+
+  useEffect(() => {
+    if (allTeamsAndUsers.length > 0) {
+      setUsersList(allTeamsAndUsers.filter((item) => item.isUser));
+      setTeamsList(allTeamsAndUsers.filter((item) => !item.isUser));
+    }
+  }, [allTeamsAndUsers]);
+
+  useEffect(() => {
+    if (usersList.length > 0) {
+      setFilteredUsers(
+        usersList.filter((item) =>
+          item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    }
+  }, [usersList, searchTerm]);
+
+  useEffect(() => {
+    if (teamsList.length > 0) {
+      setFilteredTeams(
+        teamsList.filter((item) =>
+          item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    }
+  }, [teamsList, searchTerm]);
 
   const fetchAllTeamsAndUser = async () => {
     setLoading(true);
@@ -39,139 +84,250 @@ const AddUserOrTeamModal = ({ isVisible, onClose, onNext, setLoading }) => {
   };
 
   const handleSubmit = () => {
-    const selectedData = allTeamsAndUsers.filter((user) =>
+    const selectedData = usersList.filter((user) =>
       selectedUsers.includes(user._id)
     );
-    onNext({ selectedUsers: selectedData });
+    onNext({ selectedTeam, selectedUsers: selectedData });
   };
-
-  const filteredList = allTeamsAndUsers.filter((item) =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <AppModal
       modalopen={isVisible}
       onClose={onClose}
       height="auto"
-      width="40rem"
+      width="30rem"
       customStyles={{
         overlay: { position: "fixed" },
-        modal: { position: "absolute" },
+        modal: { position: "absolute", borderRadius: "30px" },
       }}
     >
-      <div style={{ padding: "1rem" }}>
-        <h1
-          style={{
-            fontWeight: "600",
-            fontSize: "1.25rem",
-            marginBottom: "1rem",
-          }}
-        >
-          Add a user or a team
-        </h1>
+      <div>
+        <h1 className="text-[16px] mb-2 font-PJSbold">Add a user or a team</h1>
 
         <Input
+          className="font-PJSmedium mb-2 rounded-full text-[12px]"
           placeholder="Search for a user/team"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          suffix={<SearchOutlined />}
           style={{
-            marginBottom: "1rem",
-            borderRadius: "25px",
-            padding: "0.75rem",
-            fontSize: "1rem",
+            padding: "0.4rem 0.7rem",
           }}
         />
 
-        {selectedUsers.length > 0 && (
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "0.5rem",
-              marginBottom: "1rem",
-            }}
-          >
-            {allTeamsAndUsers
-              .filter((user) => selectedUsers.includes(user._id))
-              .map((user) => (
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "0.5rem 0.75rem",
-                    backgroundColor: "#e6f7ff",
-                    borderRadius: "25px",
-                    fontSize: "0.9rem",
-                    fontWeight: "500",
-                  }}
-                >
-                  <Avatar
-                    src={user.avatar}
-                    style={{ marginRight: "0.2rem" }}
-                    size="small"
-                  />
+        {/* **Selected Users/Teams Section** */}
+        {(selectedUsers.length > 0 || selectedTeam !== null) && (
+          <div>
+            {selectedTeam !== null && (
+              <div
+                key={selectedTeam._id}
+                style={{
+                  display: "inline-flex",
+                  width: "fit-content",
+                  alignItems: "center",
+                  padding: "0.2rem 0.35rem",
+                  backgroundColor: "#f4f4f4",
+                  borderRadius: "25px",
+                  borderWidth: "1px",
+                }}
+              >
+                <Avatar src={selectedTeam.cover} size="small" />
+                <span className="font-PJSbold text-[10px] mr-1">
+                  <i>{`${selectedTeam.name} (T-${selectedTeam._id.substring(
+                    selectedTeam._id.length - 2
+                  )})${
+                    selectedTeam.admins.length > 0
+                      ? ` (Admin: ${
+                          selectedTeam.admins[0].name
+                        } ID-${selectedTeam.admins[0]._id.substring(
+                          selectedTeam.admins[0]._id.length - 2
+                        )})`
+                      : ""
+                  }`}</i>
+                </span>
 
-                  <span
+                <div className="flex justify-center items-center bg-lime w-[18px] h-[18px] rounded-full">
+                  <img src={assets.checkblack} className="w-[12px] h-[12px]" />
+                </div>
+              </div>
+            )}
+            <div className="flex flex-wrap gap-1 mt-1 max-h-[4.5rem] overflow-x-auto">
+              {usersList
+                .filter((user) => selectedUsers.includes(user._id))
+                .map((user) => (
+                  <div
                     key={user._id}
+                    className="gap-1"
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "0.5rem",
-                      fontSize: "0.75rem",
-                      fontWeight: "500",
+                      padding: "0.2rem 0.35rem",
+                      backgroundColor: "#f4f4f4",
+                      borderRadius: "25px",
+                      borderWidth: "1px",
                     }}
                   >
-                    {user.name}
-                    <CloseOutlined
-                      onClick={() => handleRemove(user._id)}
-                      style={{ cursor: "pointer", color: "#000" }}
+                    <Avatar
+                      src={user.avatar}
+                      style={{ marginRight: "0.2rem" }}
+                      size="small"
                     />
-                  </span>
-                </div>
-              ))}
+                    <span className="font-PJSbold text-[10px]">
+                      <i>{`${user.name} (ID-${user._id.substring(
+                        user._id.length - 5
+                      )})`}</i>
+                    </span>
+
+                    <div className="flex justify-center items-center bg-lime w-[18px] h-[18px] rounded-full">
+                      <img
+                        src={assets.checkblack}
+                        className="w-[12px] h-[12px]"
+                      />
+                    </div>
+                  </div>
+                ))}
+            </div>
           </div>
         )}
 
-        <List
-          dataSource={filteredList}
-          renderItem={(item) => (
-            <List.Item
-              onClick={() => handleSelect(item._id)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                padding: "0.5rem 1rem",
-                borderBottom: "1px solid #f0f0f0",
-                cursor: "pointer",
-                backgroundColor: selectedUsers.includes(item._id)
-                  ? "#f0f5ff"
-                  : "transparent",
-                borderRadius: "8px",
-                marginBottom: "0.5rem",
-              }}
-            >
-              <Avatar
-                src={item.avatar}
-                style={{ marginRight: "1rem" }}
-                size="small"
-              />
-              <div style={{ fontWeight: "500", fontSize: "1rem", flex: 1 }}>
-                {item.name}
-              </div>
-            </List.Item>
-          )}
-          bordered={false}
-          style={{ maxHeight: "300px", overflowY: "auto" }}
-        />
+        {/* **Tabs for Users & Teams** */}
+        <Tabs activeKey={activeTab} onChange={setActiveTab}>
+          {/* Teams Tab */}
+          <TabPane tab="Teams" key="teams">
+            <List
+              dataSource={filteredTeams}
+              renderItem={(item) => (
+                <List.Item
+                  key={item._id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "0.5rem 1rem",
+                    borderBottom: "1px solid #f0f0f0",
+                    cursor: "pointer",
+                    borderRadius: "8px",
+                    marginBottom: "0.5rem",
+                    gap: "8px",
+                  }}
+                >
+                  <Avatar src={item.cover} size="small" />
+                  <div style={{ flex: 1 }}>
+                    <div
+                      className="font-PJSbold text-[12px] flex items-center"
+                      style={{ flex: 1 }}
+                    >
+                      {`${item.name} (T-${item._id.substring(
+                        item._id.length - 2
+                      )})`}
+                      <div className="font-PJSregular text-[9px] ml-1">{`(${item.members.length} members)`}</div>
+                    </div>
 
+                    <div className="font-PJSmedium text-[10px]">
+                      {item.admins.length > 0
+                        ? `Admin: ${
+                            item.admins[0].name
+                          } (ID-${item.admins[0]._id.substring(
+                            item.admins[0]._id.length - 2
+                          )})`
+                        : ""}
+                    </div>
+                  </div>
+
+                  <button
+                    className={`h-6 w-6 border rounded-full flex justify-center items-center font-PJSregular text-white text-[12px] ${
+                      selectedTeam && selectedTeam._id === item._id
+                        ? "bg-blue"
+                        : "bg-transparent"
+                    }`}
+                    onClick={() => setSelectedTeam(item)}
+                  >
+                    {selectedTeam && selectedTeam._id === item._id ? (
+                      <img src={assets.checkwhite} />
+                    ) : null}
+                  </button>
+                </List.Item>
+              )}
+              bordered={false}
+              style={{ maxHeight: "300px", overflowY: "auto" }}
+            />
+          </TabPane>
+
+          {/* Users Tab */}
+          <TabPane tab="Users" key="users">
+            <List
+              dataSource={filteredUsers}
+              renderItem={(item) => (
+                <List.Item
+                  key={item._id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "0.5rem 1rem",
+                    borderBottom: "1px solid #f0f0f0",
+                    cursor: "pointer",
+                    borderRadius: "8px",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  <Avatar
+                    src={item.avatar}
+                    style={{ marginRight: "1rem" }}
+                    size="small"
+                  />
+                  <div style={{ flex: 1 }}>
+                    <div className="font-PJSbold text-[12px]">
+                      {`${item.name} (ID-${item._id.substring(
+                        item._id.length - 5
+                      )})`}
+                    </div>
+
+                    <div className="font-PJSmedium text-[10px]">
+                      {item.email}
+                    </div>
+                  </div>
+
+                  <button
+                    className={`h-6 w-6 border rounded-full flex justify-center items-center font-PJSregular text-white text-[12px] ${
+                      selectedUsers.some((i) => i === item._id)
+                        ? "bg-blue"
+                        : "bg-transparent"
+                    }`}
+                    onClick={() => {
+                      const isSelected = selectedUsers.some(
+                        (i) => i === item._id
+                      );
+                      if (isSelected) {
+                        handleRemove(item._id);
+                      } else {
+                        handleSelect(item._id);
+                      }
+                    }}
+                  >
+                    {selectedUsers.some((i) => i === item._id) ? (
+                      <img src={assets.checkwhite} />
+                    ) : null}
+                  </button>
+                </List.Item>
+              )}
+              bordered={false}
+              style={{ maxHeight: "300px", overflowY: "auto" }}
+            />
+          </TabPane>
+        </Tabs>
+
+        {/* **Footer Buttons** */}
         <div style={{ display: "flex", gap: "1rem", marginTop: "1.5rem" }}>
           <Button
-            onClick={onClose}
+            onClick={() => {
+              setSelectedTeam(null);
+              setSelectedUsers([]);
+              setActiveTab("teams");
+              onClose();
+            }}
             style={{
               flex: 1,
               borderRadius: "25px",
-              padding: "1rem",
+              padding: "1.5rem",
               fontWeight: "500",
             }}
           >
@@ -179,12 +335,12 @@ const AddUserOrTeamModal = ({ isVisible, onClose, onNext, setLoading }) => {
           </Button>
           <Button
             type="primary"
-            disabled={selectedUsers.length === 0}
+            disabled={selectedUsers.length === 0 && selectedTeam === null}
             onClick={handleSubmit}
             style={{
               flex: 1,
               borderRadius: "25px",
-              padding: "1rem",
+              padding: "1.5rem",
               backgroundColor: "#9CFC38",
               color: "#000",
               fontWeight: "600",

@@ -1,9 +1,5 @@
 /* eslint-disable react/prop-types */
-import React from "react";
-import { GrFormClose } from "react-icons/gr";
-
-//svg
-import cross from "../../assets/svgs/Cross.svg";
+import React, { useEffect, useRef, useState } from "react";
 
 const AppModal = ({
   onClose,
@@ -13,14 +9,33 @@ const AppModal = ({
   width,
   customStyles,
 }) => {
+  const modalContentRef = useRef(null);
+  const [hasScrollbar, setHasScrollbar] = useState(false);
+
+  useEffect(() => {
+    const checkScrollbar = () => {
+      if (modalContentRef.current) {
+        setHasScrollbar(
+          modalContentRef.current.scrollHeight >
+            modalContentRef.current.clientHeight
+        );
+      }
+    };
+
+    checkScrollbar();
+    window.addEventListener("resize", checkScrollbar);
+    return () => window.removeEventListener("resize", checkScrollbar);
+  }, [children]);
+
   if (!modalopen) return null;
+
   const handleModalContentClick = (e) => {
     e.stopPropagation();
   };
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center z-50  "
+      className="fixed inset-0 flex items-center justify-center z-50"
       style={customStyles?.overlay}
       onClick={onClose}
     >
@@ -29,19 +44,24 @@ const AppModal = ({
         onClick={() => {}}
       ></div>
       <div
-        className={`relative z-10 bg-white p-6 rounded-[16px] shadow-lg   no-scrollbar  overscroll-none`}
-        style={{ height: height, width: width, ...customStyles?.modal }}
+        className="relative z-10 bg-white p-6 shadow-lg rounded-[16px]"
+        style={{
+          height: height,
+          width: width,
+          ...customStyles?.modal,
+        }}
         onClick={handleModalContentClick}
       >
-        <div className="absolute top-0 right-0 mt-4 mr-4">
-          <button
-            className="text-gray-500 hover:text-gray-800 focus:outline-none"
-            onClick={onClose}
-          >
-            <img src={cross} />
-          </button>
+        <div
+          ref={modalContentRef}
+          style={{
+            scrollbarWidth: "thin",
+            paddingInlineEnd: hasScrollbar ? "8px" : "0px", // Adjust padding when scrollbar is present
+          }}
+          className="max-h-[80vh] overflow-y-auto scrollbar scrollbar-thumb-gray-500 scrollbar-track-gray-200"
+        >
+          {children}
         </div>
-        {children}
       </div>
     </div>
   );

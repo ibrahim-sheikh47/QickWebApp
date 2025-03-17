@@ -15,6 +15,7 @@ function DatePickerModal({
   disabledDates,
   onApply,
   renderDayContent,
+  showButtons = true,
 }) {
   return (
     <AppModal
@@ -39,20 +40,22 @@ function DatePickerModal({
         range={dates}
         // className="custom-calendar"
       />
-      <div className="flex gap-4 w-full justify-center font-PJSMedium items-center ">
-        <button
-          className="w-full transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full bg-secondaryTen font-PJSmedium justify-center items-center"
-          onClick={onClose}
-        >
-          Cancel
-        </button>
-        <button
-          className="w-full transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full bg-lime font-PJSmedium justify-center items-center"
-          onClick={onApply}
-        >
-          Apply
-        </button>
-      </div>
+      {showButtons && (
+        <div className="flex gap-4 w-full justify-center font-PJSMedium items-center ">
+          <button
+            className="w-full transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full bg-secondaryTen font-PJSmedium justify-center items-center"
+            onClick={onClose}
+          >
+            Cancel
+          </button>
+          <button
+            className="w-full transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full bg-lime font-PJSmedium justify-center items-center"
+            onClick={onApply}
+          >
+            Apply
+          </button>
+        </div>
+      )}
     </AppModal>
   );
 }

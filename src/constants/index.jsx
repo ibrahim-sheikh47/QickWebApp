@@ -109,6 +109,131 @@ export const exportAsExcel = (bookings) => {
 
 export const DATE_FORMAT = "yyyy-MM-DD";
 
+export const hours = [
+  {
+    label: "",
+    value: "Select Time",
+  },
+  {
+    label: "12:00 AM",
+    value: "12:00 AM",
+  },
+  {
+    label: "1:00 AM",
+    value: "1:00 AM",
+  },
+  {
+    label: "2:00 AM",
+    value: "2:00 AM",
+  },
+  {
+    label: "3:00 AM",
+    value: "3:00 AM",
+  },
+  {
+    label: "4:00 AM",
+    value: "4:00 AM",
+  },
+  {
+    label: "5:00 AM",
+    value: "5:00 AM",
+  },
+  {
+    label: "6:00 AM",
+    value: "6:00 AM",
+  },
+  {
+    label: "7:00 AM",
+    value: "7:00 AM",
+  },
+  {
+    label: "8:00 AM",
+    value: "8:00 AM",
+  },
+  {
+    label: "9:00 AM",
+    value: "9:00 AM",
+  },
+  {
+    label: "10:00 AM",
+    value: "10:00 AM",
+  },
+  {
+    label: "11:00 AM",
+    value: "11:00 AM",
+  },
+  {
+    label: "12:00 PM",
+    value: "12:00 PM",
+  },
+  {
+    label: "1:00 PM",
+    value: "1:00 PM",
+  },
+  {
+    label: "2:00 PM",
+    value: "2:00 PM",
+  },
+  {
+    label: "3:00 PM",
+    value: "3:00 PM",
+  },
+  {
+    label: "4:00 PM",
+    value: "4:00 PM",
+  },
+  {
+    label: "5:00 PM",
+    value: "5:00 PM",
+  },
+  {
+    label: "6:00 PM",
+    value: "6:00 PM",
+  },
+  {
+    label: "7:00 PM",
+    value: "7:00 PM",
+  },
+  {
+    label: "8:00 PM",
+    value: "8:00 PM",
+  },
+  {
+    label: "9:00 PM",
+    value: "9:00 PM",
+  },
+  {
+    label: "10:00 PM",
+    value: "10:00 PM",
+  },
+  {
+    label: "11:00 PM",
+    value: "11:00 PM",
+  },
+];
+
+export const bookingHours = () => {
+  const times = [];
+  let currentTime = new Date();
+  currentTime.setHours(0, 0, 0, 0); // Start at 12:00 AM
+
+  for (let i = 0; i < 96; i++) {
+    const hours = currentTime.getHours();
+    const minutes = currentTime.getMinutes();
+    const formattedTime = currentTime.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+
+    times.push({ label: formattedTime, value: formattedTime });
+
+    currentTime.setMinutes(currentTime.getMinutes() + 15); // Increment by 15 mins
+  }
+
+  return times;
+};
+
 export const formattedDate = (date) => {
   return moment(date).format("yyyy-MM-DD");
 };

@@ -16,7 +16,7 @@ const MonthSelector = ({ currentDate, onMonthChange }) => {
   return (
     <div style={styles.container}>
       <button style={styles.button} onClick={handlePreviousMonth}>
-        <MdChevronLeft size={30} />
+        <MdChevronLeft size={20} />
       </button>
 
       <span className={"text-xl font-PJSbold"}>
@@ -24,7 +24,7 @@ const MonthSelector = ({ currentDate, onMonthChange }) => {
       </span>
 
       <button style={styles.button} onClick={handleNextMonth}>
-        <MdChevronRight size={30} />
+        <MdChevronRight size={20} />
       </button>
     </div>
   );
@@ -40,10 +40,10 @@ const styles = {
     padding: "10px",
   },
   button: {
-    fontSize: "18px",
+    fontSize: "12px",
     border: "none",
     outline: "none",
-    padding: "10px",
+    padding: "5px",
     cursor: "pointer",
     borderRadius: "5px",
     transition: "background-color 0.3s ease",
