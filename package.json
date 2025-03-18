@@ -44,6 +44,7 @@
     "react-time-picker": "^7.0.0",
     "react-toastify": "^11.0.3",
     "react-window": "^1.8.10",
+    "socket.io-client": "^4.8.1",
     "styled-components": "^6.1.11",
     "tailwind-scrollbar-hide": "^1.1.7",
     "xlsx": "^0.18.5",

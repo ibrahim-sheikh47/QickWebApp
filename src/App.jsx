@@ -1,5 +1,5 @@
 import { AppNavigation } from "./navigation/AppNavigation";
-import { StateContextProvider } from "./context";
+import { StateContextProvider, useStateContext } from "./context";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useEffect } from "react";
@@ -7,6 +7,7 @@ import { onMessage } from "firebase/messaging";
 import { messaging } from "./firebase";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { connectSocket, disconnectSocket } from "./utils/socket";
 
 function App() {
   useEffect(() => {
@@ -28,7 +29,9 @@ function App() {
       );
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   return (

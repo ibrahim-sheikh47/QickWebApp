@@ -7,17 +7,16 @@ import React, {
 } from "react";
 import moment from "moment";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
-import { colors } from "@mui/material";
 
 const HorizontalDaysList = React.memo(
-  ({ selectedMonth, onMonthCham, onDayChange }) => {
+  ({ selectedMonth, onDayChange }) => {
     const containerRef = useRef(null);
     const itemRef = useRef(null);
     const [selectedDay, setSelectedDay] = useState(
       moment(selectedMonth).date()
     );
 
-    console.log(selectedMonth.format("YYYY-MM"));
+    // console.log(selectedMonth.format("YYYY-MM"));
 
     // Keep track of the last scrolled-to day
     const lastDayRef = useRef(null);
@@ -172,9 +171,13 @@ const HorizontalDaysList = React.memo(
       </div>
     );
   },
-  (prev, next) =>
-    prev.selectedMonth.isSame(next.selectedMonth, "month") &&
-    prev.onDayChange === next.onDayChange
+  (prev, next) => {
+    console.log("React.memo Comparison Function Called");
+    console.log("Prev selectedMonth:", prev.selectedMonth.format("YYYY-MM"));
+    console.log("Next selectedMonth:", next.selectedMonth.format("YYYY-MM"));
+
+    return prev.selectedMonth.isSame(next.selectedMonth, "month");
+  }
 );
 
 const styles = {

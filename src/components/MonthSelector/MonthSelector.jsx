@@ -50,4 +50,6 @@ const styles = {
   },
 };
 
-export default MonthSelector;
+export default React.memo(MonthSelector, (prev, next) => {
+  return prev.currentDate.isSame(next.currentDate, "day");
+});

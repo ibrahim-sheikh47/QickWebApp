@@ -161,10 +161,14 @@ const AddBookingModal = ({
 
   const handleRecurringChange = (e) => {
     if (typeof e === "string") {
-      setRecurring(e !== "monthly" && e !== "");
+      setRecurring(e !== "monthly" && e !== "" && e !== "never");
       setRecurrence(e);
     } else {
-      setRecurring(e.target.value !== "monthly" && e.target.value !== "");
+      setRecurring(
+        e.target.value !== "monthly" &&
+          e.target.value !== "" &&
+          e.target.value !== "never"
+      );
       setRecurrence(e.target.value);
     }
   };
@@ -249,12 +253,19 @@ const AddBookingModal = ({
         }}
       >
         <Form form={form} layout="vertical">
-          <h1 style={{ fontWeight: "600", marginBottom: "1rem" }}>
-            {mode === "add" ? "Add Booking" : "Edit Booking"}
-          </h1>
+          <div className="flex items-center">
+            <h1 className="font-PJSbold text-[16px]">
+              {mode === "add" ? "Add Booking" : "Edit Booking"}
+            </h1>
+
+            {mode !== "add" && (
+              <label className="flex items-center ml-2 px-2 font-PJSbold text-[14px] h-[1.8rem] rounded-full bg-secondaryThirty">{`${initialValues.currency}${initialValues.totalAmount}`}</label>
+            )}
+          </div>
 
           {/* Booking Type */}
           <Form.Item
+            className="mt-2"
             name="type"
             initialValue="Add Users" // Default value
             rules={[
@@ -279,7 +290,11 @@ const AddBookingModal = ({
               >
                 <option value="">Select field</option>
                 {fields.map((field) => {
-                  return <option value={`${field._id}`}>{field.name}</option>;
+                  return (
+                    <option key={field._id} value={`${field._id}`}>
+                      {field.name}
+                    </option>
+                  );
                 })}
               </select>
             </div>
@@ -300,6 +315,7 @@ const AddBookingModal = ({
                 <option value="event">Event</option>
                 <option value="closure">Closure</option>
                 <option value="other">Other</option>
+                <option value="New Booking">New Booking</option>
               </select>
             </div>
           </div>
@@ -362,7 +378,7 @@ const AddBookingModal = ({
 
                     {/* <div onClick={() => setSelectedTeam(null)}>
                       <CloseOutlined />
-                    </div> */}  
+                    </div> */}
                   </div>
                 )}
                 <div className="flex flex-wrap gap-1 mt-1 max-h-[4.5rem] overflow-x-auto">
@@ -526,6 +542,7 @@ const AddBookingModal = ({
               className={`block px-4 border rounded-lg shadow-sm focus:outline-none font-PJSmedium text-sm bg-white border-secondaryThirty w-[17.5rem] h-[2.5rem]`}
             >
               <option value="">Select recurrence</option>
+              <option value="never">Never</option>
               <option value="weekly">Weekly</option>
               <option value="bi_weekly">Bi-Weekly</option>
               <option value="monthly">Monthly</option>

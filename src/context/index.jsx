@@ -14,7 +14,7 @@ export const StateContextProvider = ({ children }) => {
     () => JSON.parse(localStorage.getItem("user")) || null
   );
   const [fcmToken, setFCMToken] = useState(
-    () => localStorage.getItem("fcmToken") || null
+    () => JSON.parse(localStorage.getItem("fcmToken")) || null
   );
 
   // Save state to localStorage whenever it changes

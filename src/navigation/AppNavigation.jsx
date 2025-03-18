@@ -25,27 +25,36 @@ import {
   TeamDetail,
 } from "../pages";
 import CardDetailPage from "../pages/Dashboard/Events/CardDetailPage/CardDetailPage";
+import { useStateContext } from "../context";
+import { connectSocket, disconnectSocket } from "../utils/socket";
 export const AppNavigation = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1000);
+  const { user } = useStateContext();
 
   useEffect(() => {
+    if (user) {
+      connectSocket(user);
+    }
     const handleResize = () => {
       setIsMobile(window.innerWidth < 1000);
     };
 
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      disconnectSocket();
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
-  if (isMobile) {
-    return (
-      <div className="text-center items-center justify-center min-h-screen flex bg-secondary">
-        <p className="bg-black text-lime p-10 rounded-2xl text-2xl font-PJSbold">
-          SWITCH TO MOBILE APP
-        </p>
-      </div>
-    );
-  }
+  // if (isMobile) {
+  //   return (
+  //     <div className="text-center items-center justify-center min-h-screen flex bg-secondary">
+  //       <p className="bg-black text-lime p-10 rounded-2xl text-2xl font-PJSbold">
+  //         SWITCH TO MOBILE APP
+  //       </p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <Routes>

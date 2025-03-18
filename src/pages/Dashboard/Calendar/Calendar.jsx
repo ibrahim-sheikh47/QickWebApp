@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import BookingCard from "../../../components/BookingCard/BookingCard";
@@ -29,6 +35,8 @@ import {
 import { Modal, notification } from "antd";
 import assets from "../../../assets/assets";
 import AppModal from "../../../components/AppModal/AppModal";
+import { connectSocket, getSocket } from "../../../utils/socket";
+import { NEW_BOOKING } from "../../../utils/events";
 
 const locales = { "en-US": enUS };
 const localizer = dateFnsLocalizer({
@@ -41,36 +49,21 @@ const localizer = dateFnsLocalizer({
 
 const DragAndDropCalendar = withDragAndDrop(Calendar);
 
-const CustomToolbar = ({
-  currentDate,
-  onMonthChange,
-  onInfoPress,
-  onTodayChipPress,
-  onAddBooking,
-  selectedResource,
-  onResourceChange,
-  onDayChange,
-  resources,
-  selectedFieldOption,
-  setIsFieldModalOpen,
-  setBookingTypeOpen,
-  selectedBookingOption,
-}) => {
-  return (
-    <div className="rbc-toolbar">
-      <div
-        style={{
-          width: "100%",
-          backgroundColor: "#fff",
-          borderRadius: "8px",
-          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-          display: "flex",
-          flexDirection: "column",
-          fontFamily: "Arial, sans-serif",
-          transition: "all 0.3s ease",
-          overflowX: "auto",
-        }}
-      >
+const MonthAndDaysToolbar = React.memo(
+  ({
+    currentDate,
+    onMonthChange,
+    onInfoPress,
+    onTodayChipPress,
+    onAddBooking,
+    onDayChange,
+    selectedFieldOption,
+    setIsFieldModalOpen,
+    setBookingTypeOpen,
+    selectedBookingOption,
+  }) => {
+    return (
+      <>
         <div
           style={{
             display: "flex",
@@ -157,11 +150,64 @@ const CustomToolbar = ({
 
         <HorizontalDaysList
           selectedMonth={currentDate} // Pass the selected month
-          onMonthChange={onMonthChange}
           onDayChange={onDayChange}
         />
 
         <hr />
+      </>
+    );
+  },
+  (prev, next) => {
+    return (
+      prev.currentDate.isSame(next.currentDate, "day") &&
+      prev.selectedFieldOption === next.selectedFieldOption &&
+      prev.selectedBookingOption === next.selectedBookingOption
+    );
+  }
+);
+
+const CustomToolbar = ({
+  currentDate,
+  onMonthChange,
+  onInfoPress,
+  onTodayChipPress,
+  onAddBooking,
+  selectedResource,
+  onResourceChange,
+  onDayChange,
+  resources,
+  selectedFieldOption,
+  setIsFieldModalOpen,
+  setBookingTypeOpen,
+  selectedBookingOption,
+}) => {
+  return (
+    <div className="rbc-toolbar">
+      <div
+        style={{
+          width: "100%",
+          backgroundColor: "#fff",
+          borderRadius: "8px",
+          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+          display: "flex",
+          flexDirection: "column",
+          fontFamily: "Arial, sans-serif",
+          transition: "all 0.3s ease",
+          overflowX: "auto",
+        }}
+      >
+        <MonthAndDaysToolbar
+          currentDate={currentDate}
+          onMonthChange={onMonthChange}
+          onInfoPress={onInfoPress}
+          onTodayChipPress={onTodayChipPress}
+          onAddBooking={onAddBooking}
+          onDayChange={onDayChange}
+          selectedFieldOption={selectedFieldOption}
+          setIsFieldModalOpen={setIsFieldModalOpen}
+          setBookingTypeOpen={setBookingTypeOpen}
+          selectedBookingOption={selectedBookingOption}
+        />
 
         {/* Resource Tabs */}
         <div
@@ -173,6 +219,7 @@ const CustomToolbar = ({
         >
           {resources.map((resource, index) => (
             <div
+              key={`${index}`}
               className="flex"
               style={{
                 // ...(resource.label === "all" && { width: "4rem" }),
@@ -219,14 +266,14 @@ const CustomToolbar = ({
 };
 const MemoizedCustomToolbar = React.memo(CustomToolbar, (prev, next) => {
   return (
-    prev.currentDate === next.currentDate &&
+    prev.currentDate.isSame(next.currentDate, "day") &&
     prev.selectedResource === next.selectedResource &&
     prev.resources === next.resources
   );
 });
 
 const CalendarComponent = () => {
-  const { currentFacility, setCurrentFacility, myFacilities } =
+  const { user, currentFacility, setCurrentFacility, myFacilities } =
     useStateContext();
 
   const bookingTypes = [
@@ -278,7 +325,7 @@ const CalendarComponent = () => {
     return selectedResource === "all"
       ? memoizedResources.filter((r) => r.label !== "all")
       : memoizedResources.filter((r) => r.label === selectedResource);
-  }, [memoizedResources, selectedResource]);
+  }, [resources, selectedResource]);
 
   const handleMonthChange = useCallback((newDate) => {
     setCurrentDate(newDate);
@@ -288,12 +335,46 @@ const CalendarComponent = () => {
     setCurrentDate(moment(selectedDate));
   }, []);
 
-  const handleResourceChange = (resourceId) => {
+  const handleResourceChange = useCallback((resourceId) => {
     setSelectedResource(resourceId);
-  };
+  }, []);
 
   useEffect(() => {
+    const socket = connectSocket(user);
+
+    socket.on(NEW_BOOKING, (data) => {
+      const dataX = JSON.parse(data);
+      const booking = dataX.booking;
+
+      let newEvents;
+      const event = {
+        ...booking,
+        resourceId: booking.field._id,
+        start: new Date(booking.startDateTime),
+        end: new Date(booking.endDateTime),
+        title: `${capitalizeFirstLetter(booking.bookingType)} Event`,
+      };
+
+      // Split multi-day events into individual day events
+      if (event.start.toDateString() !== event.end.toDateString()) {
+        newEvents = splitEventByDays(event);
+      } else {
+        newEvents = [event];
+      }
+
+      setEvents((prevEvents) => [...prevEvents, ...newEvents]);
+
+      notification.success({
+        message: "New Booking",
+        description: dataX.message,
+        duration: 3, // Auto-close after 3 seconds
+      });
+    });
     fetchAllFacilityFields();
+
+    return () => {
+      socket.off(NEW_BOOKING); // Cleanup event listener
+    };
   }, []);
 
   useEffect(() => {
@@ -303,12 +384,15 @@ const CalendarComponent = () => {
     }
   }, [resources, currentDate]);
 
-  const startBookingFlow = (mode = "add", event = null, slot = null) => {
-    setMode(mode);
-    if (event) setSelectedEvent(event);
-    if (slot) setSelectedSlot(slot);
-    setShowAddBookingModal(true);
-  };
+  const startBookingFlow = useCallback(
+    (mode = "add", event = null, slot = null) => {
+      setMode(mode);
+      if (event) setSelectedEvent(event);
+      if (slot) setSelectedSlot(slot);
+      setShowAddBookingModal(true);
+    },
+    []
+  );
 
   const handleFieldOptionSelect = (option) => {
     setSelectedFieldOption(option);
@@ -542,13 +626,13 @@ const CalendarComponent = () => {
     });
   };
 
-  const onInfoPress = () => {
+  const onInfoPress = useCallback(() => {
     setInfoModalVisible(true);
-  };
+  }, []);
 
-  const onTodayChipPress = () => {
+  const onTodayChipPress = useCallback(() => {
     setCurrentDate(moment());
-  };
+  }, []);
 
   return (
     <div
@@ -558,7 +642,7 @@ const CalendarComponent = () => {
       }}
     >
       <DragAndDropCalendar
-        date={currentDate.toDate()}
+        defaultDate={currentDate.toDate()}
         localizer={localizer}
         events={
           selectedResource === "all"
@@ -643,7 +727,7 @@ const CalendarComponent = () => {
 
       <Modal
         title={`Confirm ${isResized ? "Resize" : "Change"}`}
-        visible={resizeModalVisible}
+        open={resizeModalVisible}
         onOk={handleConfirmResize} // Confirm the resize
         onCancel={handleCancelResize} // Cancel the resize
         okText="Yes, Update"

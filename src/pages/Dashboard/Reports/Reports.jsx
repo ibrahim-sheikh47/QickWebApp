@@ -197,10 +197,6 @@ const Reports = () => {
     closeModal(section);
   };
 
-  useEffect(() => {
-    console.log(stats);
-  }, [stats]);
-
   const getStats = async () => {
     setLoading(true);
     try {
@@ -262,6 +258,7 @@ const Reports = () => {
               {myFacilities.map((facility) => {
                 return (
                   <div
+                    key={facility._id}
                     className="flex items-center justify-between mt-6 cursor-pointer"
                     onClick={() => {
                       setCurrentFacility(facility);

@@ -9,7 +9,6 @@ const SplashScreen = () => {
 
   useEffect(() => {
     // localStorage.clear();
-    requestPermission();
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     if (isLoggedIn) {
       navigate("/Dashboard/Reports");
@@ -30,14 +29,16 @@ const SplashScreen = () => {
         alt=""
       />
 
-      <Link to="/SignIn">
-        <button
-          className="justify-center mx-auto text-center items-center px-40 py-5 absolute bottom-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#9CFC38] rounded-full transition duration-300 ease-in-out hover:scale-105 font-semibold"
-          type="submit"
-        >
-          Get Started
-        </button>
-      </Link>
+      <button
+        onClick={() => {
+          requestPermission();
+          navigate("/SignIn");
+        }}
+        className="justify-center mx-auto text-center items-center px-40 py-5 absolute bottom-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#9CFC38] rounded-full transition duration-300 ease-in-out hover:scale-105 font-semibold"
+        type="button"
+      >
+        Get Started
+      </button>
     </div>
   );
 };
