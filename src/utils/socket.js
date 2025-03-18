@@ -19,7 +19,7 @@ export const connectSocket = (user) => {
           // deviceToken: user.deviceToken,
         }),
       },
-      transports: ["polling", "websocket"],
+      transports: ["websocket"],
     });
 
     socket.on(CONNECTION, () => {
