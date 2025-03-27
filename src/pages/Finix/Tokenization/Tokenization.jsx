@@ -19,17 +19,17 @@ const TokenizationForm = () => {
       form.submit(
         "sandbox",
         // import.meta.env.VITE_FINIX_APPLICATION,
-        "AP9Cr8VfoWBFCPg7QTdwbQn7",
+        // "AP9Cr8VfoWBFCPg7QTdwbQn7", //prod environment
+        "APgPDQrLD52TYvqazjHJJchM",
         function (err, res) {
           setLoading(false);
-          // get token ID from response
           const tokenData = res.data || {};
           const token = tokenData.id;
+          console.log("Token: ", token);
 
           if (window.ReactNativeWebView) {
             window.ReactNativeWebView.postMessage(JSON.stringify({ token }));
           }
-          form.clear();
         }
       );
     };
