@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import assets from "../../../assets/assets";
 import finixLogo from "../../../assets/finix.png";
 import seperator from "../../../assets/seperator.png";
@@ -10,6 +10,10 @@ const TokenizationForm = () => {
   useEffect(() => {
     let form;
     const onSubmit = () => {
+      if (!window.ReactNativeWebView) {
+        return;
+      }
+
       setLoading(true);
 
       form.submit(
@@ -22,7 +26,9 @@ const TokenizationForm = () => {
           const tokenData = res.data || {};
           const token = tokenData.id;
 
-          alert("Your token ID is: " + token);
+          if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({ token }));
+          }
           form.clear();
         }
       );
