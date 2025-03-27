@@ -2,25 +2,33 @@ import React, { useEffect } from "react";
 import assets from "../../../assets/assets";
 import finixLogo from "../../../assets/finix.png";
 import seperator from "../../../assets/seperator.png";
+import Loader from "../../../components/Loader/Loader";
 
 const TokenizationForm = () => {
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
+    let form;
     const onSubmit = () => {
+      setLoading(true);
+
       form.submit(
         "sandbox",
         // import.meta.env.VITE_FINIX_APPLICATION,
         "AP9Cr8VfoWBFCPg7QTdwbQn7",
         function (err, res) {
+          setLoading(false);
           // get token ID from response
           const tokenData = res.data || {};
           const token = tokenData.id;
 
           alert("Your token ID is: " + token);
+          form.clear();
         }
       );
     };
 
-    const form = Finix.CardTokenForm("finix-form", {
+    form = Finix.CardTokenForm("finix-form", {
       showAddress: true,
       showLabels: true,
       // set custom labels for each field
@@ -135,6 +143,8 @@ const TokenizationForm = () => {
           className="w-full px-6 py-2 bg-white h-[80vh] md:h-[100vh] overflow-y-auto"
         />
       </div>
+
+      {loading && <Loader />}
     </div>
   );
 };
