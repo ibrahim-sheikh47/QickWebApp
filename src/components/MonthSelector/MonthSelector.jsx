@@ -1,16 +1,29 @@
 import React, { useState } from "react";
 import moment from "moment"; // You can use any date library like moment.js
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
+import { setSelectedDate } from "../../redux/store";
 
-const MonthSelector = ({ currentDate, onMonthChange }) => {
+const MonthSelector = () => {
+  const dispatch = useDispatch();
+  const { selectedDate } = useSelector((state) => state.calendar);
+
   // Handle the previous month click
   const handlePreviousMonth = () => {
-    onMonthChange(currentDate.clone().subtract(1, "months"));
+    dispatch(
+      setSelectedDate(
+        moment(selectedDate).clone().subtract(1, "months").toISOString()
+      )
+    );
   };
 
   // Handle the next month click
   const handleNextMonth = () => {
-    onMonthChange(currentDate.clone().add(1, "months"));
+    dispatch(
+      setSelectedDate(
+        moment(selectedDate).clone().add(1, "months").toISOString()
+      )
+    );
   };
 
   return (
@@ -20,7 +33,8 @@ const MonthSelector = ({ currentDate, onMonthChange }) => {
       </button>
 
       <span className={"text-xl font-PJSbold"}>
-        {currentDate.format("MMMM YYYY")} {/* Display current month and year */}
+        {moment(selectedDate).format("MMMM YYYY")}{" "}
+        {/* Display current month and year */}
       </span>
 
       <button style={styles.button} onClick={handleNextMonth}>
@@ -50,6 +64,4 @@ const styles = {
   },
 };
 
-export default React.memo(MonthSelector, (prev, next) => {
-  return prev.currentDate.isSame(next.currentDate, "day");
-});
+export default React.memo(MonthSelector);

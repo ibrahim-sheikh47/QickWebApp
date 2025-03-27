@@ -7,7 +7,8 @@ import { onMessage } from "firebase/messaging";
 import { messaging } from "./firebase";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { connectSocket, disconnectSocket } from "./utils/socket";
+import { Provider } from "react-redux";
+import store from "./redux/store";
 
 function App() {
   useEffect(() => {
@@ -39,9 +40,11 @@ function App() {
       <ToastContainer />
 
       <DndProvider backend={HTML5Backend}>
-        <StateContextProvider>
-          <AppNavigation />
-        </StateContextProvider>
+        <Provider store={store}>
+          <StateContextProvider>
+            <AppNavigation />
+          </StateContextProvider>
+        </Provider>
       </DndProvider>
     </>
   );

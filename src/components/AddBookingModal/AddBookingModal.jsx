@@ -709,4 +709,4 @@ const AddBookingModal = ({
   );
 };
 
-export default AddBookingModal;
+export default React.memo(AddBookingModal);

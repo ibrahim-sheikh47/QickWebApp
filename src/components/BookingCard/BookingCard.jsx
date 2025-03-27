@@ -109,4 +109,4 @@ const BookingCard = ({ event }) => {
   );
 };
 
-export default BookingCard;
+export default React.memo(BookingCard);

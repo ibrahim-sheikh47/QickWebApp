@@ -10,8 +10,6 @@ import { format, parse, startOfWeek, getDay } from "date-fns";
 import BookingCard from "../../../components/BookingCard/BookingCard";
 
 import { enUS } from "date-fns/locale";
-import HorizontalDaysList from "../../../components/HorizontalDaysList/HorizontalDaysList";
-import MonthSelector from "../../../components/MonthSelector/MonthSelector";
 import moment from "moment";
 
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -37,6 +35,8 @@ import assets from "../../../assets/assets";
 import AppModal from "../../../components/AppModal/AppModal";
 import { connectSocket, getSocket } from "../../../utils/socket";
 import { NEW_BOOKING } from "../../../utils/events";
+import CustomToolbar from "./CustomToolbar";
+import { useDispatch, useSelector } from "react-redux";
 
 const locales = { "en-US": enUS };
 const localizer = dateFnsLocalizer({
@@ -49,232 +49,14 @@ const localizer = dateFnsLocalizer({
 
 const DragAndDropCalendar = withDragAndDrop(Calendar);
 
-const MonthAndDaysToolbar = React.memo(
-  ({
-    currentDate,
-    onMonthChange,
-    onInfoPress,
-    onTodayChipPress,
-    onAddBooking,
-    onDayChange,
-    selectedFieldOption,
-    setIsFieldModalOpen,
-    setBookingTypeOpen,
-    selectedBookingOption,
-  }) => {
-    return (
-      <>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            paddingInline: "1rem",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <MonthSelector
-              currentDate={currentDate}
-              onMonthChange={onMonthChange}
-            />
-
-            <button
-              onClick={onTodayChipPress}
-              className="!font-PJSregular !text-[12px] !text-blue !border-blue !rounded-full px-2 py-1 !border"
-            >
-              Today
-            </button>
-
-            <button
-              onClick={onInfoPress}
-              style={{ border: "none", outline: "none" }}
-            >
-              <img src={assets.info} className="w-[20px] h-[20px]" alt="Info" />
-            </button>
-
-            <label className="!font-PJSregular !text-[12px] !text-blue">
-              {currentDate.format("MMM Do, yyyy")}
-            </label>
-          </div>
-
-          <div className="flex gap-5">
-            <div
-              className="bg-transparent text-center justify-center flex h-[42px] rounded-full relative cursor-pointer"
-              onClick={() => setBookingTypeOpen(true)}
-            >
-              <p className="my-auto flex items-center text-sm gap-2 text-primary font-PJSmedium">
-                Type: {selectedBookingOption.title}
-                <img src={assets.down} alt="Down" />
-              </p>
-            </div>
-
-            <div
-              className="bg-transparent text-center justify-center flex h-[42px] rounded-full relative cursor-pointer"
-              onClick={() => setIsFieldModalOpen(true)}
-            >
-              <p className="my-auto flex items-center text-sm gap-2 text-primary font-PJSmedium">
-                Fields Available: {selectedFieldOption.title}
-                <img src={assets.down} alt="Down" />
-              </p>
-            </div>
-
-            <button
-              className={"text-sm font-PJSmedium"}
-              onClick={() => onAddBooking()}
-              style={{
-                padding: "0.6rem 0.8rem",
-                backgroundColor: "#9CFC38",
-                color: "#000",
-                border: "none",
-                borderRadius: "25rem",
-              }}
-            >
-              <div className="flex items-center">
-                <img
-                  src={assets.add}
-                  className="w-[20px] h-[20px] mr-2"
-                  alt="Info"
-                />
-                Add Booking
-              </div>
-            </button>
-          </div>
-        </div>
-
-        <hr />
-
-        <HorizontalDaysList
-          selectedMonth={currentDate} // Pass the selected month
-          onDayChange={onDayChange}
-        />
-
-        <hr />
-      </>
-    );
-  },
-  (prev, next) => {
-    return (
-      prev.currentDate.isSame(next.currentDate, "day") &&
-      prev.selectedFieldOption === next.selectedFieldOption &&
-      prev.selectedBookingOption === next.selectedBookingOption
-    );
-  }
-);
-
-const CustomToolbar = ({
-  currentDate,
-  onMonthChange,
-  onInfoPress,
-  onTodayChipPress,
-  onAddBooking,
-  selectedResource,
-  onResourceChange,
-  onDayChange,
-  resources,
-  selectedFieldOption,
-  setIsFieldModalOpen,
-  setBookingTypeOpen,
-  selectedBookingOption,
-}) => {
-  return (
-    <div className="rbc-toolbar">
-      <div
-        style={{
-          width: "100%",
-          backgroundColor: "#fff",
-          borderRadius: "8px",
-          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-          display: "flex",
-          flexDirection: "column",
-          fontFamily: "Arial, sans-serif",
-          transition: "all 0.3s ease",
-          overflowX: "auto",
-        }}
-      >
-        <MonthAndDaysToolbar
-          currentDate={currentDate}
-          onMonthChange={onMonthChange}
-          onInfoPress={onInfoPress}
-          onTodayChipPress={onTodayChipPress}
-          onAddBooking={onAddBooking}
-          onDayChange={onDayChange}
-          selectedFieldOption={selectedFieldOption}
-          setIsFieldModalOpen={setIsFieldModalOpen}
-          setBookingTypeOpen={setBookingTypeOpen}
-          selectedBookingOption={selectedBookingOption}
-        />
-
-        {/* Resource Tabs */}
-        <div
-          style={{
-            display: "flex",
-            // marginTop: "0.5rem",
-            overflowX: "auto",
-          }}
-        >
-          {resources.map((resource, index) => (
-            <div
-              key={`${index}`}
-              className="flex"
-              style={{
-                // ...(resource.label === "all" && { width: "4rem" }),
-                // ...(resource.label !== "all" && { flex: 1 }),
-                flex: resource.label === "all" ? "0 0 5.5rem" : "1",
-              }}
-            >
-              <button
-                key={resource.label}
-                className={"text-large font-PJSbold"}
-                onClick={() => onResourceChange(resource.label)}
-                style={{
-                  flex: 1,
-                  paddingTop: "0.7rem",
-                  paddingBottom: "0.7rem",
-                  border: "none",
-                  borderBottom:
-                    selectedResource === resource.label
-                      ? "5px solid #33C0DB"
-                      : "none",
-                  backgroundColor: "transparent",
-                  color:
-                    selectedResource === resource.label ? "#33C0DB" : "#000",
-                  cursor: "pointer",
-                }}
-              >
-                {resource.title}
-              </button>
-
-              {index < resources.length - 1 && (
-                <div
-                  style={{
-                    backgroundColor: "#dddddd",
-                    width: "0.04rem",
-                  }}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
-const MemoizedCustomToolbar = React.memo(CustomToolbar, (prev, next) => {
-  return (
-    prev.currentDate.isSame(next.currentDate, "day") &&
-    prev.selectedResource === next.selectedResource &&
-    prev.resources === next.resources
-  );
-});
-
 const CalendarComponent = () => {
+  const dispatch = useDispatch();
   const { user, currentFacility, setCurrentFacility, myFacilities } =
     useStateContext();
+
+  const { selectedDate, selectedResource } = useSelector(
+    (state) => state.calendar
+  );
 
   const bookingTypes = [
     { key: "pickup", label: "Pickup" },
@@ -302,9 +84,7 @@ const CalendarComponent = () => {
   const [mode, setMode] = useState("add");
   const [loading, setLoading] = useState(false);
   const [infoModalVisible, setInfoModalVisible] = useState(false);
-  const [currentDate, setCurrentDate] = useState(moment());
   const [showAddBookingModal, setShowAddBookingModal] = useState(false);
-  const [selectedResource, setSelectedResource] = useState("all");
 
   const [resources, setResources] = useState([]);
   const [events, setEvents] = useState([]);
@@ -326,18 +106,6 @@ const CalendarComponent = () => {
       ? memoizedResources.filter((r) => r.label !== "all")
       : memoizedResources.filter((r) => r.label === selectedResource);
   }, [resources, selectedResource]);
-
-  const handleMonthChange = useCallback((newDate) => {
-    setCurrentDate(newDate);
-  }, []);
-
-  const handleDayChange = useCallback((selectedDate) => {
-    setCurrentDate(moment(selectedDate));
-  }, []);
-
-  const handleResourceChange = useCallback((resourceId) => {
-    setSelectedResource(resourceId);
-  }, []);
 
   useEffect(() => {
     const socket = connectSocket(user);
@@ -382,7 +150,7 @@ const CalendarComponent = () => {
       setLoading(true);
       fetchAllBookings();
     }
-  }, [resources, currentDate]);
+  }, [resources.length, selectedDate]);
 
   const startBookingFlow = useCallback(
     (mode = "add", event = null, slot = null) => {
@@ -394,13 +162,23 @@ const CalendarComponent = () => {
     []
   );
 
-  const handleFieldOptionSelect = (option) => {
-    setSelectedFieldOption(option);
-  };
+  const handleFieldOptionSelect = useCallback(
+    (option) => {
+      if (option.label !== selectedFieldOption.label) {
+        setSelectedFieldOption(option);
+      }
+    },
+    [selectedFieldOption]
+  );
 
-  const handleBookingOptionSelect = (option) => {
-    setSelectedBookingOption(option);
-  };
+  const handleBookingOptionSelect = useCallback(
+    (option) => {
+      if (option.label !== selectedBookingOption.label) {
+        setSelectedBookingOption(option);
+      }
+    },
+    [selectedBookingOption]
+  );
 
   const handleApplyFieldFilter = () => {
     setIsFieldModalOpen(false);
@@ -569,9 +347,11 @@ const CalendarComponent = () => {
   const fetchAllBookings = async () => {
     try {
       let booking = await getAllBookings(
-        `startDate=${formattedDate(currentDate)}&endDate=${formattedDate(
-          currentDate
-        )}&facilityId=${currentFacility._id}`
+        `startDate=${formattedDate(
+          moment(selectedDate)
+        )}&endDate=${formattedDate(moment(selectedDate))}&facilityId=${
+          currentFacility._id
+        }`
       );
 
       const bookings = booking.bookings.flatMap((b) => {
@@ -630,19 +410,10 @@ const CalendarComponent = () => {
     setInfoModalVisible(true);
   }, []);
 
-  const onTodayChipPress = useCallback(() => {
-    setCurrentDate(moment());
-  }, []);
-
   return (
-    <div
-      style={{
-        height: "100%",
-        paddingInline: "0.4rem",
-      }}
-    >
+    <div style={styles.container}>
       <DragAndDropCalendar
-        defaultDate={currentDate.toDate()}
+        defaultDate={moment(selectedDate).toDate()}
         localizer={localizer}
         events={
           selectedResource === "all"
@@ -671,15 +442,9 @@ const CalendarComponent = () => {
         }}
         components={{
           toolbar: () => (
-            <MemoizedCustomToolbar
-              currentDate={currentDate}
-              onMonthChange={handleMonthChange}
-              onTodayChipPress={onTodayChipPress}
+            <CustomToolbar
               onInfoPress={onInfoPress}
               onAddBooking={startBookingFlow}
-              selectedResource={selectedResource}
-              onResourceChange={handleResourceChange}
-              onDayChange={handleDayChange}
               resources={memoizedResources}
               selectedFieldOption={selectedFieldOption}
               setIsFieldModalOpen={setIsFieldModalOpen}
@@ -906,6 +671,13 @@ const CalendarComponent = () => {
       {loading && <Loader />}
     </div>
   );
+};
+
+const styles = {
+  container: {
+    height: "100%",
+    paddingInline: "0.4rem",
+  },
 };
 
 export default CalendarComponent;

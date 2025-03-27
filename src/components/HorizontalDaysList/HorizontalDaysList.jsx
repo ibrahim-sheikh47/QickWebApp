@@ -7,178 +7,153 @@ import React, {
 } from "react";
 import moment from "moment";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
+import { setSelectedDate } from "../../redux/store";
 
-const HorizontalDaysList = React.memo(
-  ({ selectedMonth, onDayChange }) => {
-    const containerRef = useRef(null);
-    const itemRef = useRef(null);
-    const [selectedDay, setSelectedDay] = useState(
-      moment(selectedMonth).date()
-    );
+const HorizontalDaysList = () => {
+  const dispatch = useDispatch();
+  const { selectedDate } = useSelector((state) => state.calendar);
+  const containerRef = useRef(null);
+  const [selectedDay, setSelectedDay] = useState(moment(selectedDate).date());
 
-    // console.log(selectedMonth.format("YYYY-MM"));
+  const daysList = useMemo(() => {
+    const startOfMonth = moment(selectedDate).startOf("month");
+    const endOfMonth = moment(selectedDate).endOf("month");
+    const currentDate = moment();
 
-    // Keep track of the last scrolled-to day
-    const lastDayRef = useRef(null);
+    const days = [];
+    let day = startOfMonth;
 
-    const daysList = useMemo(() => {
-      const startOfMonth = moment(selectedMonth).startOf("month");
-      const endOfMonth = moment(selectedMonth).endOf("month");
-      const currentDate = moment();
+    while (day.isBefore(endOfMonth) || day.isSame(endOfMonth, "day")) {
+      days.push({
+        day: day.format("ddd"),
+        date: day.date(),
+        fullDate: day.format("YYYY-MM-DD"),
+        isToday: currentDate.isSame(day, "day"),
+      });
+      day = day.add(1, "days");
+    }
 
-      const days = [];
-      let day = startOfMonth;
+    return days;
+  }, [selectedDate]);
 
-      while (day.isBefore(endOfMonth) || day.isSame(endOfMonth, "day")) {
-        days.push({
-          day: day.format("ddd"),
-          date: day.date(),
-          fullDate: day.format("YYYY-MM-DD"),
-          isToday: currentDate.isSame(day, "day"),
+  const scrollToSelectedDay = useCallback(() => {
+    const container = containerRef.current;
+    const selectedIndex = daysList.findIndex((d) => d.date === selectedDay);
+
+    if (container && selectedIndex !== -1) {
+      const selectedElement = container.children[selectedIndex];
+      if (selectedElement) {
+        const containerWidth = container.offsetWidth;
+        const elementWidth = selectedElement.offsetWidth;
+        const scrollPosition =
+          selectedElement.offsetLeft - containerWidth / 2 + elementWidth / 2;
+
+        container.scrollTo({
+          left: scrollPosition,
+          behavior: "smooth",
         });
-        day = day.add(1, "days");
       }
+    }
+  }, [daysList, selectedDay]);
 
-      return days;
-    }, [selectedMonth.format("YYYY-MM")]);
+  // Scroll to the selected day when selectedDay changes
+  useEffect(() => {
+    console.log(selectedDay);
+    scrollToSelectedDay();
+  }, [selectedDay, scrollToSelectedDay]);
 
-    const scrollToSelectedDay = useCallback(
-      (day) => {
-        const container = containerRef.current;
-        const selectedIndex = daysList.findIndex((d) => d.date === day);
+  // Reset selectedDay when the selectedDate changes
+  useEffect(() => {
+    const newSelectedDay = moment(selectedDate).date();
+    if (newSelectedDay !== selectedDay) {
+      setSelectedDay(newSelectedDay);
+    }
+  }, [selectedDate]);
 
-        if (container && selectedIndex !== -1) {
-          const selectedElement = container.children[selectedIndex];
-          if (selectedElement) {
-            const containerWidth = container.offsetWidth;
-            const elementWidth = selectedElement.offsetWidth;
-            const scrollPosition =
-              selectedElement.offsetLeft -
-              containerWidth / 2 +
-              elementWidth / 2;
-
-            container.scrollTo({
-              left: scrollPosition,
-              behavior: "smooth",
-            });
-
-            // Save the last scrolled-to day
-            lastDayRef.current = day;
-          }
-        }
-      },
-      [daysList]
-    );
-
-    // Scroll to the selected day on change
-    useEffect(() => {
-      if (selectedDay && daysList.length > 0) {
-        scrollToSelectedDay(selectedDay);
-      }
-    }, [daysList, selectedDay]);
-
-    const handleDayClick = useCallback(
-      (day) => {
+  const handleDayClick = useCallback(
+    (day) => {
+      if (day !== selectedDay) {
         setSelectedDay(day);
-        const selectedDate = moment(selectedMonth).date(day);
-        onDayChange(selectedDate);
-      },
-      [onDayChange, selectedMonth]
-    );
-
-    const scrollNext = useCallback(() => {
-      if (lastDayRef.current === null) {
-        lastDayRef.current = selectedDay;
+        const selectedDateX = moment(selectedDate).date(day);
+        dispatch(setSelectedDate(moment(selectedDateX).toISOString()));
       }
+    },
+    [selectedDate, selectedDay]
+  );
 
-      const nextDay = lastDayRef.current + 1;
-      const nextDayIndex = daysList.findIndex((d) => d.date === nextDay);
+  const scrollNext = useCallback(() => {
+    const nextDay = selectedDay + 1;
+    if (daysList.some((d) => d.date === nextDay)) {
+      handleDayClick(nextDay);
+    }
+  }, [handleDayClick, selectedDay, daysList]);
 
-      if (nextDayIndex !== -1) {
-        handleDayClick(nextDay);
-      }
-    }, [handleDayClick, daysList.length]);
+  const scrollPrev = useCallback(() => {
+    const prevDay = selectedDay - 1;
+    if (daysList.some((d) => d.date === prevDay)) {
+      handleDayClick(prevDay);
+    }
+  }, [handleDayClick, selectedDay, daysList]);
 
-    const scrollPrev = useCallback(() => {
-      if (lastDayRef.current === null) {
-        lastDayRef.current = selectedDay;
-      }
+  return (
+    <div style={styles.wrapper}>
+      <button onClick={scrollPrev} style={styles.button}>
+        <MdChevronLeft size={30} />
+      </button>
 
-      const prevDay = lastDayRef.current - 1;
-      const prevDayIndex = daysList.findIndex((d) => d.date === prevDay);
-
-      if (prevDayIndex !== -1) {
-        handleDayClick(prevDay);
-      }
-    }, [handleDayClick]);
-
-    return (
-      <div style={styles.wrapper}>
-        <button onClick={scrollPrev} style={styles.button}>
-          <MdChevronLeft size={30} />
-        </button>
-
-        <div style={styles.container} ref={containerRef}>
-          {daysList.map((day, index) => (
+      <div style={styles.container} ref={containerRef}>
+        {daysList.map((day, index) => (
+          <div
+            key={index}
+            onClick={() => handleDayClick(day.date)}
+            style={{
+              ...styles.dayCard,
+              backgroundColor: "#fff",
+              color: "#333",
+              padding: "10px",
+            }}
+          >
             <div
-              key={index}
-              onClick={() => handleDayClick(day.date)}
+              className={`text-large font-PJSbold ${
+                day.isToday
+                  ? selectedDay === day.date
+                    ? "!text-white !bg-blue"
+                    : "!text-blue"
+                  : ""
+              }`}
               style={{
-                ...styles.dayCard,
-                backgroundColor: "#fff",
-                color: "#333",
-                padding: "10px",
+                ...styles.dateText,
+                height: "40px",
+                width: "40px",
+                backgroundColor:
+                  selectedDay === day.date && !day.isToday
+                    ? "#9CFC38"
+                    : "transparent",
+                borderRadius: "20px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
-              ref={index === 0 ? itemRef : null}
             >
-              <div
-                className={`text-large font-PJSbold ${
-                  day.isToday
-                    ? selectedDay === day.date
-                      ? "!text-white !bg-blue"
-                      : "!text-blue"
-                    : ""
-                }`}
-                style={{
-                  ...styles.dateText,
-                  height: "40px",
-                  width: "40px",
-                  backgroundColor:
-                    selectedDay === day.date && !day.isToday
-                      ? "#9CFC38"
-                      : "transparent",
-                  borderRadius: "20px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                {day.date}
-              </div>
-              <div
-                className={`${day.isToday ? "!text-blue" : ""}`}
-                style={styles.dayText}
-              >
-                {day.day}
-              </div>
+              {day.date}
             </div>
-          ))}
-        </div>
-
-        <button onClick={scrollNext} style={styles.button}>
-          <MdChevronRight size={30} />
-        </button>
+            <div
+              className={`${day.isToday ? "!text-blue" : ""}`}
+              style={styles.dayText}
+            >
+              {day.day}
+            </div>
+          </div>
+        ))}
       </div>
-    );
-  },
-  (prev, next) => {
-    console.log("React.memo Comparison Function Called");
-    console.log("Prev selectedMonth:", prev.selectedMonth.format("YYYY-MM"));
-    console.log("Next selectedMonth:", next.selectedMonth.format("YYYY-MM"));
 
-    return prev.selectedMonth.isSame(next.selectedMonth, "month");
-  }
-);
+      <button onClick={scrollNext} style={styles.button}>
+        <MdChevronRight size={30} />
+      </button>
+    </div>
+  );
+};
 
 const styles = {
   wrapper: {
@@ -228,4 +203,4 @@ const styles = {
   },
 };
 
-export default HorizontalDaysList;
+export default React.memo(HorizontalDaysList);

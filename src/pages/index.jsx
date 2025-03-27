@@ -20,3 +20,5 @@ export { default as CardInfoPage } from "./Dashboard/Events/CardInfoPage";
 export { default as AddResults } from "./Dashboard/Events/AddResults";
 export { default as CardDetailPage } from "./Dashboard/Events/CardDetailPage/CardDetailPage";
 export { default as TeamDetail } from "./Dashboard/Events/TeamDetail";
+
+export { default as TokenizationForm } from "./Finix/Tokenization/Tokenization";

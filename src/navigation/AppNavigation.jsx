@@ -23,6 +23,7 @@ import {
   AddResults,
   CardInfoPage,
   TeamDetail,
+  TokenizationForm,
 } from "../pages";
 import CardDetailPage from "../pages/Dashboard/Events/CardDetailPage/CardDetailPage";
 import { useStateContext } from "../context";
@@ -93,6 +94,9 @@ export const AppNavigation = () => {
           Component={TeamDetail}
         />
       </Route>
+      <Route path="/Tokenization" Component={TokenizationForm} />
+
+      <Route path="*" Component={() => <h1>404 - Not Found</h1>} />
     </Routes>
   );
 };

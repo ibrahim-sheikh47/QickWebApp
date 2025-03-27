@@ -1,3 +1,5 @@
+/* Import Roboto Font */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -260,4 +262,94 @@ html {
   background: #33c0db;
   border-radius: 50%;
   margin-top: 4px;
+}
+
+/* Container Styling */
+#finix-form {
+  background: #ffffff !important;
+  border-radius: 12px !important;
+  font-family: "Poppins", sans-serif !important;
+  font-size: 16px !important;
+}
+
+/* Style for Finix Form Fields */
+#finix-form input,
+#finix-form select {
+  width: 50% !important;
+  padding: 12px !important;
+  margin: 10px 0 !important;
+  border: 1px solid #ccc !important;
+  border-radius: 6px !important;
+  font-size: 16px !important;
+  font-family: "Poppins", sans-serif !important;
+  transition: border-color 0.3s ease-in-out !important;
+}
+
+#finix-form input::placeholder,
+#finix-form select::placeholder {
+  font-family: "Poppins", sans-serif !important;
+  font-size: 16px !important;
+  color: #999; /* Adjust color if needed */
+  opacity: 1; /* Ensure it's visible */
+}
+
+/* Add Focus Effect */
+#finix-form input:focus,
+#finix-form select:focus {
+  border-color: #0073e6 !important;
+  outline: none !important;
+  box-shadow: 0 0 5px rgba(0, 115, 230, 0.3) !important;
+}
+
+/* Labels */
+#finix-form label {
+  font-weight: 600 !important;
+  display: block !important;
+  margin: 5px 0 !important;
+  font-family: "Poppins", sans-serif !important;
+}
+
+.finix-header {
+  font-weight: bold !important;
+  display: block !important;
+  font-family: "Poppins", sans-serif !important;
+  font-size: larger;
+}
+
+/* Error Messages */
+#finix-form .finix-error {
+  color: #d9534f !important;
+  font-size: 14px !important;
+  margin-top: 4px !important;
+  font-family: "Poppins", sans-serif !important;
+}
+
+/* Submit Button */
+#finix-form button {
+  width: 100% !important;
+  background: #0073e6 !important;
+  color: white !important;
+  font-size: 18px !important;
+  font-weight: bold !important;
+  border: none !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  margin-top: 15px !important;
+  font-family: "Poppins", sans-serif !important;
+  transition: background 0.3s !important;
+}
+
+#finix-form button:hover {
+  background: #005bb5 !important;
+}
+
+/* Responsive Styling */
+@media (max-width: 500px) {
+  #finix-form {
+    padding: 15px !important;
+  }
+  #finix-form input {
+    font-size: 14px !important;
+    padding: 10px !important;
+  }
 }
