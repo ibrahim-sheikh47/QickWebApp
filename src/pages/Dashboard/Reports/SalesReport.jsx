@@ -390,7 +390,10 @@ const SalesReport = () => {
             <p className="text-2xl font-PJSbold text-primary">
               Sales
               <span className="text-secondary font-PJSregular text-sm ml-1">
-                {`($0 from ${bookings.length} Results)`}
+                {`(${bookings.reduce(
+                  (sum, b) => sum + (b.paidAmount || 0),
+                  0
+                )} from ${bookings.length} Results)`}
               </span>
             </p>
           </div>
