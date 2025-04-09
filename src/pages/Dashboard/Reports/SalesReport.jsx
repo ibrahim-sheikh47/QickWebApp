@@ -189,7 +189,7 @@ const SalesReport = () => {
       `${formattedTime(booking.startDateTime)} - ${formattedTime(
         booking.endDateTime
       )}`,
-      booking.status ?? "",
+      booking.paymentStatus ?? "",
     ]);
 
     autoTable(doc, {
@@ -237,7 +237,7 @@ const SalesReport = () => {
           `${formattedTime(booking.startDateTime) || "N/A"} - ${
             formattedTime(booking.endDateTime) || "N/A"
           }`,
-          booking.status || "N/A",
+          booking.paymentStatus || "N/A",
         ]),
       ];
 
@@ -277,7 +277,7 @@ const SalesReport = () => {
         Time: `${formattedTime(booking.startDateTime)} - ${formattedTime(
           booking.endDateTime
         )}`,
-        Status: booking.status,
+        Status: booking.paymentStatus,
       }))
     );
 
@@ -496,7 +496,7 @@ const SalesReport = () => {
                 <p>{`${formattedTime(booking.startDateTime)} - ${formattedTime(
                   booking.endDateTime
                 )}`}</p>
-                <p>{capitalizeFirstLetter(booking.status)}</p>
+                <p>{capitalizeFirstLetter(booking.paymentStatus)}</p>
               </div>
               <div className="h-[1px] bg-secondaryTwenty my-5"></div>
             </>

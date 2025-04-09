@@ -195,6 +195,157 @@ const AcademyModal = ({ isOpen, onClose }) => (
 
 ///////////////////////////////////SALES////////////////////////////////
 
+const renderPaymentInfo = (booking) => {
+  const totalPlayers =
+    (booking.participants?.length || 0) +
+    (booking.rivalParticipants?.length || 0);
+
+  return (
+    <div className="grid grid-cols-5 font-PJSregular text-sm text-secondary border rounded-xl mt-5">
+      {/* Header Row */}
+      <p className="text-left border-r border-b p-2 px-3">User</p>
+      <p className="text-left border-r border-b p-2 px-3">Transaction ID</p>
+      <p className="text-left border-r border-b p-2 px-3">Sales Tax</p>
+      <p className="text-left border-r border-b p-2 px-3">Player Total</p>
+      <p className="text-left border-b p-2 px-3">Status</p>
+
+      {/* Team Info Row (Optional) */}
+      {booking.team && (
+        <p
+          className="col-span-5 border-b px-3 py-2 font-semibold"
+          style={{ backgroundColor: "#f9f9f9", color: "black" }}
+        >
+          {`${booking.team.name} (${booking.participants?.length})`}
+        </p>
+      )}
+
+      {!booking.team ||
+        (booking.isOpenToJoin && (
+          <p
+            className="col-span-5 border-b px-3 py-2 font-semibold"
+            style={{ backgroundColor: "#f9f9f9", color: "black" }}
+          >
+            {`Player's List (${bookingDetail?.participants?.length})`}
+          </p>
+        ))}
+
+      {/* Participant Rows */}
+      {booking.participants?.map((detail, index) => {
+        const transaction = booking.successfulTransactions.some(
+          (t) => t.participant.toString() === detail._id.toString()
+        )
+          ? {
+              transaction: booking.successfulTransactions.find(
+                (t) => t.participant.toString() === detail._id.toString()
+              ),
+              status: "Paid",
+            }
+          : booking.failedTransactions.some(
+              (t) => t.participant.toString() === detail._id.toString()
+            )
+          ? {
+              transaction: booking.failedTransactions.find(
+                (t) => t.participant.toString() === detail._id.toString()
+              ),
+              status: "Failed",
+            }
+          : null;
+        const transactionId = transaction
+          ? transaction.transaction.transaction
+          : "";
+
+        return (
+          <React.Fragment key={index}>
+            <p className="text-left text-primary border-r border-b p-2 whitespace-normal break-words">
+              {detail.name}
+            </p>
+            <p className="text-left text-primary border-r border-b p-2 whitespace-normal break-words">
+              {transactionId}
+            </p>
+            <p className="text-left text-primary border-r border-b p-2 whitespace-normal break-words">
+              0
+            </p>
+            <p className="text-left text-primary border-r border-b p-2 whitespace-normal break-words">
+              ${(booking.totalAmount / totalPlayers).toFixed(2)}{" "}
+              <span className="text-secondary text-[10px] ml-1">
+                {detail.credit}
+              </span>
+            </p>
+            <p className="text-left text-primary border-b p-2 whitespace-normal break-words">
+              {transaction?.status || " "}
+            </p>
+          </React.Fragment>
+        );
+      })}
+
+      {booking.rivals?.length > 0 && (
+        <p
+          className="col-span-5 border-b px-3 py-2 font-semibold"
+          style={{ backgroundColor: "#f9f9f9", color: "black" }}
+        >
+          {`${booking.rivals[0].name} (${booking.rivalParticipants?.length})`}
+        </p>
+      )}
+
+      {booking.rivalParticipants?.map((detail, index) => {
+        const transaction = booking.successfulTransactions.some(
+          (t) => t.participant.toString() === detail._id.toString()
+        )
+          ? {
+              transaction: booking.successfulTransactions.find(
+                (t) => t.participant.toString() === detail._id.toString()
+              ),
+              status: "Paid",
+            }
+          : booking.failedTransactions.some(
+              (t) => t.participant.toString() === detail._id.toString()
+            )
+          ? {
+              transaction: booking.failedTransactions.find(
+                (t) => t.participant.toString() === detail._id.toString()
+              ),
+              status: "Failed",
+            }
+          : null;
+        const transactionId = transaction
+          ? transaction.transaction.transaction
+          : "";
+
+        return (
+          <React.Fragment key={index}>
+            <p className="text-left text-primary border-r border-b p-2 whitespace-normal break-words">
+              {detail.name}
+            </p>
+            <p className="text-left text-primary border-r border-b p-2 whitespace-normal break-words">
+              {transactionId}
+            </p>
+            <p className="text-left text-primary border-r border-b p-2 whitespace-normal break-words">
+              0
+            </p>
+            <p className="text-left text-primary border-r border-b p-2 whitespace-normal break-words">
+              ${(booking.totalAmount / totalPlayers).toFixed(2)}{" "}
+              <span className="text-secondary text-[10px] ml-1">
+                {detail.credit}
+              </span>
+            </p>
+            <p className="text-left text-primary border-b p-2 whitespace-normal break-words">
+              {transaction?.status || " "}
+            </p>
+          </React.Fragment>
+        );
+      })}
+
+      {/* Total Row */}
+      <p className="p-4 text-primary font-PJSbold border-t">Total</p>
+      <p className="border-t"></p>
+      <p className="p-4 text-primary font-PJSbold border-t">$0</p>
+      <p className="p-4 text-primary font-PJSbold border-t">
+        ${booking.totalAmount}
+      </p>
+    </div>
+  );
+};
+
 const NewBookingSalesModal = ({ isOpen, onClose, booking }) => {
   if (!booking) return;
   const bookingTime = new Date(booking.startDateTime);
@@ -204,9 +355,9 @@ const NewBookingSalesModal = ({ isOpen, onClose, booking }) => {
     <AppModal
       modalopen={isOpen}
       onClose={onClose}
-      height="100vh"
+      height="90vh"
       width="auto"
-      customStyles={{ modal: { overflowY: "auto" } }}
+      customStyles={{ modal: { overflowY: "auto", maxWidth: "80vw" } }}
     >
       <div className="flex">
         <div className="mr-10">
@@ -301,42 +452,7 @@ const NewBookingSalesModal = ({ isOpen, onClose, booking }) => {
               (Coupon Applied: VRX56H 20% off)
             </span>
           </p>
-          <div className="grid grid-cols-4 font-PJSregular text-sm text-secondary border rounded-xl mt-5">
-            <p className="text-left border-r border-b p-1 px-2 ">User</p>
-            <p className="text-left border-r border-b p-1 px-2">
-              Transaction ID
-            </p>
-            <p className="text-left border-r border-b p-1 px-2">Sales Tax</p>
-            <p className="text-left border-b p-1 px-3">Player Total</p>
-
-            {booking.participants.map((detail, index) => (
-              <React.Fragment key={index}>
-                <p className="text-left text-primary border-r border-b p-2 text-sm whitespace-nowrap">
-                  {detail.name}
-                </p>
-                <p className="text-left text-primary border-r border-b p-2 text-sm ">
-                  {detail.transactionId}
-                </p>
-                <p className="text-left text-primary border-r border-b p-2  text-sm">
-                  0
-                </p>
-                <p className="text-left text-primary border-b p-2 text-sm">
-                  {booking.totalAmount /
-                    (booking.participants.length +
-                      booking.rivalParticipants.length)}
-                  <span className="text-secondary text-[10px]">
-                    {detail.credit}
-                  </span>
-                </p>
-              </React.Fragment>
-            ))}
-            <p className="p-4 text-primary font-PJSbold">Total</p>
-            <p></p>
-            <p className="p-4 text-primary font-PJSbold">$0</p>
-            <p className="p-4 text-primary font-PJSbold">
-              ${booking.totalAmount}
-            </p>
-          </div>
+          {renderPaymentInfo(booking)}
           <div className="flex mt-5 gap-4 w-full justify-center font-PJSMedium items-center">
             <button className="w-full  transition duration-300 ease-in-out transform hover:scale-105 h-[54px] text-[14px] rounded-full bg-secondaryTen font-PJSmedium justify-center items-center ">
               Allocate Credits
