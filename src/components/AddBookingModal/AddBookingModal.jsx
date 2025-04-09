@@ -205,6 +205,7 @@ const AddBookingModal = ({
         const endDateTime = moment(endDate)
           .hour(moment(endTime, "h:mm A").hour())
           .minute(moment(endTime, "h:mm A").minute());
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
         const data = {
           bookingType: bookingType,
@@ -212,6 +213,7 @@ const AddBookingModal = ({
           facility: fields.find((f) => f._id === field).fieldOwner._id,
           startDateTime: startDateTime.toISOString(),
           endDateTime: endDateTime.toISOString(),
+          timeZone,
           notes: notes,
           recurring: recurrence,
           size:

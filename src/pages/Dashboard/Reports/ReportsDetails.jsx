@@ -12,6 +12,7 @@ import {
   paymentRecurDetails,
 } from "../../../constants/reportsIndex";
 import { formattedDate, formattedTime } from "../../../constants";
+import moment from "moment";
 
 /////////////////////////////////BOOKING///////////////////////////
 
@@ -196,6 +197,8 @@ const AcademyModal = ({ isOpen, onClose }) => (
 
 const NewBookingSalesModal = ({ isOpen, onClose, booking }) => {
   if (!booking) return;
+  const bookingTime = new Date(booking.startDateTime);
+  bookingTime.setMinutes(bookingTime.getMinutes() + 15);
 
   return (
     <AppModal
@@ -266,8 +269,8 @@ const NewBookingSalesModal = ({ isOpen, onClose, booking }) => {
                 Payment Date
               </p>
               <p className="font-PJSmedium text-sm">
-                Mon, Jan 31st, 2024, 8:15pm{" "}
-                <span className="text-secondary"> (Mastercard ****7789)</span>
+                {moment(bookingTime).format("ddd, MMM Do, yyyy, hh:mm A")}{" "}
+                {/* <span className="text-secondary"> (Mastercard ****7789)</span> */}
               </p>
             </div>
           </div>
