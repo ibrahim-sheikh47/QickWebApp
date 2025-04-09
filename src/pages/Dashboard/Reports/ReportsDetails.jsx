@@ -195,11 +195,47 @@ const AcademyModal = ({ isOpen, onClose }) => (
 
 ///////////////////////////////////SALES////////////////////////////////
 
-const renderPaymentInfo = (booking) => {
+const paymentRow = ({ booking, detail, index }) => {
+  const transaction =
+    booking.successfulTransactions.find(
+      (t) => t.participant.toString() === detail._id.toString()
+    ) ||
+    booking.failedTransactions.find(
+      (t) => t.participant.toString() === detail._id.toString()
+    );
+  const status = transaction
+    ? booking.successfulTransactions.includes(transaction)
+      ? "Paid"
+      : "Failed"
+    : "";
+  const transactionId = transaction ? transaction.transaction : "";
   const totalPlayers =
     (booking.participants?.length || 0) +
     (booking.rivalParticipants?.length || 0);
 
+  return (
+    <React.Fragment key={index}>
+      <p className="text-[0.7rem] text-left text-primary border-r border-b p-2 whitespace-normal break-words">
+        {detail.name}
+      </p>
+      <p className="text-[0.6rem] text-left text-primary border-r border-b p-2 whitespace-normal break-words">
+        {transactionId}
+      </p>
+      <p className="text-[0.7rem] text-left text-primary border-r border-b p-2 whitespace-normal break-words">
+        0
+      </p>
+      <p className="text-[0.7rem] text-left text-primary border-r border-b p-2 whitespace-normal break-words">
+        ${(booking.totalAmount / totalPlayers).toFixed(2)}{" "}
+        <span className="text-secondary text-[10px] ml-1">{detail.credit}</span>
+      </p>
+      <p className="text-[0.7rem] text-left text-primary border-b p-2 whitespace-normal break-words">
+        {status}
+      </p>
+    </React.Fragment>
+  );
+};
+
+const renderPaymentInfo = (booking) => {
   return (
     <div className="grid grid-cols-5 font-PJSregular text-sm text-secondary border rounded-xl mt-5">
       {/* Header Row */}
@@ -230,53 +266,9 @@ const renderPaymentInfo = (booking) => {
         ))}
 
       {/* Participant Rows */}
-      {booking.participants?.map((detail, index) => {
-        const transaction = booking.successfulTransactions.some(
-          (t) => t.participant.toString() === detail._id.toString()
-        )
-          ? {
-              transaction: booking.successfulTransactions.find(
-                (t) => t.participant.toString() === detail._id.toString()
-              ),
-              status: "Paid",
-            }
-          : booking.failedTransactions.some(
-              (t) => t.participant.toString() === detail._id.toString()
-            )
-          ? {
-              transaction: booking.failedTransactions.find(
-                (t) => t.participant.toString() === detail._id.toString()
-              ),
-              status: "Failed",
-            }
-          : null;
-        const transactionId = transaction
-          ? transaction.transaction.transaction
-          : "";
-
-        return (
-          <React.Fragment key={index}>
-            <p className="text-left text-primary border-r border-b p-2 whitespace-normal break-words">
-              {detail.name}
-            </p>
-            <p className="text-left text-primary border-r border-b p-2 whitespace-normal break-words">
-              {transactionId}
-            </p>
-            <p className="text-left text-primary border-r border-b p-2 whitespace-normal break-words">
-              0
-            </p>
-            <p className="text-left text-primary border-r border-b p-2 whitespace-normal break-words">
-              ${(booking.totalAmount / totalPlayers).toFixed(2)}{" "}
-              <span className="text-secondary text-[10px] ml-1">
-                {detail.credit}
-              </span>
-            </p>
-            <p className="text-left text-primary border-b p-2 whitespace-normal break-words">
-              {transaction?.status || " "}
-            </p>
-          </React.Fragment>
-        );
-      })}
+      {booking.participants?.map((detail, index) =>
+        paymentRow({ booking, detail, index })
+      )}
 
       {booking.rivals?.length > 0 && (
         <p
@@ -287,53 +279,9 @@ const renderPaymentInfo = (booking) => {
         </p>
       )}
 
-      {booking.rivalParticipants?.map((detail, index) => {
-        const transaction = booking.successfulTransactions.some(
-          (t) => t.participant.toString() === detail._id.toString()
-        )
-          ? {
-              transaction: booking.successfulTransactions.find(
-                (t) => t.participant.toString() === detail._id.toString()
-              ),
-              status: "Paid",
-            }
-          : booking.failedTransactions.some(
-              (t) => t.participant.toString() === detail._id.toString()
-            )
-          ? {
-              transaction: booking.failedTransactions.find(
-                (t) => t.participant.toString() === detail._id.toString()
-              ),
-              status: "Failed",
-            }
-          : null;
-        const transactionId = transaction
-          ? transaction.transaction.transaction
-          : "";
-
-        return (
-          <React.Fragment key={index}>
-            <p className="text-left text-primary border-r border-b p-2 whitespace-normal break-words">
-              {detail.name}
-            </p>
-            <p className="text-left text-primary border-r border-b p-2 whitespace-normal break-words">
-              {transactionId}
-            </p>
-            <p className="text-left text-primary border-r border-b p-2 whitespace-normal break-words">
-              0
-            </p>
-            <p className="text-left text-primary border-r border-b p-2 whitespace-normal break-words">
-              ${(booking.totalAmount / totalPlayers).toFixed(2)}{" "}
-              <span className="text-secondary text-[10px] ml-1">
-                {detail.credit}
-              </span>
-            </p>
-            <p className="text-left text-primary border-b p-2 whitespace-normal break-words">
-              {transaction?.status || " "}
-            </p>
-          </React.Fragment>
-        );
-      })}
+      {booking.rivalParticipants?.map((detail, index) =>
+        paymentRow({ booking, detail, index })
+      )}
 
       {/* Total Row */}
       <p className="p-4 text-primary font-PJSbold border-t">Total</p>

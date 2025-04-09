@@ -10,6 +10,7 @@ const endpoints = {
   social: "api/social",
   user: "api/user",
   bookingStats: "api/booking/field-booking-stats",
+  bookingSales: "api/booking/monthly-sales",
   booking: "api/booking",
   dicounts: "api/voucher",
   chats: "api/chat",

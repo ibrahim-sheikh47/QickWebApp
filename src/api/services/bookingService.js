@@ -12,6 +12,17 @@ export const getFieldsBookingStats = async (facilityId, query = "") => {
   }
 };
 
+export const getBookingSales = async (facilityId) => {
+  try {
+    const response = await apiClient.get(
+      `${endpoints.bookingSales}/${facilityId}`
+    );
+    return response.data.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getAllBookings = async (query = "") => {
   try {
     const response = await apiClient.get(`${endpoints.booking}/all?${query}`);

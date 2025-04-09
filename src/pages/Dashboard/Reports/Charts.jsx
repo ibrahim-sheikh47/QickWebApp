@@ -88,8 +88,10 @@ const BookingBar = ({ stats }) => {
   );
 };
 
-const SalesBar = () => {
+const SalesBar = ({ sales }) => {
   const [activeIndex, setActiveIndex] = useState(null);
+  const labels = sales.map((s) => s.month);
+  const totalSales = sales.map((s) => s.totalSales);
 
   const navigate = useNavigate();
   const handleNavigation = () => {
@@ -97,25 +99,11 @@ const SalesBar = () => {
   };
 
   const data = {
-    labels: [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-      "January",
-    ],
+    labels: labels,
     datasets: [
       {
         label: "",
-        data: [15, 35, 45, 25, 38, 24, 55, 60, 22, 41, 31, 51, 43],
+        data: totalSales,
         backgroundColor: (context) => {
           const index = context.dataIndex;
           return index === activeIndex ? "#1F2933" : "#9CFC38";
@@ -147,12 +135,7 @@ const SalesBar = () => {
             family: "PJSregular",
           },
           callback: (index) => {
-            // Display only first and last labels
-            if (index === 0 || index === 12) {
-              return "January";
-            } else {
-              return "";
-            }
+            return labels[index];
           },
           autoSkip: false,
           maxRotation: 0,
@@ -165,7 +148,7 @@ const SalesBar = () => {
         },
         ticks: {
           callback: (value) => {
-            return `$${value}k`;
+            return `$${value}`;
           },
           color: "#1f2933",
           font: {
@@ -183,7 +166,7 @@ const SalesBar = () => {
         padding: 10,
         callbacks: {
           label: (context) => {
-            let label = `$${context.parsed.y}k`;
+            let label = `$${context.parsed.y}`;
             return label;
           },
         },

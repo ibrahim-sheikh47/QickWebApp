@@ -12,7 +12,10 @@ import EventBar, {
 } from "./Charts";
 import assets from "../../../assets/assets";
 import { useStateContext } from "../../../context";
-import { getFieldsBookingStats } from "../../../api/services/bookingService";
+import {
+  getBookingSales,
+  getFieldsBookingStats,
+} from "../../../api/services/bookingService";
 import Loader from "../../../components/Loader/Loader";
 import moment from "moment";
 import AddNewFacilityModal from "../../../components/AddNewFacilityModal/AddNewFacilityModal";
@@ -68,6 +71,7 @@ const Reports = () => {
   });
 
   const [stats, setStats] = useState([]);
+  const [sales, setSales] = useState([]);
   const { start, end } = getStartAndEndOfWeek();
 
   // Separate state variables for each section's date range
@@ -120,6 +124,7 @@ const Reports = () => {
   useEffect(() => {
     if (currentFacility) {
       getStats();
+      getSales();
     }
   }, [currentFacility, dateRangeBookings]);
 
@@ -211,6 +216,18 @@ const Reports = () => {
     } catch (error) {
       console.log(error);
       setStats([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getSales = async () => {
+    setLoading(true);
+    try {
+      setSales(await getBookingSales(currentFacility._id));
+    } catch (error) {
+      console.log(error);
+      setSales([]);
     } finally {
       setLoading(false);
     }
@@ -361,7 +378,7 @@ const Reports = () => {
             onDateClick={() => openModal("sales")}
             onTitleClick={() => navigate("SalesReport")}
           >
-            <SalesBar />
+            <SalesBar sales={sales} />
           </Section>
           <DateRangeModal
             isOpen={isModalOpen.sales}
