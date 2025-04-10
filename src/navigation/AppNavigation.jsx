@@ -94,7 +94,7 @@ export const AppNavigation = () => {
           Component={TeamDetail}
         />
       </Route>
-      <Route path="/Tokenization" Component={TokenizationForm} />
+      <Route path="/Tokenization/:type?" Component={TokenizationForm} />
 
       <Route path="*" Component={() => <h1>404 - Not Found</h1>} />
     </Routes>

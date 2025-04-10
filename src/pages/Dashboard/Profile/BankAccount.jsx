@@ -1,12 +1,24 @@
 /* eslint-disable react/no-unescaped-entities */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import assets from "../../../assets/assets";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import AppModal from "../../../components/AppModal/AppModal";
+import { useNavigate } from "react-router-dom";
+import {
+  deleteBankAccount,
+  getBankAccounts,
+} from "../../../api/services/paymentService";
+import { useStateContext } from "../../../context";
+import { editFacility } from "../../../api/services/facilityService";
+import Loader from "../../../components/Loader/Loader";
 
 const BankAccount = () => {
+  const navigate = useNavigate();
+  const { currentFacility, setCurrentFacility } = useStateContext();
+  const [bankAccounts, setBankAccounts] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddAccountSelectionOpen, setIsAddAccountModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("bankAccount");
@@ -14,6 +26,53 @@ const BankAccount = () => {
   const [isAccessRestrictedVisible, setIsAccessRestrictedVisible] =
     useState(true);
   const [isAddAccClicked, setIsAddAccClicked] = useState(false);
+
+  useEffect(() => {
+    getAllBankAccounts();
+  }, []);
+
+  const getAllBankAccounts = async () => {
+    setLoading(true);
+    try {
+      const res = await getBankAccounts(currentFacility._id);
+      console.log(res.data);
+      setBankAccounts(res.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const setDefaultBankAccount = async (id) => {
+    setLoading(true);
+    try {
+      setCurrentFacility(
+        await editFacility({ defaultBankAccount: id }, currentFacility._id)
+      );
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteBankAccount = async (id, shouldDisable = true) => {
+    setLoading(true);
+    try {
+      const res = await deleteBankAccount({
+        pI: id,
+        shouldDisable,
+        facilityId: currentFacility._id,
+      });
+      setCurrentFacility(res.data);
+      getAllBankAccounts();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const onSubmitAdminPassword = (data) => {
     console.log(data);
@@ -69,8 +128,9 @@ const BankAccount = () => {
   });
 
   const openAddAccountModal = () => {
-    setIsAddAccountModalOpen(true);
-    setIsAddAccClicked(false);
+    navigate("/Tokenization/bank-account");
+    // setIsAddAccountModalOpen(true);
+    // setIsAddAccClicked(false);
   };
 
   const bankAccountSchema = yup.object().shape({
@@ -224,9 +284,77 @@ const BankAccount = () => {
               />
             </div>
           </div>
-          <p className="text-sm font-PJSmedium mt-8">3 Added</p>
+          <p className="text-sm font-PJSmedium mt-8">
+            {bankAccounts.length} Added
+          </p>
 
-          {accounts.map((account) => (
+          {bankAccounts.map((account) => (
+            <div
+              key={account.name}
+              className={`flex items-center justify-between mt-5 border-2 rounded-lg py-3 px-5 ${
+                currentFacility.defaultBankAccount !== account.id
+                  ? "opacity-50"
+                  : ""
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <img
+                  className="w-6"
+                  src={assets.bankAccount}
+                  alt={account.name}
+                />
+
+                <div className="flex flex-col">
+                  <p className="font-PJSbold text-[1rem]">{account.name}</p>
+                  <p className="font-PJSmedium text-[0.6rem]">
+                    Account Number: {account.masked_account_number}
+                  </p>
+                  <p className="font-PJSmedium text-[0.6rem]">
+                    Bank Code: {account.bank_code}
+                  </p>
+                </div>
+
+                {!account.enabled && (
+                  <p className="font-PJSmedium text-[0.6rem] text-red-500">disabled</p>
+                )}
+              </div>
+
+              <div className="flex items-center gap-8">
+                <div
+                  className={`px-3 border-2 rounded-full bg-secondaryThirty cursor-pointer`}
+                  onClick={() => {
+                    if (account.enabled) {
+                      setDefaultBankAccount(account.id);
+                    } else {
+                      handleDeleteBankAccount(account.id, false);
+                    }
+                  }}
+                >
+                  <p className="font-PJSmedium text-sm">
+                    {account.enabled
+                      ? currentFacility.defaultBankAccount === account.id
+                        ? "Default"
+                        : "Set as default"
+                      : "Enable"}
+                  </p>
+                </div>
+                {account.enabled && (
+                  <div
+                    className="border-2 rounded-full p-1 cursor-pointer"
+                    onClick={() => handleDeleteBankAccount(account.id)}
+                  >
+                    <img
+                      className="w-[18px] h-[18px]"
+                      src={assets.Del}
+                      alt="Delete"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+
+          {/* {accounts.map((account) => (
             <div
               key={account.name}
               className={`flex items-center justify-between mt-5 border-2 rounded-lg py-3 px-5 ${
@@ -257,7 +385,7 @@ const BankAccount = () => {
                 </div>
               </div>
             </div>
-          ))}
+          ))} */}
           <p className="font-PJSmedium text-sm text-center  text-secondary mt-20">
             Clients' sensitive information is safeguarded with PCI-DSS
             compliance, ensuring <br /> maximum protection. For further details,
@@ -564,6 +692,8 @@ const BankAccount = () => {
           </div>
         </>
       )}
+
+      {loading && <Loader />}
     </div>
   );
 };

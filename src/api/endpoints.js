@@ -14,6 +14,7 @@ const endpoints = {
   booking: "api/booking",
   dicounts: "api/voucher",
   chats: "api/chat",
+  payment: "api/payment",
 };
 
 export default endpoints;
