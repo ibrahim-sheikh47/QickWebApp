@@ -26,6 +26,8 @@ import { Link } from "react-router-dom";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import AttachmentPreview from "../../../components/AttachmentPreview/AttachmentPreview";
+import { connectSocket, getSocket } from "../../../utils/socket";
+import { CHAT_MESSAGE, CHATS_LISTING } from "../../../utils/events";
 
 const Chats = () => {
   const { user, currentFacility } = useStateContext();
@@ -83,7 +85,26 @@ const Chats = () => {
   };
 
   useEffect(() => {
+    const socket = connectSocket(user);
+
+    socket.on(CHATS_LISTING, (data) => {
+      const chats = JSON.parse(data);
+
+      setChats(chats);
+      setAllChats(chats);
+    });
+
+    socket.on(CHAT_MESSAGE, (data) => {
+      const message = JSON.parse(data);
+      setMessages((prevMessages) => [...prevMessages, message]);
+    });
+
     fetAllChatsAndUsers();
+
+    return () => {
+      socket.off(CHATS_LISTING); // Cleanup event listener
+      socket.off(CHAT_MESSAGE); // Cleanup event listener
+    };
   }, []);
 
   useEffect(() => {
@@ -195,7 +216,7 @@ const Chats = () => {
 
   const { errors } = formState;
   const onSubmit = async (image = null) => {
-    setLoading(true);
+    // setLoading(true);
     try {
       let body = {
         chatId: `${user._id}-${userToChat._id}`,
@@ -211,14 +232,13 @@ const Chats = () => {
       if (image != null) {
         body.image = image;
       }
-      console.log(body);
       if (!chat) {
         await createChat(JSON.stringify(body));
-        window.location.reload();
+        // window.location.reload();
       } else {
         await sendMessage(body);
         setMessage("");
-        fetchChatById();
+        // fetchChatById();
       }
     } catch (err) {
       console.log(err);
@@ -347,7 +367,10 @@ const Chats = () => {
   };
 
   return (
-    <div className=" min-h-full min-w-full flex justify-center items-center">
+    <div
+      onClick={() => setShowPicker(false)}
+      className=" min-h-full min-w-full flex justify-center items-center"
+    >
       {screenstate === 1 ? (
         <>
           <div className="flex flex-col w-[30vw] h-[90vh] bg-white rounded-l-[16px]">
@@ -400,7 +423,7 @@ const Chats = () => {
             </div>
             {/* Recent and 3 icons filter etc */}
             <div className="flex px-4 justify-between mt-4">
-              <div className="font-PJSbold text-[24px] flex gap-2 items-center">
+              <div className="font-PJSbold text-[16px] flex gap-2 items-center">
                 {chats.length > 0
                   ? "Recent "
                   : users.length > 0
@@ -436,7 +459,7 @@ const Chats = () => {
               </div>
             </div>
             {/* Recent and 3 icons filter etc */}
-            <div className="overflow-y-scroll flex flex-col gap-5 mt-4 scrollbar-hide">
+            <div className="overflow-y-scroll flex flex-col scrollbar-hide">
               {chats.length > 0 &&
                 chats.map((item, index) => {
                   const user2 = item.members.find((m) => m._id !== user._id);
@@ -446,39 +469,43 @@ const Chats = () => {
                         selectUserToChat(user2);
                       }}
                       key={index}
-                      className="flex justify-between px-4 hover:bg-secondaryTen cursor-pointer py-2"
+                      className="flex justify-between px-4 hover:bg-secondaryTen cursor-pointer py-3"
                       style={{
                         borderBottomColor: "#e2e2e2",
                         borderBottomWidth: 1,
                       }}
                     >
-                      <div className="flex gap-4">
+                      <div className="flex gap-4" style={{ flex: 1 }}>
                         {/* image div */}
                         <div>
                           {/* Adjust the path to be relative to the current file */}
                           <img
                             src={user2.avatar}
                             alt=""
-                            className="w-12 h-12 rounded-full"
+                            className="w-10 h-10 rounded-full"
                           />
                         </div>
                         {/* image div */}
                         {/* name and message */}
-                        <div className="flex flex-col gap-1">
-                          <div className="font-PJSbold text-[16px]">
+                        <div
+                          className="flex flex-col gap-1"
+                          style={{ flex: 1 }}
+                        >
+                          <div className="font-PJSbold text-[13px]">
                             {user2.name}
                           </div>
-                          <div className="font-PJSbold text-[14px]">
+                          <div className="font-PJSmedium text-[10px]">
                             {item.lastMessage}
-                          </div>
-                          <div className="font-PJSregular text-[12px] text-secondary flex items-center gap-2">
-                            {new Date(item.createdAt).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
                           </div>
                         </div>
                         {/* name and message */}
+
+                        <div className="font-PJSregular text-[10px] text-secondary flex items-center gap-2">
+                          {new Date(item.createdAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </div>
                       </div>
                       {/* unread */}
                       {/* <div className="flex flex-col items-center gap-2">
@@ -587,9 +614,9 @@ const Chats = () => {
                           m.senderId === user._id
                             ? "bg-lime text-white"
                             : "bg-secondaryTen text-primary"
-                        } max-w-[70%] rounded-[10px] p-3`}
+                        } max-w-[70%] min-w-[10%] rounded-[10px] p-2`}
                       >
-                        <div className="font-PJSmedium text-[14px]">
+                        <div className="font-PJSmedium text-[12px]">
                           {m.type === "text" && m.text}
                           {m.type === "image" && (
                             <img
@@ -602,7 +629,7 @@ const Chats = () => {
                             />
                           )}
                         </div>
-                        <div className="text-[12px] text-secondary mt-1 text-right">
+                        <div className="text-[10px] text-secondary mt-1 text-right">
                           {new Date(m.createdAt).toLocaleTimeString([], {
                             hour: "2-digit",
                             minute: "2-digit",
@@ -625,6 +652,24 @@ const Chats = () => {
                       type={"text"}
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault(); // Optional: prevent default Enter behavior (e.g., form refresh)
+                          onSubmit(); // trigger form submission
+
+                          // let body = {
+                          //   chatId: `${user._id}-${userToChat._id}`,
+                          //   altChatId: `${userToChat._id}-${user._id}`,
+                          //   facility: currentFacility._id,
+                          //   senderId: user._id,
+                          //   receiverIds: [userToChat._id],
+                          //   type: "text",
+                          //   text: message,
+                          // };
+                          // setMessages([...messages, body]);
+                          setMessage("");
+                        }
+                      }}
                       placeholder="Type message..."
                       className="font-PJSregular text-secondary text-[14px] outline-none appearance-none w-[80%] h-full"
                     />
@@ -648,7 +693,20 @@ const Chats = () => {
                   </div>
                   <button
                     disabled={message.trim().length === 0 ? true : false}
-                    onClick={() => onSubmit()}
+                    onClick={() => {
+                      onSubmit();
+                      // let body = {
+                      //   chatId: `${user._id}-${userToChat._id}`,
+                      //   altChatId: `${userToChat._id}-${user._id}`,
+                      //   facility: currentFacility._id,
+                      //   senderId: user._id,
+                      //   receiverIds: [userToChat._id],
+                      //   type: "text",
+                      //   text: message,
+                      // };
+                      // setMessages([...messages, body]);
+                      setMessage("");
+                    }}
                     className="h-[60px] w-[60px] rounded-full bg-lime flex items-center justify-center"
                   >
                     <img src={assets.Send} />
@@ -845,7 +903,8 @@ const Chats = () => {
                 ) : (
                   /* Display selected users */
                   <div
-                    className="flex flex-wrap gap-2 pb-2 overflow-hidden"
+                    // className="flex flex-wrap gap-2 pb-2 overflow-hidden"
+                    className="flex flex-wrap gap-1 mt-1 max-h-[4.5rem] overflow-x-auto"
                     style={{ width: "100%" }}
                   >
                     {selectedUsers.map((user, index) => (
@@ -950,14 +1009,16 @@ const Chats = () => {
                   />
                 </div>
 
-                <AttachmentPreview
-                  attachments={attachments}
-                  onAttachmentsChange={handleAttachmentsChange}
-                  onClick={(image) => {
-                    setImageToView(image);
-                    setIsImageViewerOpen(true);
-                  }}
-                />
+                {attachments.length > 0 && (
+                  <AttachmentPreview
+                    attachments={attachments}
+                    onAttachmentsChange={handleAttachmentsChange}
+                    onClick={(image) => {
+                      setImageToView(image);
+                      setIsImageViewerOpen(true);
+                    }}
+                  />
+                )}
 
                 <div className="flex gap-4">
                   <input

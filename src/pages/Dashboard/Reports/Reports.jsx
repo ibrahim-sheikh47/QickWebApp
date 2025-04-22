@@ -22,6 +22,11 @@ import AddNewFacilityModal from "../../../components/AddNewFacilityModal/AddNewF
 import { formattedDate } from "../../../constants";
 import { useNavigate } from "react-router-dom";
 import DateRangeModal from "../../../components/DateRangeModal/DateRangeModal";
+import {
+  getFacilities,
+  getFacilitiesMonthlyUser,
+  getFacilitiesUser,
+} from "../../../api/services/facilityService";
 
 const Section = ({ title, children, date, onDateClick, onTitleClick }) => (
   <div className="md:w-1/2 w-full h-full rounded-xl bg-white shadow-sm drop-shadow-sm p-4">
@@ -71,6 +76,7 @@ const Reports = () => {
   });
 
   const [stats, setStats] = useState([]);
+  const [facilitiesUser, setFacilitiesUser] = useState([]);
   const [sales, setSales] = useState([]);
   const { start, end } = getStartAndEndOfWeek();
 
@@ -124,6 +130,7 @@ const Reports = () => {
   useEffect(() => {
     if (currentFacility) {
       getStats();
+      fetchFacilitiesMonthlyUser();
       getSales();
     }
   }, [currentFacility, dateRangeBookings]);
@@ -216,6 +223,20 @@ const Reports = () => {
     } catch (error) {
       console.log(error);
       setStats([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchFacilitiesMonthlyUser = async () => {
+    setLoading(true);
+    try {
+      const data = await getFacilitiesMonthlyUser(currentFacility?._id);
+      console.log(data);
+      setFacilitiesUser(data.data);
+    } catch (error) {
+      console.log(error);
+      setFacilitiesUser([]);
     } finally {
       setLoading(false);
     }
@@ -403,7 +424,7 @@ const Reports = () => {
             onDateClick={() => openModal("users")}
             onTitleClick={() => navigate("UsersReport")}
           >
-            <UsersChart />
+            <UsersChart users={facilitiesUser} />
           </Section>
           <DateRangeModal
             isOpen={isModalOpen.users}

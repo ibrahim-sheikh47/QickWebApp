@@ -189,25 +189,23 @@ const SalesBar = ({ sales }) => {
   );
 };
 
-const UsersChart = () => {
+const UsersChart = ({ users }) => {
   const navigate = useNavigate();
   const handleNavigation = () => {
     navigate("UsersReport");
   };
-  const ptData = [
-    { value: 255, date: "5 Oct 2022" },
-    { value: 265, date: "10 Oct 2022" },
-    { value: 275, date: "25 Oct 2022" },
-    { value: 285, date: "30 Oct 2022" },
-    { value: 295, date: "5 Nov 2022" },
-    { value: 305, date: "10 Nov 2022" },
-    { value: 315, date: "25 Nov 2022" },
-    { value: 325, date: "30 Nov 2022" },
-    { value: 335, date: "5 Dec 2022" },
-    { value: 345, date: "10 Dec 2022" },
-    { value: 355, date: "25 Dec 2022" },
-    { value: 365, date: "30 Dec 2022" },
-  ];
+  const ptData = users.map((d) => {
+    return {
+      value: d.count,
+      date: d.month,
+    };
+  });
+  let max = 0;
+  ptData.forEach((item) => {
+    if (item.value > max) {
+      max = item.value;
+    }
+  });
   const data = {
     labels: ptData.map((item) => item.date),
     datasets: [
@@ -235,9 +233,9 @@ const UsersChart = () => {
     scales: {
       y: {
         beginAtZero: true,
-        max: 600,
+        max: max * 2,
         ticks: {
-          stepSize: 100,
+          stepSize: max / 2,
           color: "#1f2933",
           font: {
             size: "14px",

@@ -24,6 +24,28 @@ export const getFacility = async (facilityId) => {
   }
 };
 
+export const getFacilitiesUser = async () => {
+  try {
+    const response = await apiClient.get(
+      `${endpoints.facilities}/facilities-users`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getFacilitiesMonthlyUser = async (facilityId) => {
+  try {
+    const response = await apiClient.get(
+      `${endpoints.facilities}/facilities-users-monthly/${facilityId}`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const editFacility = async (body, facilityId) => {
   try {
     const response = await apiClient.patch(
