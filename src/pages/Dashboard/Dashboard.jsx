@@ -11,6 +11,8 @@ import { getFacilities } from "../../api/services/facilityService";
 import Loader from "../../components/Loader/Loader";
 import Toast from "../../components/Toast/Toast";
 import PopupMenu from "../../components/PopupMenu/PopupMenu";
+import { getNotificationCounts } from "../../api/services/notificationService";
+import { OutletContext } from "../../context/OutletContext";
 
 // Utility Function
 function classNames(...classes) {
@@ -31,7 +33,7 @@ const Dashboard = () => {
   // Set "Reports" as the default tab
   const [selectedTab, setSelectedTab] = useState("Reports");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [notificationCount] = useState(3); // notification count set as 3 initially
+  const [notificationCount, setNotificationCount] = useState(0); // notification count set as 3 initially
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -41,6 +43,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchMyFacilities();
+    fetchNotificationCounts();
   }, []);
 
   const handleNav = () => {
@@ -65,6 +68,20 @@ const Dashboard = () => {
     { name: "Events", link: "/Dashboard/Events", icon: assets.league },
     { name: "Chats", link: "/Dashboard/Chats", icon: assets.chatsvg },
   ];
+
+  const fetchNotificationCounts = async () => {
+    setLoading(true);
+    try {
+      const response = await getNotificationCounts();
+      setNotificationCount(response.count);
+    } catch (err) {
+      if (err.response && err.response.data) {
+        showToast(err.response.data.message, "error");
+      } else console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchMyFacilities = async () => {
     setLoading(true);
@@ -316,7 +333,7 @@ const Dashboard = () => {
         <main className="flex-1">
           <div className="py-6">
             <div className="mx-auto px-4 sm:px-6 lg:px-4 w-full">
-              <Outlet />
+              <Outlet context={{ fetchNotificationCounts }} />
             </div>
           </div>
         </main>

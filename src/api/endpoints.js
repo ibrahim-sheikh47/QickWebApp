@@ -15,6 +15,7 @@ const endpoints = {
   dicounts: "api/voucher",
   chats: "api/chat",
   payment: "api/payment",
+  notifications: "api/notifications",
 };
 
 export default endpoints;

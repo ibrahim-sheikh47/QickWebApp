@@ -315,7 +315,9 @@ const BankAccount = () => {
                 </div>
 
                 {!account.enabled && (
-                  <p className="font-PJSmedium text-[0.6rem] text-red-500">disabled</p>
+                  <p className="font-PJSmedium text-[0.6rem] text-red-500">
+                    disabled
+                  </p>
                 )}
               </div>
 
