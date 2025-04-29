@@ -63,14 +63,14 @@ export const AppNavigation = () => {
       <Route Component={SignIn} path="/SignIn" />
       <Route Component={SignUp} path="/SignUp" />
       <Route Component={Dashboard} path="/Dashboard">
-        <Route Component={CalendarComponent} path="Calendar" />
+        <Route Component={CalendarComponent} path="Calendar/:id?" />
         <Route Component={Reports} path="Reports" />
         <Route Component={Chats} path="Chats" />
         <Route Component={Users} path="Users" />
         <Route Component={Notifications} path="Notifications" />
         <Route Component={Profile} path="Profile" />
-        <Route Component={BookingReport} path="Reports/BookingReport" />
-        <Route Component={SalesReport} path="Reports/SalesReport" />
+        <Route Component={BookingReport} path="Reports/BookingReport/:id?" />
+        <Route Component={SalesReport} path="Reports/SalesReport/:id?" />
         <Route Component={UsersReport} path="Reports/UsersReport" />
         <Route
           Component={CreditHolderReport}

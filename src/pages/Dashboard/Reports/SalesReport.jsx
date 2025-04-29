@@ -22,6 +22,7 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
 import { getAllBookings } from "../../../api/services/bookingService";
+import { useParams } from "react-router-dom";
 
 const getStartAndEndOfWeek = () => {
   const today = new Date();
@@ -39,6 +40,7 @@ const getStartAndEndOfWeek = () => {
 const SalesReport = () => {
   const { currentFacility, setCurrentFacility, myFacilities } =
     useStateContext();
+  const { id } = useParams();
   const [isFacilityModalOpen, setFacilityModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
@@ -98,17 +100,22 @@ const SalesReport = () => {
   const fetchAllBookings = async () => {
     try {
       setLoading(true);
-      let query = `startDate=${formattedDate(
-        dateRangeBookings[0].startDate
-      )}&endDate=${formattedDate(dateRangeBookings[0].endDate)}&facilityId=${
-        currentFacility._id
-      }`;
-      if (selectedFieldOption.label !== "all") {
-        query = query + `&fieldId=${selectedFieldOption.label}`;
+      let query = "";
+      if (!id) {
+        query = `startDate=${formattedDate(
+          dateRangeBookings[0].startDate
+        )}&endDate=${formattedDate(dateRangeBookings[0].endDate)}&facilityId=${
+          currentFacility._id
+        }`;
+        if (selectedFieldOption.label !== "all") {
+          query = query + `&fieldId=${selectedFieldOption.label}`;
+        }
       }
 
       const booking = await getAllBookings(query);
       setBookings(booking.bookings);
+
+      handleBookingClick(booking.bookings.find((b) => b._id.toString() === id));
     } catch (error) {
       console.log(error);
     } finally {
@@ -390,10 +397,9 @@ const SalesReport = () => {
             <p className="text-2xl font-PJSbold text-primary">
               Sales
               <span className="text-secondary font-PJSregular text-sm ml-1">
-                {`($${(bookings.reduce(
-                  (sum, b) => sum + (b.paidAmount || 0),
-                  0
-                )).toFixed(3)} from ${bookings.length} Results)`}
+                {`($${bookings
+                  .reduce((sum, b) => sum + (b.paidAmount || 0), 0)
+                  .toFixed(3)} from ${bookings.length} Results)`}
               </span>
             </p>
           </div>

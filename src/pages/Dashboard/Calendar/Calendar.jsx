@@ -37,6 +37,7 @@ import { connectSocket, getSocket } from "../../../utils/socket";
 import { NEW_BOOKING } from "../../../utils/events";
 import CustomToolbar from "./CustomToolbar";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 
 const locales = { "en-US": enUS };
 const localizer = dateFnsLocalizer({
@@ -53,7 +54,7 @@ const CalendarComponent = () => {
   const dispatch = useDispatch();
   const { user, currentFacility, setCurrentFacility, myFacilities } =
     useStateContext();
-
+  const { id } = useParams();
   const { selectedDate, selectedResource } = useSelector(
     (state) => state.calendar
   );
@@ -346,13 +347,19 @@ const CalendarComponent = () => {
 
   const fetchAllBookings = async () => {
     try {
-      let booking = await getAllBookings(
-        `startDate=${formattedDate(
+      let query = "";
+      if (!id) {
+        query = `startDate=${formattedDate(
           moment(selectedDate)
         )}&endDate=${formattedDate(moment(selectedDate))}&facilityId=${
           currentFacility._id
-        }`
-      );
+        }`;
+        if (selectedFieldOption.label !== "all") {
+          query = query + `&fieldId=${selectedFieldOption.label}`;
+        }
+      }
+
+      const booking = await getAllBookings(query);
 
       const bookings = booking.bookings.flatMap((b) => {
         const event = {
@@ -373,6 +380,10 @@ const CalendarComponent = () => {
       });
 
       setEvents(bookings);
+
+      if(id){
+        startBookingFlow("edit", bookings.find((b) => b._id.toString() === id));
+      }
     } catch (error) {
       console.log(error);
     } finally {

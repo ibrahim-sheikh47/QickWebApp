@@ -9,7 +9,11 @@ import * as yup from "yup";
 import Toast from "../../../components/Toast/Toast";
 
 import assets from "../../../assets/assets";
-import { getAllUsers, sendMail } from "../../../api/services/userService";
+import {
+  getAllUsers,
+  sendMail,
+  sendPushNotifications,
+} from "../../../api/services/userService";
 import Loader from "../../../components/Loader/Loader";
 import {
   createChat,
@@ -81,7 +85,8 @@ const Chats = () => {
   };
 
   const onEmojiSelect = (emoji) => {
-    setMessage((prev) => prev + emoji.native); // Append emoji to the message
+    setMessage((prev) => prev + emoji.native);
+    setShowPicker(false); // Close picker after selection
   };
 
   useEffect(() => {
@@ -247,17 +252,24 @@ const Chats = () => {
     }
   };
 
-  const sendPushNotification = () => {
+  const sendPushNotification = async () => {
     setLoading(true);
     try {
-      // selectedUsers.forEach(async (user) => {
-      //   const body = {
-      //     uid: user._id,
-      //     subject: subject,
-      //     message: mailBody,
-      //   };
-      //   await sendMail(body);
-      // });
+      console.log(selectedUsers.map((u) => u._id));
+      const body = {
+        title,
+        body: pnMessage,
+        users: selectedUsers.map((u) => u._id),
+      };
+      await sendPushNotifications(body);
+
+      await saveCommunicationHistory({
+        type: "push-notification",
+        subject: title,
+        body: pnMessage,
+        usersCount: selectedUsers.length,
+        attachments: [],
+      });
 
       setTimeout(() => {
         showToast("Push Notifications sent to all selected users");
@@ -267,10 +279,9 @@ const Chats = () => {
       }, 2500);
     } catch (err) {
       console.log(err);
+    } finally {
+      setLoading(false);
     }
-    // finally {
-    //   setLoading(false);
-    // }
   };
 
   const sendMailNotifications = async () => {
@@ -368,7 +379,7 @@ const Chats = () => {
 
   return (
     <div
-      onClick={() => setShowPicker(false)}
+      // onClick={() => setShowPicker(false)}
       className=" min-h-full min-w-full flex justify-center items-center"
     >
       {screenstate === 1 ? (

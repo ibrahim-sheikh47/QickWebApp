@@ -46,6 +46,28 @@ export const getFacilitiesMonthlyUser = async (facilityId) => {
   }
 };
 
+export const getFacilitiesUsersVisits = async (facilityId) => {
+  try {
+    const response = await apiClient.get(
+      `${endpoints.facilities}/facilities-users-visits/${facilityId}`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getFacilitiesTeamsVisits = async (facilityId) => {
+  try {
+    const response = await apiClient.get(
+      `${endpoints.facilities}/facilities-teams-visits/${facilityId}`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const editFacility = async (body, facilityId) => {
   try {
     const response = await apiClient.patch(

@@ -18,3 +18,12 @@ export const sendMail = async (body) => {
     throw error;
   }
 };
+
+export const sendPushNotifications = async (body) => {
+  try {
+    const response = await apiClient.post(`${endpoints.user}/send-push-notifications`, body);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

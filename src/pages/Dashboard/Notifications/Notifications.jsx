@@ -16,11 +16,12 @@ import {
 import { AppModal } from "../../../components";
 import UserNotifItem from "./UserNotifItem";
 import { useStateContext } from "../../../context";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 
 const Notifications = () => {
   const { user } = useStateContext();
   const { fetchNotificationCounts } = useOutletContext();
+  const navigate = useNavigate();
 
   const [selected, setSelected] = useState("Activity");
   const [notifications, setNotifications] = useState([]);

@@ -146,7 +146,12 @@ const UserNotifItem = ({
 
   return (
     <>
-      <div className="relative group">
+      <div
+        className="relative group"
+        onClick={() => {
+          navigate(`/Dashboard/Reports/SalesReport/${item.reference}`);
+        }}
+      >
         <div
           className={`flex items-center p-4 mb-3 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer ${
             isRead ? "opacity-70" : ""
