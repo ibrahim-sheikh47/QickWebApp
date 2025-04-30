@@ -32,7 +32,7 @@ export const profileItems = [
   { image: assets.Discounts, heading: "Discounts", content: <Discount /> },
   {
     image: assets.bankAccount,
-    heading: "Bank Account",
+    heading: "Finix Payments",
     content: <BankAccount />,
   },
 ];

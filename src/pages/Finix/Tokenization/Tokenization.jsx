@@ -6,6 +6,7 @@ import Loader from "../../../components/Loader/Loader";
 import { useNavigate, useParams } from "react-router-dom";
 import { addBankAccount } from "../../../api/services/paymentService";
 import { useStateContext } from "../../../context";
+import { createFacilityMerchant } from "../../../api/services/facilityService";
 
 const TokenizationForm = () => {
   const navigate = useNavigate();
@@ -24,9 +25,8 @@ const TokenizationForm = () => {
 
       form.submit(
         "sandbox",
-        import.meta.env.VITE_FINIX_APPLICATION,
-        // "AP9Cr8VfoWBFCPg7QTdwbQn7", //prod environment
-        // "APgPDQrLD52TYvqazjHJJchM",
+        // import.meta.env.VITE_FINIX_APPLICATION,
+        "AP9Cr8VfoWBFCPg7QTdwbQn7",
         async function (err, res) {
           const tokenData = res.data || {};
           const token = tokenData.id;
@@ -40,8 +40,13 @@ const TokenizationForm = () => {
                 facilityId: currentFacility?._id,
                 token,
               });
+              if (!currentFacility?.merchant) {
+                const data = await createFacilityMerchant(currentFacility?._id);
+                setCurrentFacility(data);
+              } else {
+                setCurrentFacility(resp.data.facility);
+              }
 
-              setCurrentFacility(resp.data.facility);
               window.history.back();
             } catch (err) {
               console.log("Add Bank Account error: ", err);

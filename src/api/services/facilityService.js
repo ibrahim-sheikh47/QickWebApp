@@ -80,6 +80,29 @@ export const editFacility = async (body, facilityId) => {
   }
 };
 
+export const createFacilityIdentity = async (body, facilityId) => {
+  try {
+    const response = await apiClient.patch(
+      `${endpoints.facilities}/create-identity/${facilityId}`,
+      body
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const createFacilityMerchant = async (facilityId) => {
+  try {
+    const response = await apiClient.patch(
+      `${endpoints.facilities}/create-merchant/${facilityId}`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getFacilities = async (userId) => {
   try {
     const response = await apiClient.get(`${endpoints.facilities}/${userId}`);
