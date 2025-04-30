@@ -24,9 +24,9 @@ const TokenizationForm = () => {
 
       form.submit(
         "sandbox",
-        // import.meta.env.VITE_FINIX_APPLICATION,
+        import.meta.env.VITE_FINIX_APPLICATION,
         // "AP9Cr8VfoWBFCPg7QTdwbQn7", //prod environment
-        "APgPDQrLD52TYvqazjHJJchM",
+        // "APgPDQrLD52TYvqazjHJJchM",
         async function (err, res) {
           const tokenData = res.data || {};
           const token = tokenData.id;

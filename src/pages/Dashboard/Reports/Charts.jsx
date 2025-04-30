@@ -426,6 +426,13 @@ const EventBar = ({ labels, values, isEvent = true }) => {
     navigate(isEvent ? "EventReport" : "BookingReport");
   };
 
+  let max = 0;
+  values.forEach((item) => {
+    if (item > max) {
+      max = item;
+    }
+  });
+
   const data = {
     labels: labels,
     datasets: [
@@ -475,10 +482,13 @@ const EventBar = ({ labels, values, isEvent = true }) => {
         },
       },
       y: {
+        beginAtZero: true,
+        max: max,
         grid: {
           display: false,
         },
         ticks: {
+          stepSize: max / 2,
           callback: (value) => {
             return `${value}`; // Display the number as-is
           },
