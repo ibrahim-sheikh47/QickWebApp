@@ -28,6 +28,9 @@ import {
 import CardDetailPage from "../pages/Dashboard/Events/CardDetailPage/CardDetailPage";
 import { useStateContext } from "../context";
 import { connectSocket, disconnectSocket } from "../utils/socket";
+import CreateMerchantForm from "../components/CreateMerchantForm/CreateMerchantForm";
+import submitMerchantApplication from "../components/CreateMerchantForm/submitMerchantApplication";
+
 export const AppNavigation = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1000);
   const { user } = useStateContext();
@@ -95,6 +98,10 @@ export const AppNavigation = () => {
         />
       </Route>
       <Route path="/Tokenization/:type?" Component={TokenizationForm} />
+      <Route
+        path="/Finix-Onboarding"
+        element={<CreateMerchantForm onSubmit={submitMerchantApplication} />}
+      />
 
       <Route path="*" Component={() => <h1>404 - Not Found</h1>} />
     </Routes>

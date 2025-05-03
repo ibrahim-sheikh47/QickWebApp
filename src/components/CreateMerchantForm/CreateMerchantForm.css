@@ -1,0 +1,29 @@
+select {
+  width: 300px;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid #ced4da;  /* Add a border */
+  border-radius: 0.25rem; /* Rounded corners */
+  background-color: white;
+  font-size: 1rem;
+  margin-top: 0;
+}
+
+select:focus {
+  border-color: #80bdff;
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25); /* Add focus effect */
+}
+
+.small-text {
+  font-size: 12px;
+}
+
+.previous {
+  background-color: white !important;
+    color: #007bff !important;
+    margin-right: 10px;
+}
+
+.subtitle {
+  color: gray
+}

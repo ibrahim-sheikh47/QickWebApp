@@ -1,6 +1,7 @@
 // store.js
 import { configureStore, createSlice } from "@reduxjs/toolkit";
 import moment from "moment";
+import { reducer as reduxFormReducer } from "redux-form";
 
 // Create a slice (simplifies reducers and actions)
 const calendarSlice = createSlice({
@@ -36,6 +37,7 @@ export const { setSelectedDate, setSelectedMonth, setSelectedResource, reset } =
 const store = configureStore({
   reducer: {
     calendar: calendarSlice.reducer,
+    form: reduxFormReducer,
   },
 });
 

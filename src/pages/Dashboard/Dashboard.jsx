@@ -189,10 +189,10 @@ const Dashboard = () => {
           isSidebarExpanded ? "w-64" : "w-16"
         }`}
       >
-        <div className="flex items-center justify-content-center">
+        <div className="flex items-center justify-content-center mt-4">
           <div
-            className={`flex flex-col items-center justify-center h-16 ${
-              !isSidebarExpanded ? "w-full" : ""
+            className={`flex flex-col items-center justify-center ${
+              !isSidebarExpanded ? "w-full" : "w-[48px]"
             }`}
           >
             <button
@@ -201,14 +201,15 @@ const Dashboard = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                height: "40px",
-                width: "40px",
+                backgroundColor: "#FFFFFF0D",
+                height: "48px",
+                width: "48px",
                 zIndex: 5000,
                 alignSelf: "center",
               }}
               className={`${
                 isSidebarExpanded ? "ml-6" : ""
-              } rounded-full bg-secondary text-white hover:bg-gray-600`}
+              } rounded-full text-white`}
             >
               {isSidebarExpanded ? "<" : ">"}
             </button>

@@ -9,6 +9,15 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Provider } from "react-redux";
 import store from "./redux/store";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import {
+  faInfoCircle,
+  faCreditCard,
+  faMoneyCheckAlt,
+  faUser,
+  faCheckCircle,
+} from "@fortawesome/free-solid-svg-icons";
+library.add(faInfoCircle, faCreditCard, faMoneyCheckAlt, faUser, faCheckCircle);
 
 function App() {
   useEffect(() => {

@@ -31,6 +31,10 @@ const BankAccount = () => {
   const [isAddAccClicked, setIsAddAccClicked] = useState(false);
 
   useEffect(() => {
+    // if (!currentFacility.identity) {
+    //   navigate("/Finix-Onboarding");
+    // }
+
     getAllBankAccounts();
   }, []);
 
@@ -95,6 +99,13 @@ const BankAccount = () => {
     setLoading(true);
 
     const body = {
+      max_transaction_amount: 5000 * 100,
+      has_accepted_credit_cards_previously: true,
+      principal_percentage_ownership: "100",
+      annual_ach_volume: "1000000",
+      annual_card_volume: "100000",
+      average_ach_transfer_amount: "100000",
+      average_card_transfer_amount: "5000",
       first_name: data.ownerFirstName,
       last_name: data.ownerLastName,
       personal_address: {
