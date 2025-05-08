@@ -22,3 +22,4 @@ export { default as CardDetailPage } from "./Dashboard/Events/CardDetailPage/Car
 export { default as TeamDetail } from "./Dashboard/Events/TeamDetail";
 
 export { default as TokenizationForm } from "./Finix/Tokenization/Tokenization";
+export { default as Support } from "./Support/Support";

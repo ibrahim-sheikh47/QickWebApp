@@ -128,8 +128,12 @@ import yellowCard from "../assets/svgs/yellowCard.svg";
 import closeRed from "../assets/svgs/closeRed.svg";
 
 import UsersThree from "../assets/svgs/UsersThree.svg";
+import support from "./support.png";
+import mail from "./mail.png";
 
 export default {
+  support,
+  mail,
   add,
   star,
   UsersThree,

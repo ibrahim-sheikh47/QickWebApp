@@ -24,6 +24,7 @@ import {
   CardInfoPage,
   TeamDetail,
   TokenizationForm,
+  Support,
 } from "../pages";
 import CardDetailPage from "../pages/Dashboard/Events/CardDetailPage/CardDetailPage";
 import { useStateContext } from "../context";
@@ -102,6 +103,7 @@ export const AppNavigation = () => {
         path="/Finix-Onboarding"
         element={<CreateMerchantForm onSubmit={submitMerchantApplication} />}
       />
+      <Route path="/support" Component={Support} />
 
       <Route path="*" Component={() => <h1>404 - Not Found</h1>} />
     </Routes>

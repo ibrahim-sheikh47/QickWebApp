@@ -378,14 +378,13 @@ const Chats = () => {
   };
 
   return (
-    <div
-      // onClick={() => setShowPicker(false)}
-      className=" min-h-full min-w-full flex justify-center items-center"
-    >
+    <div className="min-h-full min-w-full flex justify-center items-center">
+      {/* // <div className="overflow-y-auto h-[calc(100%-headerHeight)]"> */}
       {screenstate === 1 ? (
-        <>
-          <div className="flex flex-col w-[30vw] h-[90vh] bg-white rounded-l-[16px]">
-            <div className="flex justify-between items-center px-4 mt-6 font-PJSbold text-[24px] h-[100px] w-full border-b-[1px] border-secondaryTwenty ">
+        <div className="flex w-full h-[90vh]">
+          {/* First column - 40% */}
+          <div className="flex flex-col w-[40%] h-full bg-white rounded-l-[16px]">
+            <div className="flex justify-between px-4 mt-6 font-PJSbold text-[24px] h-[100px] w-full border-b-[1px] border-secondaryTwenty ">
               <div className="flex flex-col justify-center">
                 <div className="flex items-center gap-1">
                   <div>Chats</div>
@@ -393,9 +392,6 @@ const Chats = () => {
                     <img src={assets.info} className="w-[20px] h-[20px]" />
                   </button>
                 </div>
-                {/* <div className="font-PJSregular text-[14px] text-secondary">
-                    4 new messages
-                  </div> */}
               </div>
               {/* icons search and new chat */}
               <div className="flex flex-row justify-end items-center gap-3 w-[60%] ">
@@ -429,9 +425,8 @@ const Chats = () => {
                   <img src={assets.plus} className="w-5 h-5" />
                 </button>
               </div>
-
-              {/* icons search and new chat */}
             </div>
+
             {/* Recent and 3 icons filter etc */}
             <div className="flex px-4 justify-between mt-4">
               <div className="font-PJSbold text-[16px] flex gap-2 items-center">
@@ -449,14 +444,6 @@ const Chats = () => {
                 })`}</p>
               </div>
               <div className="flex gap-2">
-                {/* <button
-                    className="h-10 w-10 rounded-full border border-secondaryThirty flex justify-center items-center"
-                    onClick={() => {
-                      setscreenstate(2), console.log(screenstate);
-                    }}
-                  >
-                    <img src={assets.megaphone} />
-                  </button> */}
                 <button className="h-10 w-10 rounded-full border border-secondaryThirty flex justify-center items-center">
                   <img src={assets.funnel} />
                 </button>
@@ -469,7 +456,7 @@ const Chats = () => {
                 </button>
               </div>
             </div>
-            {/* Recent and 3 icons filter etc */}
+
             <div className="overflow-y-scroll flex flex-col scrollbar-hide">
               {chats.length > 0 &&
                 chats.map((item, index) => {
@@ -487,17 +474,13 @@ const Chats = () => {
                       }}
                     >
                       <div className="flex gap-4" style={{ flex: 1 }}>
-                        {/* image div */}
                         <div>
-                          {/* Adjust the path to be relative to the current file */}
                           <img
                             src={user2.avatar}
                             alt=""
                             className="w-10 h-10 rounded-full"
                           />
                         </div>
-                        {/* image div */}
-                        {/* name and message */}
                         <div
                           className="flex flex-col gap-1"
                           style={{ flex: 1 }}
@@ -509,8 +492,6 @@ const Chats = () => {
                             {item.lastMessage}
                           </div>
                         </div>
-                        {/* name and message */}
-
                         <div className="font-PJSregular text-[10px] text-secondary flex items-center gap-2">
                           {new Date(item.createdAt).toLocaleTimeString([], {
                             hour: "2-digit",
@@ -518,63 +499,58 @@ const Chats = () => {
                           })}
                         </div>
                       </div>
-                      {/* unread */}
-                      {/* <div className="flex flex-col items-center gap-2">
-                        <div className="font-PJSregular text-secondary text-[12px]">
-                          {item.ago}
-                        </div>
-                        <div className="h-6 w-6 bg-blue rounded-full flex justify-center items-center font-PJSregular text-white text-[12px]">
-                          {item.remaining}
-                        </div>
-                      </div> */}
-                      {/* unread */}
                     </div>
                   );
                 })}
 
-              {chats.length === 0 &&
-                users.length > 0 &&
-                users.map((item, index) => (
-                  <div
-                    key={index}
-                    className={`flex justify-between px-4 hover:bg-secondaryTen cursor-pointer py-2 gap-4`}
-                    style={{
-                      borderBottomColor: "#e2e2e2",
-                      borderBottomWidth: 1,
-                    }}
-                  >
-                    <div>
-                      {/* Adjust the path to be relative to the current file */}
-                      <img
-                        src={item.avatar}
-                        alt=""
-                        className="w-12 h-12 rounded-full"
-                      />
-                    </div>
-                    {/* image div */}
-                    {/* name and message */}
-                    <div className="flex flex-col gap-1" style={{ flex: 1 }}>
-                      <div className="font-PJSbold text-[16px]">
-                        {item.name}
-                      </div>
-                      <div className="font-PJSregular text-[12px] text-secondary flex items-center gap-2">
-                        {item.skill}
-                      </div>
-                    </div>
-                    {/* name and message */}
-
-                    <button
-                      onClick={() => selectUserToChat(item)}
-                      className="rounded-full bg-white px-6 border-[1px]"
+              {chats.length === 0 && users.length > 0 && (
+                <div className="overflow-y-scroll flex flex-col scrollbar-hide">
+                  {users.map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between px-4 hover:bg-secondaryTen cursor-pointer py-3"
+                      style={{
+                        borderBottomColor: "#e2e2e2",
+                        borderBottomWidth: 1,
+                      }}
                     >
-                      Chat
-                    </button>
-                  </div>
-                ))}
+                      <div className="flex gap-4" style={{ flex: 1 }}>
+                        <div>
+                          <img
+                            src={item.avatar}
+                            alt=""
+                            className="w-10 h-10 rounded-full"
+                          />
+                        </div>
+                        <div
+                          className="flex flex-col gap-1"
+                          style={{ flex: 1 }}
+                        >
+                          <div className="font-PJSbold text-[13px]">
+                            {item.name}
+                          </div>
+                          <div className="font-PJSmedium text-[10px] text-secondary">
+                            {item.skill}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <button
+                          onClick={() => selectUserToChat(item)}
+                          className="rounded-full bg-white px-4 border-[1px] border-secondaryThirty h-8 text-[12px] font-PJSmedium hover:bg-secondaryTen"
+                        >
+                          Chat
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="w-[60vw] h-[90vh] bg-chatbackground relative rounded-r-[16px]">
+          {/* Second column - remaining space */}
+          <div className="flex-1 h-full bg-chatbackground relative rounded-r-[16px]">
             {userToChat && (
               <div className="flex flex-col items-center h-full">
                 {/* Chat Header */}
@@ -665,19 +641,8 @@ const Chats = () => {
                       onChange={(e) => setMessage(e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
-                          e.preventDefault(); // Optional: prevent default Enter behavior (e.g., form refresh)
-                          onSubmit(); // trigger form submission
-
-                          // let body = {
-                          //   chatId: `${user._id}-${userToChat._id}`,
-                          //   altChatId: `${userToChat._id}-${user._id}`,
-                          //   facility: currentFacility._id,
-                          //   senderId: user._id,
-                          //   receiverIds: [userToChat._id],
-                          //   type: "text",
-                          //   text: message,
-                          // };
-                          // setMessages([...messages, body]);
+                          e.preventDefault();
+                          onSubmit();
                           setMessage("");
                         }
                       }}
@@ -706,16 +671,6 @@ const Chats = () => {
                     disabled={message.trim().length === 0 ? true : false}
                     onClick={() => {
                       onSubmit();
-                      // let body = {
-                      //   chatId: `${user._id}-${userToChat._id}`,
-                      //   altChatId: `${userToChat._id}-${user._id}`,
-                      //   facility: currentFacility._id,
-                      //   senderId: user._id,
-                      //   receiverIds: [userToChat._id],
-                      //   type: "text",
-                      //   text: message,
-                      // };
-                      // setMessages([...messages, body]);
                       setMessage("");
                     }}
                     className="h-[60px] w-[60px] rounded-full bg-lime flex items-center justify-center"
@@ -743,12 +698,13 @@ const Chats = () => {
               </div>
             )}
           </div>
-        </>
+        </div>
       ) : (
-        <>
-          <div className="flex flex-col w-[35vw] h-[90vh] bg-white rounded-l-[16px] border-r-[1px] border-secondaryTen">
-            <div className="flex justify-between px-4 mt-6 pb-6 font-PJSbold text-[24px] h-[100px] w-full border-b-[1px] border-secondaryTwenty ">
-              <div className="flex flex-col justify-center w-[400px]  ">
+        <div className="flex w-full h-[90vh]">
+          {/* First column - 40% */}
+          <div className="flex flex-col w-[40%] h-full bg-white rounded-l-[16px] border-r-[1px] border-secondaryTen">
+            <div className="flex justify-between px-4 mt-6 pb-6 font-PJSbold text-[24px] h-[100px] w-full border-b-[1px] border-secondaryTwenty">
+              <div className="flex flex-col justify-center w-[400px]">
                 <div
                   className="flex rounded-full w-[80%] p-1 h-[100%]"
                   style={{ backgroundColor: "#e2e2e2" }}
@@ -757,7 +713,7 @@ const Chats = () => {
                     onClick={() => setSelectedCreateNew("push")}
                     className={`rounded-full ${
                       selectedCreateNew === "push" ? "bg-white" : ""
-                    } font-PJSbold text-[16px]`}
+                    } font-PJSbold text-[12px]`}
                     style={{ flex: 1 }}
                   >
                     Push
@@ -766,16 +722,15 @@ const Chats = () => {
                     onClick={() => setSelectedCreateNew("email")}
                     className={`rounded-full ${
                       selectedCreateNew === "email" ? "bg-white" : ""
-                    } font-PJSbold text-[16px]`}
+                    } font-PJSbold text-[12px]`}
                     style={{ flex: 1 }}
                   >
                     Email
                   </button>
                 </div>
               </div>
-              {/* icons search and new chat */}
-              <div className="flex flex-row justify-end items-center gap-3 w-[60%] ">
-                <button className="flex justify-center items-center rounded-[100px]  ">
+              <div className="flex flex-row justify-end items-center gap-3 w-[60%]">
+                <button className="flex justify-center items-center rounded-[100px]">
                   <form action="" className="relative mx-auto w-max">
                     <input
                       type="search"
@@ -805,14 +760,15 @@ const Chats = () => {
                   <img src={assets.cross} className="w-5 h-5" />
                 </button>
               </div>
-
-              {/* icons search and new chat */}
             </div>
-            {/* Recent and 3 icons filter etc */}
-            <div className="flex px-4 justify-between mt-4">
-              <div className="font-PJSbold text-[24px] flex gap-2 items-center">
+
+            {/* Updated list styling to match screenstate 1 */}
+            <div className="flex px-4 justify-between mt-4 items-center">
+              <div className="font-PJSbold text-[16px] flex gap-2 items-center">
                 Users{" "}
-                <p className="font-PJSbold text-[16px]">({users.length})</p>
+                <span className="font-PJSbold text-[16px]">
+                  ({users.length})
+                </span>
               </div>
               <div className="flex gap-2">
                 <button
@@ -824,7 +780,7 @@ const Chats = () => {
                       setSelectedUsers([]);
                     } else setSelectedUsers(allUsers);
                   }}
-                  className=" gap-2 font-PJSregular text-[14px] h-10 w-[100px] rounded-full border border-secondaryThirty flex justify-center items-center"
+                  className="gap-2 font-PJSregular text-[14px] h-10 w-[100px] rounded-full border border-secondaryThirty flex justify-center items-center"
                 >
                   {selectedUsers.length > 0 &&
                   selectedUsers.length === allUsers.length
@@ -833,77 +789,68 @@ const Chats = () => {
                 </button>
               </div>
             </div>
-            {/* Recent and 3 icons filter etc */}
-            <div className="overflow-y-scroll flex flex-col gap-5 mt-4 scrollbar-hide">
+
+            <div className="overflow-y-scroll flex flex-col scrollbar-hide">
               {users.map((item, index) => (
                 <div
                   key={index}
-                  className="flex justify-between px-4 py-2"
+                  className="flex justify-between px-4 hover:bg-secondaryTen cursor-pointer py-3"
                   style={{
                     borderBottomColor: "#e2e2e2",
                     borderBottomWidth: 1,
                   }}
                 >
-                  <div className="flex gap-4">
-                    {/* image div */}
+                  <div className="flex gap-4" style={{ flex: 1 }}>
                     <div>
-                      {/* Adjust the path to be relative to the current file */}
                       <img
                         src={item.avatar}
                         alt=""
-                        className="w-12 h-12 rounded-full"
+                        className="w-10 h-10 rounded-full"
                       />
                     </div>
-                    {/* image div */}
-                    {/* name and message */}
-                    <div className="flex flex-col gap-1">
-                      <div className="font-PJSbold text-[16px]">
+                    <div className="flex flex-col gap-1" style={{ flex: 1 }}>
+                      <div className="font-PJSbold text-[13px]">
                         {item.name}
                       </div>
-                      <div className="font-PJSregular text-[14px] text-secondary">
+                      <div className="font-PJSmedium text-[10px] text-secondary">
                         {item.position}
                       </div>
                     </div>
-                    {/* name and message */}
                   </div>
-                  {/* unread */}
-                  <div className="flex flex-col items-center gap-2">
+                  <div className="flex items-center">
                     <button
-                      className={`h-6 w-6 border rounded-full flex justify-center items-center font-PJSregular text-white text-[12px] ${
+                      className={`h-6 w-6 rounded-full flex justify-center items-center ${
                         selectedUsers.some((i) => i._id === item._id)
                           ? "bg-blue"
-                          : "bg-transparent"
+                          : "border border-secondaryThirty"
                       }`}
                       onClick={() => {
                         const isSelected = selectedUsers.some(
                           (i) => i._id === item._id
                         );
                         if (isSelected) {
-                          // Remove the item by filtering it out
                           setSelectedUsers(
                             selectedUsers.filter((i) => i._id !== item._id)
                           );
                         } else {
-                          // Add the item to the selectedUsers array
                           setSelectedUsers([...selectedUsers, item]);
                         }
                       }}
                     >
-                      {selectedUsers.some((i) => i._id === item._id) ? (
-                        <img src={assets.checkwhite} />
-                      ) : null}
+                      {selectedUsers.some((i) => i._id === item._id) && (
+                        <img src={assets.checkwhite} className="w-3 h-3" />
+                      )}
                     </button>
                   </div>
-                  {/* unread */}
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="flex flex-col w-[70vw] h-[90vh] bg-white rounded-r-[16px]">
+          {/* Second column - remaining space */}
+          <div className="flex flex-col flex-1 h-full bg-white rounded-r-[16px] overflow-y-auto">
             <div className="flex justify-between px-6 mt-6 pb-6 font-PJSbold text-[24px] w-full border-b-[1px] border-secondaryTwenty ">
-              <div className="flex flex-col justify-center w-full">
-                {/* Placeholder for no selected users */}
+              <div className="flex flex-col justify-center w-full h-[3rem]">
                 {selectedUsers.length === 0 ? (
                   <div className="flex items-center gap-2">
                     <div className="w-[56px] h-[56px] rounded-full bg-secondaryTen flex justify-center items-center">
@@ -912,9 +859,7 @@ const Chats = () => {
                     <div className="text-[18px]">Selected Users</div>
                   </div>
                 ) : (
-                  /* Display selected users */
                   <div
-                    // className="flex flex-wrap gap-2 pb-2 overflow-hidden"
                     className="flex flex-wrap gap-1 mt-1 max-h-[4.5rem] overflow-x-auto"
                     style={{ width: "100%" }}
                   >
@@ -923,19 +868,14 @@ const Chats = () => {
                         key={index}
                         className="flex items-center gap-2 border border-secondaryThirty px-3 py-1 rounded-full bg-secondaryTen"
                       >
-                        {/* User Avatar */}
                         <img
                           src={user.avatar}
                           alt={user.name}
                           className="h-6 w-6 rounded-full object-cover shrink-0"
                         />
-
-                        {/* User Name */}
                         <span className="text-[12px] font-PJSmedium truncate">
                           {user.name}
                         </span>
-
-                        {/* Remove Tag Icon */}
                         <img
                           src={assets.cross}
                           onClick={() =>
@@ -1081,15 +1021,11 @@ const Chats = () => {
               <Link to="CommunicationHistory">{"History >"}</Link>
             </button>
           </div>
-        </>
+        </div>
       )}
+
       {/* Block user modal */}
-      <AppModal
-        onClose={closemodal}
-        modalopen={modal}
-        height={"316px"}
-        width={"494px"}
-      >
+      <AppModal onClose={closemodal} modalopen={modal}>
         <div className="flex flex-col justify-center items-center">
           <div className="flex w-[80px] h-[80px] bg-secondaryTen rounded-full justify-center items-center">
             <img src={assets.infolarge} className="h-[48px] w-[48px]" />
@@ -1111,14 +1047,9 @@ const Chats = () => {
           </div>
         </div>
       </AppModal>
-      {/* Block user modal */}
+
       {/* Info modal */}
-      <AppModal
-        onClose={closeinfomodal}
-        modalopen={infomodal}
-        height={"316px"}
-        width={"494px"}
-      >
+      <AppModal onClose={closeinfomodal} modalopen={infomodal}>
         <div className="flex flex-col justify-center ">
           <div className="font-PJSbold text-[20px]">Info</div>
 
@@ -1146,14 +1077,9 @@ const Chats = () => {
           </div>
         </div>
       </AppModal>
-      {/* Info modal */}
+
       {/* Sort modal */}
-      <AppModal
-        onClose={closesortmodal}
-        modalopen={sortmodal}
-        height={"274px"}
-        width={"282px"}
-      >
+      <AppModal onClose={closesortmodal} modalopen={sortmodal}>
         <div className="flex flex-col justify-center ">
           <div className="font-PJSbold text-[20px]">Sort chats</div>
           <div className="flex flex-col gap-4 mt-4">
@@ -1193,20 +1119,11 @@ const Chats = () => {
           </div>
         </div>
       </AppModal>
-      {/* Sort modal */}
+
       {/* Booking Details modal */}
-      <AppModal
-        onClose={closedetailsmodal}
-        modalopen={detailsmodal}
-        height={"623px"}
-        width={"494px"}
-      >
+      <AppModal onClose={closedetailsmodal} modalopen={detailsmodal}>
         <div className="flex flex-col justify-center ">
-          {/* <div className="font-PJSbold text-[20px]">Booking Details</div> */}
           <div className="flex flex-col gap-4 mt-2 justify-center  ">
-            {/* <div className="font-PJSregular text-[14px]">
-              Total Bookings: 08
-            </div> */}
             <div className="flex justify-between items-center font-PJSmedium text-[14px]">
               <div className="flex items-center gap-2">
                 <img
@@ -1220,13 +1137,9 @@ const Chats = () => {
                   </div>
                 </div>
               </div>
-              {/* <div className="font-PJSmedium text-[14px]">The Tigers</div> */}
             </div>
-            {/* Greyline */}
             <div className="h-[1px] w-full bg-secondaryTwenty"></div>
-            {/* Greyline */}
 
-            {/* Item 1 */}
             <div className="flex flex-col  justify-between items-center font-PJSmedium text-[14px]">
               <div className="flex justify-between items-center w-full">
                 <div className="flex items-center gap-2">
@@ -1248,8 +1161,7 @@ const Chats = () => {
               </div>
               <div className="h-[1px] w-full bg-secondaryTwenty mt-4"></div>
             </div>
-            {/* Item 1 */}
-            {/* Item 2 */}
+
             <div className="flex flex-col  justify-between items-center font-PJSmedium text-[14px]">
               <div className="flex justify-between items-center w-full">
                 <div className="flex items-center gap-2">
@@ -1271,51 +1183,6 @@ const Chats = () => {
               </div>
               <div className="h-[1px] w-full bg-secondaryTwenty mt-4"></div>
             </div>
-            {/* Item 2 */}
-            {/* Item 3 */}
-            {/* <div className="flex flex-col  justify-between items-center font-PJSmedium text-[14px]">
-              <div className="flex justify-between items-center w-full">
-                <div className="flex items-center gap-2">
-                  <div className="flex w-[48px] h-[48px] rounded-full bg-secondaryTen justify-center items-center">
-                    <img src={assets.hash} />
-                  </div>
-                  <div className="flex flex-col">
-                    <div className="font-PJSregular text-secondary text-[12px]">
-                      Booking ID
-                    </div>
-                    <div className="font-PJSmedium text-[14px]">B4555</div>
-                  </div>
-                </div>
-                <button className="flex justify-center items-center bg-secondaryTen w-[79px] h-[39px] rounded-full font-PJSmedium text-[12px]">
-                  Copy
-                </button>
-              </div>
-              <div className="h-[1px] w-full bg-secondaryTwenty mt-4"></div>
-            </div> */}
-            {/* Item 3 */}
-            {/* Item 4 */}
-            {/* <div className="flex flex-col  justify-between items-center font-PJSmedium text-[14px]">
-              <div className="flex justify-between items-center w-full">
-                <div className="flex items-center gap-2">
-                  <div className="flex w-[48px] h-[48px] rounded-full bg-secondaryTen justify-center items-center">
-                    <img src={assets.calendar} />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <div className="font-PJSregular text-secondary text-[12px]">
-                      Booking Details
-                    </div>
-                    <div className="font-PJSmedium text-[14px]">
-                      6-7pm, 6v6, South Field
-                      <div className="font-PJSmedium">
-                        Sun, Jan 10th, 2023 (Recurring, Sun)
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="font-PJSbold">120$</div>
-              </div>
-            </div> */}
-            {/* Item 4 */}
           </div>
 
           <div className="flex mt-10 gap-4 w-full justify-center items-center">
@@ -1334,7 +1201,7 @@ const Chats = () => {
           </div>
         </div>
       </AppModal>
-      {/* Booking Details modal */}
+
       {isImageViewerOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
