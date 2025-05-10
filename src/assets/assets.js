@@ -130,10 +130,12 @@ import closeRed from "../assets/svgs/closeRed.svg";
 import UsersThree from "../assets/svgs/UsersThree.svg";
 import support from "./support.png";
 import mail from "./mail.png";
+import privacyPolicy from "./privacy_policy.png";
 
 export default {
   support,
   mail,
+  privacyPolicy,
   add,
   star,
   UsersThree,

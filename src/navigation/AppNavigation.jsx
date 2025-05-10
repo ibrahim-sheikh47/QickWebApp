@@ -25,6 +25,7 @@ import {
   TeamDetail,
   TokenizationForm,
   Support,
+  PrivacyPolicy,
 } from "../pages";
 import CardDetailPage from "../pages/Dashboard/Events/CardDetailPage/CardDetailPage";
 import { useStateContext } from "../context";
@@ -104,6 +105,7 @@ export const AppNavigation = () => {
         element={<CreateMerchantForm onSubmit={submitMerchantApplication} />}
       />
       <Route path="/support" Component={Support} />
+      <Route path="/privacy-policy" Component={PrivacyPolicy} />
 
       <Route path="*" Component={() => <h1>404 - Not Found</h1>} />
     </Routes>
